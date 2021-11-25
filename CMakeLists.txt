@@ -6,7 +6,7 @@ project(AdventOfCode VERSION 0.1.0)
 
 add_executable(2015.01 2015/01.cpp)
 add_executable(2015.02 2015/02.cpp)
-#add_executable(2015.01B 2015/01B.cpp)
+add_executable(2015.03 2015/03.cpp)
 
 #set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 #set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
