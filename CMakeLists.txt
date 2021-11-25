@@ -8,6 +8,10 @@ add_executable(2015.01 2015/01.cpp)
 add_executable(2015.02 2015/02.cpp)
 add_executable(2015.03 2015/03.cpp)
 
+
+add_executable(2015.04 2015/04.cpp)
+target_link_libraries(2015.04 crypto)
+
 #set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 #set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 #include(CPack)

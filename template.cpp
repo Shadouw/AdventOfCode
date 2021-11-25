@@ -12,4 +12,6 @@ int main(int, char**) {
     }
 
     cout << result << endl;
+
+    return 0;
 }
