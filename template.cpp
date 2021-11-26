@@ -5,13 +5,15 @@ using namespace std;
 
 int main(int, char**) {
     string input = "";
-    int result = 0;
+    int resultA = 0;
+    int resultB = 0;
 
     for ( char c : input )
     {
     }
 
-    cout << result << endl;
+    cout << "Result A: " << resultA << endl;
+    cout << "Result B: " << resultB << endl;
 
     return 0;
 }

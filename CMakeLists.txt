@@ -12,6 +12,8 @@ add_executable(2015.03 2015/03.cpp)
 add_executable(2015.04 2015/04.cpp)
 target_link_libraries(2015.04 crypto)
 
+add_executable(2015.05 2015/05.cpp)
+
 #set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 #set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 #include(CPack)
