@@ -4,8 +4,7 @@
 
 using namespace std;
 
-/*
-string inputT[] = {
+const string inputT[] = {
     "123 -> x",
     "456 -> y",
     "x AND y -> d",
@@ -15,9 +14,8 @@ string inputT[] = {
     "NOT x -> h",
     "NOT y -> i"
 };
-*/
 
-string inputA[] = {
+const string inputA[] = {
     "NOT dq -> dr",
     "kg OR kf -> kh",
     "ep OR eo -> eq",
@@ -359,7 +357,7 @@ string inputA[] = {
     "he RSHIFT 2 -> hf"
 };
 
-string input[] = {
+const string inputB[] = {
     "NOT dq -> dr",
     "kg OR kf -> kh",
     "ep OR eo -> eq",
@@ -700,6 +698,8 @@ string input[] = {
     "fo RSHIFT 3 -> fq",
     "he RSHIFT 2 -> hf"
 };
+
+auto &input = inputB;
 
 map<string,uint16_t> varT;
 
