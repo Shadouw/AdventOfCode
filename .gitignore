@@ -43,3 +43,6 @@ bin/
 *.workspace.layout
 *.depend
 *.layout
+
+# VSCode Settings
+.vscode/*

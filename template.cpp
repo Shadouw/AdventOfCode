@@ -8,7 +8,7 @@ int main(int, char**) {
     int resultA = 0;
     int resultB = 0;
 
-    for ( char c : input )
+    for ( auto c : input )
     {
     }
 
