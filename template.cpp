@@ -3,8 +3,10 @@
 
 using namespace std;
 
+string input = "";
+
 int main(int, char**) {
-    string input = "";
+
     int resultA = 0;
     int resultB = 0;
 
