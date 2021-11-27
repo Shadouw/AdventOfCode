@@ -3,14 +3,27 @@
 
 using namespace std;
 
-string input = "";
+const string inputT[] = {
+""
+};
+
+const string inputA[] = {
+""
+};
+
+const string inputB[] = {
+""
+};
+
+
+auto &input = inputT;
 
 int main(int, char**) {
 
     int resultA = 0;
     int resultB = 0;
 
-    for ( auto c : input )
+    for ( auto elem : input )
     {
     }
 
