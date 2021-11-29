@@ -19,6 +19,7 @@ add_executable(2015.08 2015/08.cpp)
 add_executable(2015.09 2015/09.cpp)
 add_executable(2015.10 2015/10.cpp)
 add_executable(2015.11 2015/11.cpp)
+add_executable(2015.12 2015/12.cpp)
 
 #set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 #set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
