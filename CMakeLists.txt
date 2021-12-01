@@ -27,6 +27,7 @@ add_executable(2015.16 2015/16.cpp)
 
 
 add_executable(2021.01 2021/01.cpp)
+add_executable(2021.02 2021/02.cpp)
 
 #set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 #set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
