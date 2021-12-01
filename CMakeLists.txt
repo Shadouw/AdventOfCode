@@ -24,6 +24,10 @@ add_executable(2015.13 2015/13.cpp)
 add_executable(2015.14 2015/14.cpp)
 add_executable(2015.15 2015/15.cpp)
 
+
+
+add_executable(2021.01 2021/01.cpp)
+
 #set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 #set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 #include(CPack)
