@@ -17,6 +17,7 @@ const string inputB[] = {
 
 
 auto &input = inputT;
+auto sizeofinput = sizeof(input) / sizeof(input[0]);
 
 int main(int, char**) {
 
