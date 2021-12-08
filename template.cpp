@@ -20,7 +20,7 @@ auto &input = inputT;
 auto sizeofinput = sizeof(input) / sizeof(input[0]);
 
 int main(int, char**) {
-
+    cout << "sizeofinput: " << sizeofinput << endl;
     int resultA = 0;
     int resultB = 0;
 
