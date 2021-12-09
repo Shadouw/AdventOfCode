@@ -1,32 +1,54 @@
 #include <iostream>
 #include <string>
+#include <vector>
+
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
 
 using namespace std;
 
-const string inputT[] = {
+const vector<string> inputT = {
     ""};
 
-const string inputA[] = {
+const vector<string> inputA = {
     ""};
 
-const string inputB[] = {
+const vector<string> inputB = {
     ""};
 
-auto &input = inputT;
-auto sizeofinput = sizeof(input) / sizeof(input[0]);
-
-int main(int, char **)
+class problem
 {
-    cout << "sizeofinput: " << sizeofinput << endl;
-    int resultA = 0;
-    int resultB = 0;
-
-    for (auto elem : input)
+public:
+    problem(const vector<string> &_input) : input(_input), resulta(0), resultb(0)
     {
+        cout << "Size of Input: " << input.size() << endl;
     }
 
-    cout << "Result A: " << resultA << endl;
-    cout << "Result B: " << resultB << endl;
+    void listinput()
+    {
+        for (auto elem : input)
+        {
+            cout << elem << endl;
+        }
+    }
 
-    return 0;
+    int getResultA(){
+        cout << "ResultA: " << resulta << endl;
+        return resulta;
+    }
+    int getResultB(){
+        cout << "ResultB: " << resultb << endl;
+        return resultb;
+    }
+private:
+    const vector<string>  input;
+    int resulta;
+    int resultb;
+};
+
+TEST_CASE ( "Testdata" )
+{
+    problem testproblem(inputT);
+    REQUIRE ( 0 == testproblem.getResultA() );
+    REQUIRE ( 0 == testproblem.getResultB() );
 }
