@@ -19,7 +19,7 @@ const vector<string> inputB = {
 class problem
 {
 public:
-    problem(const vector<string> &_input) : input(_input), resulta(0), resultb(0)
+    problem(const vector<string> &_input) : input(_input), resultA(0), resultB(0)
     {
         cout << "Size of Input: " << input.size() << endl;
     }
@@ -32,23 +32,23 @@ public:
         }
     }
 
-    int getResultA(){
-        cout << "ResultA: " << resulta << endl;
-        return resulta;
+    int getresultA(){
+        cout << "resultA: " << resultA << endl;
+        return resultA;
     }
-    int getResultB(){
-        cout << "ResultB: " << resultb << endl;
-        return resultb;
+    int getresultB(){
+        cout << "resultB: " << resultB << endl;
+        return resultB;
     }
 private:
     const vector<string>  input;
-    int resulta;
-    int resultb;
+    int resultA;
+    int resultB;
 };
 
 TEST_CASE ( "Testdata" )
 {
     problem testproblem(inputT);
-    REQUIRE ( 0 == testproblem.getResultA() );
-    REQUIRE ( 0 == testproblem.getResultB() );
+    REQUIRE ( 0 == testproblem.getresultA() );
+    REQUIRE ( 0 == testproblem.getresultB() );
 }
