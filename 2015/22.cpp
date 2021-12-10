@@ -24,21 +24,9 @@ vector<spell> spells = {
 class problem
 {
 public:
-    problem(int phit, int pmana, int bhit, int bdamage) : playerhit(phit), playermana(pmana), bosshit(bhit), bossdamage(bdamage),
-                                                          resultA(0), resultB(0)
+    problem(int phit, int pmana, int bhit, int bdamage) : playerhit(phit), playermana(pmana), bosshit(bhit), bossdamage(bdamage)
     {
         //cout << "Size of Input: " << input.size() << endl;
-    }
-
-    int getresultA()
-    {
-        cout << "resultA: " << resultA << endl;
-        return resultA;
-    }
-    int getresultB()
-    {
-        cout << "resultB: " << resultB << endl;
-        return resultB;
     }
 
     void Spellturn()
@@ -75,7 +63,8 @@ public:
                 if (spell.turns > 0)
                 {
                     // Add spelltimer
-                    if (0 != spelltimer[_spell])
+                    if (1 < spelltimer[_spell])
+                    //if (0 != spelltimer[_spell])
                     {
                         // oh oh, spell still running
                         return false;
@@ -108,7 +97,7 @@ public:
 
         if (bosshit <= 0)
         {
-            cout << "Boss is dead." << endl;
+            // cout << "Boss is dead." << endl;
             return false;
         }
 
@@ -144,14 +133,87 @@ public:
         return 0;
     }
 
-    //private:
-    int resultA;
-    int resultB;
-
     int playerhit, playermana, bosshit, bossdamage;
 
     map<string, int> spelltimer;
 };
+
+int fight(problem currentfight, int spentmana, vector<string> listofspells, bool hardlevel)
+{
+    //cout << currentfight.playerhit << ":" << currentfight.bosshit << endl;
+    static int totalspentmana = INT32_MAX;
+
+    if (0 == spentmana) // New fight.
+        totalspentmana = INT32_MAX;
+    for (auto spell : spells)
+    {
+        problem loopcurrentfight(currentfight);
+        vector<string> looplistofspells(listofspells);
+        int loopspentmana = spentmana;
+
+        if (hardlevel)
+        {
+            --loopcurrentfight.playerhit;
+            if (0 >= loopcurrentfight.playerhit)
+            {
+                // Lost
+                break;
+            }
+        }
+
+        if (loopcurrentfight.Playerturn(spell.name))
+        {
+            loopspentmana += spell.costs;
+            looplistofspells.push_back(spell.name);
+            //cout << "  " << spell.name << endl;
+
+            switch (loopcurrentfight.checkWinner())
+            {
+            case -1: // Fight lost
+                break;
+            case 1: // Fight won
+                if (loopspentmana < totalspentmana)
+                {
+                    totalspentmana = loopspentmana;
+
+                    /*
+                    for (auto elem : listofspells)
+                        cout << elem << " / ";
+                    cout << endl;
+                    */
+                }
+                break;
+            default: // Still fighting
+                loopcurrentfight.Bossturn();
+                switch (loopcurrentfight.checkWinner())
+                {
+                case -1: // Fight lost
+                    break;
+                case 1: // Fight won
+                    if (loopspentmana < totalspentmana)
+                    {
+                        totalspentmana = loopspentmana;
+
+                        /*
+                        for (auto elem : listofspells)
+                            cout << elem << " ";
+                        cout << endl;
+                        */
+                    }
+                    break;
+                default: // Still fighting
+                    if (loopspentmana < totalspentmana)
+                    {
+                        fight(loopcurrentfight, loopspentmana, looplistofspells, hardlevel);
+                    }
+                    break;
+                }
+                break;
+            }
+        }
+    }
+    return totalspentmana;
+}
 
 TEST_CASE("Test1")
 {
@@ -294,7 +356,34 @@ TEST_CASE("Test2")
 
     REQUIRE(false == testproblem.Bossturn());
     REQUIRE(1 == testproblem.checkWinner());
+}
 
-    REQUIRE(0 == testproblem.getresultA());
-    REQUIRE(0 == testproblem.getresultB());
+TEST_CASE("Testfight")
+{
+    problem testproblem(10, 250, 13, 8);
+    REQUIRE(226 >= fight(testproblem, 0, vector<string>({}), false));
+}
+
+TEST_CASE("Testfight2")
+{
+    problem testproblem(10, 250, 14, 8);
+    REQUIRE(641 == fight(testproblem, 0, vector<string>({}), false));
+}
+
+TEST_CASE("FightA")
+{
+    problem testproblem(50, 500, 55, 8);
+    int resultA = fight(testproblem, 0, vector<string>({}), false);
+    cout << "ResultA: " << resultA << endl;
+
+    REQUIRE(953 == resultA);
+}
+
+TEST_CASE("FightB")
+{
+    problem testproblem(50, 500, 55, 8);
+    int resultB = fight(testproblem, 0, vector<string>({}), true);
+    cout << "ResultB: " << resultB << endl;
+
+    REQUIRE(1289 == resultB);
 }
