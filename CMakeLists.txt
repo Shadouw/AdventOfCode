@@ -13,6 +13,10 @@ add_test ( template ${CMAKE_BINARY_DIR}/template )
 
 # 2021 
 
+add_executable(2021.12 2021/12.cpp)
+target_include_directories ( 2021.12 PRIVATE lib )
+add_test ( 2021.12 ${CMAKE_BINARY_DIR}/2021.12 )
+
 add_executable(2021.11 2021/11.cpp)
 target_include_directories ( 2021.11 PRIVATE lib )
 add_test ( 2021.11 ${CMAKE_BINARY_DIR}/2021.11 )
