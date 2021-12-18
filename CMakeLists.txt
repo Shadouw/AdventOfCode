@@ -19,6 +19,10 @@ add_test ( template ${CMAKE_BINARY_DIR}/template )
 
 # 2021 
 
+add_executable(2021.18 2021/18.cpp)
+target_link_libraries(2021.18 PRIVATE Catch2::Catch2)
+add_test ( 2021.18 ${CMAKE_BINARY_DIR}/2021.18 )
+
 add_executable(2021.17 2021/17.cpp)
 target_link_libraries(2021.17 PRIVATE Catch2::Catch2)
 add_test ( 2021.17 ${CMAKE_BINARY_DIR}/2021.17 )
