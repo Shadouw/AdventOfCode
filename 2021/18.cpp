@@ -413,10 +413,24 @@ TEST_CASE("Example Homework")
     }
     REQUIRE("[[[[6,6],[7,6]],[[7,7],[7,0]]],[[[7,7],[7,7]],[[7,8],[9,9]]]]" == test.getText());
     REQUIRE(4140 == test.magnitude());
+
+    int maxmagnitude = 0;
+    for (size_t a = 0; a < inputT.size(); ++a)
+    {
+        for (size_t b = 0; b < inputT.size(); ++b)
+        {
+            if (a != b)
+            {
+                int magnitude = (snailfishnumber(inputT[a]) + snailfishnumber(inputT[b])).magnitude();
+                if (maxmagnitude < magnitude)
+                    maxmagnitude = magnitude;
+            }
+        }
+    }
+    REQUIRE(3993 == maxmagnitude);
 }
 
-
-TEST_CASE("Task A")
+TEST_CASE("Snailfish")
 {
     const vector<string> inputT = {"[[3,[8,[2,1]]],[[[0,6],[0,2]],3]]",
                                    "[[[1,[8,5]],[[3,9],0]],2]",
@@ -527,4 +541,21 @@ TEST_CASE("Task A")
     int resultA = test.magnitude();
     cout << "Result A: " << resultA << endl;
     REQUIRE(3981 == resultA);
+
+    int maxmagnitude = 0;
+    for (size_t a = 0; a < inputT.size(); ++a)
+    {
+        snailfishnumber sfa(inputT[a]);
+        for (size_t b = 0; b < inputT.size(); ++b)
+        {
+            if (a != b)
+            {
+                int magnitude = (sfa + snailfishnumber(inputT[b])).magnitude();
+                if (maxmagnitude < magnitude)
+                    maxmagnitude = magnitude;
+            }
+        }
+    }
+    cout << "Result B: " << maxmagnitude << endl;
+    REQUIRE(4687 == maxmagnitude);
 }
