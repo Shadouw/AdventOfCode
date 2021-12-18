@@ -69,6 +69,8 @@ add_executable(2021.01 2021/01.cpp)
 # 2015
 
 add_executable(2015.25 2015/25.cpp)
+target_link_libraries ( 2015.25 PRIVATE Catch2::Catch2 )
+add_test ( 2015.25 ${CMAKE_BINARY_DIR}/2015.25 )
 
 add_executable(2015.24 2015/24.cpp)
 target_link_libraries(2015.24 PRIVATE Catch2::Catch2)
