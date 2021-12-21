@@ -153,8 +153,9 @@ public:
         pixels.clear();
         if (autoincrease)
         {
-            mapincrease(1);
             static bool fillblack = false;
+            if ( !fillblack)
+            mapincrease(2);/*            
             // Fill the "border"
             if (fillblack)
             {
@@ -169,7 +170,7 @@ public:
                     oldpixels[make_pair(xmax - 1, y)] = (algorithm[0] == '#');
                 }
             }
-            fillblack = !fillblack;
+            fillblack = !fillblack;*/
         }
 
         for (int x = xmin; x < xmax; ++x)
@@ -281,11 +282,32 @@ TEST_CASE("Problem B")
     testimageenhancment.mapincrease(99);
 
     for (int i = 0; i < 50; ++i)
+    {
+        //if ( 10 == i )
+            //testimageenhancment.printimage();
         testimageenhancment.applyalgorithm();
+    }
 
     uint32_t resultb = testimageenhancment.countlit(49);
 
     //testimageenhancment.printimage();
+    cout << "Result B: " << resultb << endl;
+    REQUIRE(16482 == resultb);
+}
+
+TEST_CASE("Test B")
+{
+    imageenhancment testimageenhancment(image, enhancementalgorithm);
+    //testimageenhancment.mapincrease(2);
+
+    for (int i = 0; i < 50; ++i)
+    {
+        testimageenhancment.applyalgorithm();
+        testimageenhancment.printimage();
+    }
+
+    uint32_t resultb = testimageenhancment.countlit();
+
     cout << "Result B: " << resultb << endl;
     REQUIRE(16482 == resultb);
 }
