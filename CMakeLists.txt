@@ -82,6 +82,13 @@ add_executable(2021.03 2021/03.cpp)
 add_executable(2021.02 2021/02.cpp)
 add_executable(2021.01 2021/01.cpp)
 
+# 2016
+
+add_executable(2016.01 2016/01.cpp)
+target_link_libraries ( 2016.01 PRIVATE Catch2::Catch2 )
+add_test ( 2016.01 ${CMAKE_BINARY_DIR}/20120165.01 )
+
+
 # 2015
 
 add_executable(2015.25 2015/25.cpp)
@@ -118,6 +125,7 @@ add_executable(2015.07 2015/07.cpp)
 add_executable(2015.06 2015/06.cpp)
 add_executable(2015.05 2015/05.cpp)
 
+# sudo apt install libcrypto++-dev
 add_executable(2015.04 2015/04.cpp)
 target_link_libraries(2015.04 crypto)
 
