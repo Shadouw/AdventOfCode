@@ -1627,6 +1627,27 @@ public:
         return resultA;
     }
 
+    int checkPossibleTriangleB()
+    {
+        int resultB = 0;
+        for (int row = 0; row < 3; ++row)
+        {
+            for (auto elem = input.begin(); elem != input.end(); ++ elem)
+            {
+                int a = (*elem)[row];
+                ++elem;
+                int b = (*elem)[row];
+                ++elem;
+                int c = (*elem)[row];
+
+                if (a + b > c && b + c > a && a + c > b)
+                    ++resultB;
+            }
+        }
+
+        return resultB;
+    }
+
 private:
     const vector<array<int, 3>> &input;
 };
@@ -1635,4 +1656,5 @@ TEST_CASE("Testdata")
 {
     triangles testtriangles(testdata);
     REQUIRE(869 == testtriangles.checkPossibleTriangle());
+    REQUIRE(1544 == testtriangles.checkPossibleTriangleB());
 }
