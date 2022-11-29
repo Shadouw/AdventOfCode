@@ -17,7 +17,5 @@ tasks:
 vscode:
   extensions:
     - twxs.cmake
-    - ms-vscode.cpptools
-    - ms-vscode.cpptools-extension-pack
     - ms-vscode.cmake-tools
-    
+    - webfreak.debug
