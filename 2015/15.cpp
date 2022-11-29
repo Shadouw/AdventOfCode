@@ -27,7 +27,7 @@ long resultB = 0;
 
 auto const numofinput = sizeof(input) / sizeof(input[0]);
 
-long addSpoon( int elem, int size, int remaining )
+void addSpoon( int elem, int size, int remaining )
 {
     static long cap=0, dur=0, fla=0, tex=0, cal=0;
     if ( 100 == remaining)
@@ -75,7 +75,6 @@ long addSpoon( int elem, int size, int remaining )
     fla -= size * stoi(input[elem][3]);
     tex -= size * stoi(input[elem][4]);
     cal -= size * stoi(input[elem][5]);
-    //return result;
 }
 
 int main(int, char**) {
