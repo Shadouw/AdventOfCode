@@ -6,11 +6,10 @@ project(AdventOfCode VERSION 0.1.0)
 
 find_package(Catch2 REQUIRED)
 
-
 include(CTest)
 enable_testing()
 
-
+include_directories ( include )
 
 # Template
 add_executable(template template.cpp)
@@ -85,7 +84,7 @@ add_executable(2021.01 2021/01.cpp)
 # 2016
 
 add_executable(2016.05 2016/05.cpp)
-target_link_libraries ( 2016.05 PRIVATE Catch2::Catch2WithMain )
+target_link_libraries ( 2016.05 PRIVATE Catch2::Catch2WithMain crypto )
 add_test ( 2016.05 ${CMAKE_BINARY_DIR}/2016.05 )
 
 add_executable(2016.04 2016/04.cpp)
