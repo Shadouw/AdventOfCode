@@ -1,5 +1,5 @@
 tasks:
-- init: |
+- before: |
     (
       sudo apt -y install cmake
       
