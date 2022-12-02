@@ -1013,7 +1013,7 @@ const vector<string> inputA = {
     "14-15 h: hhhhhhhhhhhhhjh",
     "14-16 p: tpkppppppppppppppppp"};
 
-class problem
+class PasswordPhilosophy
 {
 public:
     struct password
@@ -1048,7 +1048,7 @@ public:
     };
 
     vector<password> listofpw;
-    problem(const vector<string> &_input) : input(_input)
+    PasswordPhilosophy(const vector<string> &_input) : input(_input)
     {
         cout << "Size of Input: " << input.size() << endl;
         for (auto e : _input)
@@ -1082,7 +1082,7 @@ private:
 
 TEST_CASE("Testdata")
 {
-    problem::password pw("1-3 a: abcde");
+    PasswordPhilosophy::password pw("1-3 a: abcde");
     REQUIRE(1 == pw.min);
     REQUIRE(3 == pw.max);
     REQUIRE('a' == pw.letter);
@@ -1090,23 +1090,23 @@ TEST_CASE("Testdata")
     REQUIRE(pw.check());
     REQUIRE(pw.check(true));
 
-    problem::password pw2("1-3 b: cdefg");
+    PasswordPhilosophy::password pw2("1-3 b: cdefg");
     REQUIRE(!pw2.check());
     REQUIRE(!pw2.check(true));
 
-    problem::password pw3("2-9 c: ccccccccc");
+    PasswordPhilosophy::password pw3("2-9 c: ccccccccc");
     REQUIRE(pw3.check());
     REQUIRE(!pw3.check(true));
 
-    problem testproblem(inputT);
+    PasswordPhilosophy testPasswordPhilosophy(inputT);
 
-    REQUIRE(2 == testproblem.getValid());
-    REQUIRE(1 == testproblem.getValid(true));
+    REQUIRE(2 == testPasswordPhilosophy.getValid());
+    REQUIRE(1 == testPasswordPhilosophy.getValid(true));
 }
 
 TEST_CASE("Problem")
 {
-    problem testproblem(inputA);
-    REQUIRE(586 == testproblem.getValid());     // A
-    REQUIRE(352 == testproblem.getValid(true)); // B
+    PasswordPhilosophy testPasswordPhilosophy(inputA);
+    REQUIRE(586 == testPasswordPhilosophy.getValid());     // A
+    REQUIRE(352 == testPasswordPhilosophy.getValid(true)); // B
 }

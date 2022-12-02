@@ -216,10 +216,10 @@ const vector<int> inputA = {
     1861,
     1468};
 
-class problem
+class ReportRepair
 {
 public:
-    problem(const vector<int> &_input) : input(_input)
+    ReportRepair(const vector<int> &_input) : input(_input)
     {
         cout << "Size of Input: " << input.size() << endl;
     }
@@ -258,14 +258,14 @@ private:
 
 TEST_CASE("Testdata")
 {
-    problem testproblem(inputT);
-    REQUIRE(514579 == testproblem.multiply2020A());
-    REQUIRE(241861950 == testproblem.multiply2020B());
+    ReportRepair testReportRepair(inputT);
+    REQUIRE(514579 == testReportRepair.multiply2020A());
+    REQUIRE(241861950 == testReportRepair.multiply2020B());
 }
 
 TEST_CASE("Problem A")
 {
-    problem testproblem(inputA);
-    REQUIRE(913824 == testproblem.multiply2020A());     // A
-    REQUIRE(240889536 == testproblem.multiply2020B());  // B
+    ReportRepair testReportRepair(inputA);
+    REQUIRE(913824 == testReportRepair.multiply2020A());     // A
+    REQUIRE(240889536 == testReportRepair.multiply2020B());  // B
 }
