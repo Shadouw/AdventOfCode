@@ -2280,10 +2280,10 @@ const vector<int> inputA = {
 
 
 
-class problem
+class CalorieCounting
 {
 public:
-    problem(const vector<int> &_input) : input(_input)
+    CalorieCounting(const vector<int> &_input) : input(_input)
     {
         cout << "Size of Input: " << input.size() << endl;
 
@@ -2339,14 +2339,14 @@ private:
 
 TEST_CASE ( "Testdata" )
 {
-    problem testproblem(inputT);
-    REQUIRE ( 24000 == testproblem.getMaxFood() );
-    REQUIRE ( 45000 == testproblem.getMaxFood(3) );
+    CalorieCounting testCalorieCounting(inputT);
+    REQUIRE ( 24000 == testCalorieCounting.getMaxFood() );
+    REQUIRE ( 45000 == testCalorieCounting.getMaxFood(3) );
 }
 
 TEST_CASE ( "Problem" )
 {
-    problem testproblem(inputA);
-    REQUIRE ( 71924 == testproblem.getMaxFood() );
-    REQUIRE ( 210406 == testproblem.getMaxFood(3) );
+    CalorieCounting testCalorieCounting(inputA);
+    REQUIRE ( 71924 == testCalorieCounting.getMaxFood() );
+    REQUIRE ( 210406 == testCalorieCounting.getMaxFood(3) );
 }

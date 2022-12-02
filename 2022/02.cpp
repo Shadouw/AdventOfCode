@@ -2514,10 +2514,10 @@ const vector<string> inputA = {
     "A X",
     "B Z"};
 
-class problem
+class RockPaperScissors
 {
 public:
-    problem(const vector<string> &_input) : input(_input)
+    RockPaperScissors(const vector<string> &_input) : input(_input)
     {
         cout << "Size of Input: " << input.size() << endl;
 
@@ -2617,14 +2617,14 @@ private:
 
 TEST_CASE("Testdata")
 {
-    problem testproblem(inputT);
-    REQUIRE(15 == testproblem.playgamesA('A', 'B', 'C'));
-    REQUIRE(12 == testproblem.playgamesB());
+    RockPaperScissors testRockPaperScissors(inputT);
+    REQUIRE(15 == testRockPaperScissors.playgamesA('A', 'B', 'C'));
+    REQUIRE(12 == testRockPaperScissors.playgamesB());
 }
 
 TEST_CASE("Problem")
 {
-    problem testproblem(inputA);
-    REQUIRE(13446 == testproblem.playgamesA('A', 'B', 'C'));
-    REQUIRE(13509 == testproblem.playgamesB());
+    RockPaperScissors testRockPaperScissors(inputA);
+    REQUIRE(13446 == testRockPaperScissors.playgamesA('A', 'B', 'C'));
+    REQUIRE(13509 == testRockPaperScissors.playgamesB());
 }
