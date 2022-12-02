@@ -1034,9 +1034,6 @@ const vector<string> inputA = {
     "pid:455361219 hgt:153cm eyr:2027 hcl:#6b5442",
     "byr:1965"};
 
-const vector<string> inputB = {
-    ""};
-
 class passport
 {
 public:
@@ -1208,23 +1205,9 @@ public:
 
         return cnt;
     }
-
-    int getresultA()
-    {
-        cout << "resultA: " << resultA << endl;
-        return resultA;
-    }
-    int getresultB()
-    {
-        cout << "resultB: " << resultB << endl;
-        return resultB;
-    }
-
 private:
     const vector<string> input;
     vector<passport> passports;
-    int resultA = 0;
-    int resultB = 0;
 };
 
 TEST_CASE("Testdata")
