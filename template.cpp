@@ -15,12 +15,32 @@ const vector<string> inputA = {
 const vector<string> inputB = {
     ""};
 
+class item
+{
+public:
+    item(const string _input) : input(_input)
+    {
+    }
+
+    string getString()
+    {
+        return input;
+    }
+
+private:
+    string input;
+};
+
 class problem
 {
 public:
     problem(const vector<string> &_input) : input(_input)
     {
         cout << "Size of Input: " << input.size() << endl;
+
+        // Parse data
+        for (auto elem : input)
+            items.push_back(item(elem));
     }
 
     void listinput()
@@ -41,6 +61,7 @@ public:
     }
 private:
     const vector<string>  input;
+    vector<item> items;
     int resultA = 0;
     int resultB = 0;
 };
