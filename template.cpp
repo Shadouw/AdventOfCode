@@ -72,3 +72,8 @@ TEST_CASE ( "Testdata" )
     REQUIRE ( 0 == testproblem.getresultA() );
     REQUIRE ( 0 == testproblem.getresultB() );
 }
+
+TEST_CASE("Problem")
+{
+    problem testproblem(inputA);
+}
