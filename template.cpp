@@ -6,13 +6,10 @@
 
 using namespace std;
 
-const vector<string> inputT = {
+const vector<string> inputTestdata = {
     ""};
 
-const vector<string> inputA = {
-    ""};
-
-const vector<string> inputB = {
+const vector<string> inputData = {
     ""};
 
 class item
@@ -20,6 +17,20 @@ class item
 public:
     item(const string _input) : input(_input)
     {
+    }
+
+    int getResultA()
+    {
+        int resultA = 0;
+
+        return resultA;
+    }
+
+    bool getResultB()
+    {
+        int resultB = 0;
+
+        return resultB;
     }
 
     string getString()
@@ -43,37 +54,40 @@ public:
             items.push_back(item(elem));
     }
 
-    void listinput()
+    int getResultA()
     {
-        for (auto elem : input)
-        {
-            cout << elem << endl;
-        }
-    }
+        int resultA = 0;
+        for (auto e : items)
+            resultA += e.getResultA();
 
-    int getresultA(){
-        cout << "resultA: " << resultA << endl;
+        cout << "result A: " << resultA << endl;
         return resultA;
     }
-    int getresultB(){
-        cout << "resultB: " << resultB << endl;
+    int getResultB()
+    {
+        int resultB = 0;
+        for (auto e : items)
+            resultB += e.getResultB();
+
+        cout << "result B: " << resultB << endl;
         return resultB;
     }
+
 private:
     const vector<string>  input;
     vector<item> items;
-    int resultA = 0;
-    int resultB = 0;
 };
 
 TEST_CASE ( "Testdata" )
 {
-    problem testproblem(inputT);
-    REQUIRE ( 0 == testproblem.getresultA() );
-    REQUIRE ( 0 == testproblem.getresultB() );
+    problem problemData(inputTestdata);
+    REQUIRE(0 == problemData.getResultA());
+    REQUIRE(0 == problemData.getResultB());
 }
 
 TEST_CASE("Problem")
 {
-    problem testproblem(inputA);
+    problem problemData(inputData);
+    REQUIRE(0 == problemData.getResultA());
+    REQUIRE(0 == problemData.getResultB());
 }

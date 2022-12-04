@@ -6,7 +6,7 @@
 
 using namespace std;
 
-const vector<string> inputT = {
+const vector<string> inputTestdata = {
     "2-4,6-8",
     "2-3,4-5",
     "5-7,7-9",
@@ -14,7 +14,7 @@ const vector<string> inputT = {
     "6-6,4-6",
     "2-6,4-8"};
 
-const vector<string> inputA = {
+const vector<string> inputData = {
     "36-92,35-78",
     "26-31,25-27",
     "17-72,16-71",
@@ -1016,9 +1016,6 @@ const vector<string> inputA = {
     "49-49,8-50",
     "3-96,4-4"};
 
-const vector<string> inputB = {
-    ""};
-
 class section
 {
 public:
@@ -1125,13 +1122,14 @@ private:
 
 TEST_CASE("Testdata")
 {
-    CampCleanup dataCampCleanup(inputT);
+    CampCleanup dataCampCleanup(inputTestdata);
     REQUIRE(2 == dataCampCleanup.getFullContains());
     REQUIRE(4 == dataCampCleanup.getOverlap());
 }
 
 TEST_CASE("CampCleanup")
 {
-    CampCleanup dataCampCleanup(inputA);
+    CampCleanup dataCampCleanup(inputData);
+    REQUIRE(494 == dataCampCleanup.getFullContains());
     REQUIRE(833 == dataCampCleanup.getOverlap());
 }
