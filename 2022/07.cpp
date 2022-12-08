@@ -1049,10 +1049,10 @@ private:
     string input;
 };
 
-class problem
+class NoSpaceLeftNoDevice
 {
 public:
-    problem(const vector<string> &_input) : input(_input)
+    NoSpaceLeftNoDevice(const vector<string> &_input) : input(_input)
     {
         cout << "Size of Input: " << input.size() << endl;
 
@@ -1087,14 +1087,14 @@ private:
 
 TEST_CASE ( "Testdata" )
 {
-    problem problemData(inputTestdata);
-    REQUIRE(0 == problemData.getResultA());
-    REQUIRE(0 == problemData.getResultB());
+    NoSpaceLeftNoDevice NoSpaceLeftNoDeviceData(inputTestdata);
+    REQUIRE(0 == NoSpaceLeftNoDeviceData.getResultA());
+    REQUIRE(0 == NoSpaceLeftNoDeviceData.getResultB());
 }
 
-TEST_CASE("Problem")
+TEST_CASE("NoSpaceLeftNoDevice")
 {
-    problem problemData(inputData);
-    REQUIRE(0 == problemData.getResultA());
-    REQUIRE(0 == problemData.getResultB());
+    NoSpaceLeftNoDevice NoSpaceLeftNoDeviceData(inputData);
+    REQUIRE(0 == NoSpaceLeftNoDeviceData.getResultA());
+    REQUIRE(0 == NoSpaceLeftNoDeviceData.getResultB());
 }
