@@ -222,14 +222,14 @@ public:
         for (int _x = xpos - 1; _x >= 0; --_x)
         {
             ++steps;
-            if ( input[ypos][_x] >= height)
+            if (input[ypos][_x] >= height)
                 break;
         }
         scenicscore *= steps;
         steps = 0;
 
         // To right (same y, x growing)
-        for (int _x = xpos + 1; _x <x; ++_x)
+        for (int _x = xpos + 1; _x < x; ++_x)
         {
             ++steps;
             if (input[ypos][_x] >= height)
@@ -269,7 +269,7 @@ public:
             for (int _x = 0; _x < x; ++_x)
             {
                 int scenicscore = getscenicscore(_x, _y);
-                if ( scenicscore > maxscenicscore )
+                if (scenicscore > maxscenicscore)
                     maxscenicscore = scenicscore;
             }
         }

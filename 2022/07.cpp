@@ -1026,15 +1026,15 @@ public:
     directory(const string _name, directory *_back) : name(_name), back(_back)
     {
     }
-    
+
     string getName()
     {
         return name;
     }
 
-    directory* getUpperDirectory()
+    directory *getUpperDirectory()
     {
-        if ( !back )
+        if (!back)
         {
             cout << "Outch you're already in /" << endl;
             return this;
@@ -1043,10 +1043,10 @@ public:
         return back;
     }
 
-    directory* cd(string folder)
+    directory *cd(string folder)
     {
-        for ( auto& elem : folders )
-            if ( folder == elem.getName() )
+        for (auto &elem : folders)
+            if (folder == elem.getName())
                 return &elem;
 
         cout << "Folder " << folder << " doesn't exist, creating it." << endl;
@@ -1057,10 +1057,10 @@ public:
 
     bool addDirectory(string folder)
     {
-        for ( auto& elem : folders )
-            if ( folder == elem.getName() )
+        for (auto &elem : folders)
+            if (folder == elem.getName())
                 return false;
-        
+
         folders.push_back(directory(folder, this));
         return true;
     }
@@ -1070,16 +1070,16 @@ public:
         files[file] = size;
     }
 
-    void print (int level = 0)
+    void print(int level = 0)
     {
         string preceeding(level, ' ');
 
         cout << preceeding << "- " << name << endl;
 
-        for ( auto& elem : folders )
-            elem.print(level+1);
+        for (auto &elem : folders)
+            elem.print(level + 1);
 
-        for ( auto& elem : files )
+        for (auto &elem : files)
             cout << preceeding << " - " << elem.first << " " << elem.second << endl;
     }
 
@@ -1087,10 +1087,10 @@ public:
     {
         totalsize = 0;
 
-        for ( auto& elem : folders )
+        for (auto &elem : folders)
             totalsize += elem.getTotalSize();
 
-        for ( auto& elem : files )
+        for (auto &elem : files)
             totalsize += elem.second;
 
         return totalsize;
@@ -1102,10 +1102,10 @@ public:
         // First calulcate it
         getTotalSize();
 
-        for ( auto& elem : folders )
+        for (auto &elem : folders)
         {
             totalsizeatmost += elem.getTotalSizeAtMost(most);
-            if ( elem.totalsize <= most )
+            if (elem.totalsize <= most)
                 totalsizeatmost += elem.totalsize;
         }
 
@@ -1114,10 +1114,10 @@ public:
 
     long getDeletionSize(long neededsize, long currentmindeletionsize)
     {
-        if ( totalsize > neededsize && totalsize < currentmindeletionsize )
+        if (totalsize > neededsize && totalsize < currentmindeletionsize)
             currentmindeletionsize = totalsize;
 
-        for ( auto& elem : folders )
+        for (auto &elem : folders)
             currentmindeletionsize = elem.getDeletionSize(neededsize, currentmindeletionsize);
 
         return currentmindeletionsize;
@@ -1127,7 +1127,7 @@ private:
     string name;
     directory *back = nullptr;
     vector<directory> folders;
-    map<string,long> files;
+    map<string, long> files;
     long totalsize = 0;
 };
 
@@ -1142,35 +1142,38 @@ public:
         bool lsmode = false;
         for (auto elem : input)
         {
-            if ( '$' == elem[0] )  // Command
+            if ('$' == elem[0]) // Command
             {
                 lsmode = false;
-                string command = elem.substr(2,2);
-                if ( "cd" == command )
+                string command = elem.substr(2, 2);
+                if ("cd" == command)
                 {
                     string folder = elem.substr(5);
-                    if ( "/" == folder )
+                    if ("/" == folder)
                         curdir = &root;
-                    else if ( ".." == folder )
+                    else if (".." == folder)
                         curdir = curdir->getUpperDirectory();
-                    else 
+                    else
                         curdir = curdir->cd(folder);
-                } else if ( "ls" == command )
+                }
+                else if ("ls" == command)
                     lsmode = true;
-                else 
+                else
                     cout << "Unknown Command: " << command << endl;
-            } else {
-                if ( lsmode )
+            }
+            else
+            {
+                if (lsmode)
                 {
                     auto pos = elem.find(' ');
-                    if ( "dir " == elem.substr(0,4) )
+                    if ("dir " == elem.substr(0, 4))
                         curdir->addDirectory(elem.substr(4));
-                    else if ( std::string::npos != pos )
-                        curdir->addFile(stoi(elem), elem.substr(pos+1));
+                    else if (std::string::npos != pos)
+                        curdir->addFile(stoi(elem), elem.substr(pos + 1));
                     else
                         cout << "Unknown folder entry: " << elem << endl;
                 }
-                else 
+                else
                     cout << "Don't know what to do with: " << elem << endl;
             }
 
@@ -1185,14 +1188,14 @@ public:
 
     long getTotalSizesAtMost(long most)
     {
-        long TotalSizesAtMost = root.getTotalSizeAtMost( most );
+        long TotalSizesAtMost = root.getTotalSizeAtMost(most);
 
         cout << "result A: " << TotalSizesAtMost << endl;
         return TotalSizesAtMost;
     }
     long getDeletionSize()
     {
-        long DeletionSize = root.getDeletionSize(30000000-getFreeSpace(), root.getTotalSize());
+        long DeletionSize = root.getDeletionSize(30000000 - getFreeSpace(), root.getTotalSize());
         cout << "result B: " << DeletionSize << endl;
         return DeletionSize;
     }
@@ -1208,17 +1211,17 @@ public:
     }
 
 private:
-    const vector<string>  input;
+    const vector<string> input;
     directory root = directory("/", nullptr);
     directory *curdir = &root;
     long disksize = 70000000;
 };
 
-TEST_CASE ( "Testdata" )
+TEST_CASE("Testdata")
 {
     NoSpaceLeftNoDevice NoSpaceLeftNoDeviceData(inputTestdata);
     NoSpaceLeftNoDeviceData.print();
-    REQUIRE ( 48381165 == NoSpaceLeftNoDeviceData.getTotalSize() );
+    REQUIRE(48381165 == NoSpaceLeftNoDeviceData.getTotalSize());
     REQUIRE(95437 == NoSpaceLeftNoDeviceData.getTotalSizesAtMost(100000));
 
     REQUIRE(21618835 == NoSpaceLeftNoDeviceData.getFreeSpace());

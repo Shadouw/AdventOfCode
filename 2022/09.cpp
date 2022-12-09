@@ -26,8 +26,7 @@ const vector<string> inputTestdata2 = {
     "R 17",
     "D 10",
     "L 25",
-    "U 20"
-};
+    "U 20"};
 
 const vector<string> inputData = {
     "R 1",
@@ -2038,10 +2037,10 @@ public:
     {
         cout << "Size of Input: " << input.size() << endl;
 
-        visited[{0,0}] = 1;
+        visited[{0, 0}] = 1;
 
-        for ( int i = 0; i<knots; ++i )
-            rope.push_back({0,0});
+        for (int i = 0; i < knots; ++i)
+            rope.push_back({0, 0});
 
         // Parse data
         for (auto elem : input)
@@ -2051,8 +2050,8 @@ public:
     void steps(string dirs)
     {
         char dir = dirs[0];
-        int  cnt = stoi(dirs.substr(2));
-        for ( int i=0; i<cnt; ++i )
+        int cnt = stoi(dirs.substr(2));
+        for (int i = 0; i < cnt; ++i)
             step(dir);
     }
 
@@ -2068,10 +2067,10 @@ public:
             break;
         case 'U':
             ++rope[0].second;
-            break;            
+            break;
         case 'D':
             --rope[0].second;
-            break;        
+            break;
         }
         pullTail(1);
     }
@@ -2079,37 +2078,37 @@ public:
     void pullTail(int position)
     {
         // Offset
-        pair<int,int> offset({rope[position-1].first - rope[position].first, rope[position-1].second - rope[position].second});
-        
-        if ( abs(offset.first) <=1 && abs(offset.second) <=1 ) // Nothing to do
+        pair<int, int> offset({rope[position - 1].first - rope[position].first, rope[position - 1].second - rope[position].second});
+
+        if (abs(offset.first) <= 1 && abs(offset.second) <= 1) // Nothing to do
             return;
 
         // Normalize Offset
-        if ( 0 != offset.first) 
+        if (0 != offset.first)
             offset.first /= abs(offset.first);
-        if ( 0 != offset.second) 
+        if (0 != offset.second)
             offset.second /= abs(offset.second);
 
         rope[position].first += offset.first;
         rope[position].second += offset.second;
 
-        if ( position == knots-1)
+        if (position == knots - 1)
             ++visited[rope[position]];
-        else 
-            pullTail(position+1);
+        else
+            pullTail(position + 1);
     }
 
-    pair<int,int> getH()
+    pair<int, int> getH()
     {
         return rope[0];
     }
 
-    pair<int,int> getT()
+    pair<int, int> getT()
     {
-        return rope[knots-1];
+        return rope[knots - 1];
     }
 
-    int getVisitedPositions( )
+    int getVisitedPositions()
     {
         int VisitedPositions = 0;
         for (auto e : visited)
@@ -2120,35 +2119,35 @@ public:
     }
 
 private:
-    const vector<string>  input;
+    const vector<string> input;
 
     int knots = 0;
-    vector<pair<int,int>> rope;
+    vector<pair<int, int>> rope;
 
-    map<pair<int,int>,int> visited;
+    map<pair<int, int>, int> visited;
 };
 
-TEST_CASE ( "Testdata" )
+TEST_CASE("Testdata")
 {
     RopeBridge RopeBridgeData(inputTestdata, 2);
-    REQUIRE(pair<int,int>({2,2}) == RopeBridgeData.getH());
-    REQUIRE(pair<int,int>({1,2}) == RopeBridgeData.getT());
+    REQUIRE(pair<int, int>({2, 2}) == RopeBridgeData.getH());
+    REQUIRE(pair<int, int>({1, 2}) == RopeBridgeData.getT());
     REQUIRE(13 == RopeBridgeData.getVisitedPositions());
 }
 
-TEST_CASE ( "Testdata B" )
+TEST_CASE("Testdata B")
 {
     RopeBridge RopeBridgeData(inputTestdata, 10);
-    REQUIRE(pair<int,int>({2,2}) == RopeBridgeData.getH());
-    REQUIRE(pair<int,int>({0,0}) == RopeBridgeData.getT());
+    REQUIRE(pair<int, int>({2, 2}) == RopeBridgeData.getH());
+    REQUIRE(pair<int, int>({0, 0}) == RopeBridgeData.getT());
     REQUIRE(1 == RopeBridgeData.getVisitedPositions());
 }
 
-TEST_CASE ( "Testdata B2" )
+TEST_CASE("Testdata B2")
 {
     RopeBridge RopeBridgeData(inputTestdata2, 10);
-    REQUIRE(pair<int,int>({-11,15}) == RopeBridgeData.getH());
-    REQUIRE(pair<int,int>({-11,6}) == RopeBridgeData.getT());
+    REQUIRE(pair<int, int>({-11, 15}) == RopeBridgeData.getH());
+    REQUIRE(pair<int, int>({-11, 6}) == RopeBridgeData.getT());
     REQUIRE(36 == RopeBridgeData.getVisitedPositions());
 }
 
