@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -1019,34 +1020,115 @@ const vector<string> inputData = {
     "$ ls",
     "142652 bhgwj"};
 
-class item
+class directory
 {
 public:
-    item(const string _input) : input(_input)
+    directory(const string _name, directory *_back) : name(_name), back(_back)
     {
     }
-
-    int getResultA()
+    
+    string getName()
     {
-        int resultA = 0;
-
-        return resultA;
+        return name;
     }
 
-    bool getResultB()
+    directory* getUpperDirectory()
     {
-        int resultB = 0;
+        if ( !back )
+        {
+            cout << "Outch you're already in /" << endl;
+            return this;
+        }
 
-        return resultB;
+        return back;
     }
 
-    string getString()
+    directory* cd(string folder)
     {
-        return input;
+        for ( auto& elem : folders )
+            if ( folder == elem.getName() )
+                return &elem;
+
+        cout << "Folder " << folder << " doesn't exist, creating it." << endl;
+        folders.push_back(directory(folder, this));
+
+        return &(folders.back());
+    }
+
+    bool addDirectory(string folder)
+    {
+        for ( auto& elem : folders )
+            if ( folder == elem.getName() )
+                return false;
+        
+        folders.push_back(directory(folder, this));
+        return true;
+    }
+
+    void addFile(long size, string file)
+    {
+        files[file] = size;
+    }
+
+    void print (int level = 0)
+    {
+        string preceeding(level, ' ');
+
+        cout << preceeding << "- " << name << endl;
+
+        for ( auto& elem : folders )
+            elem.print(level+1);
+
+        for ( auto& elem : files )
+            cout << preceeding << " - " << elem.first << " " << elem.second << endl;
+    }
+
+    long getTotalSize()
+    {
+        totalsize = 0;
+
+        for ( auto& elem : folders )
+            totalsize += elem.getTotalSize();
+
+        for ( auto& elem : files )
+            totalsize += elem.second;
+
+        return totalsize;
+    }
+
+    long getTotalSizeAtMost(long most)
+    {
+        long totalsizeatmost = 0;
+        // First calulcate it
+        getTotalSize();
+
+        for ( auto& elem : folders )
+        {
+            totalsizeatmost += elem.getTotalSizeAtMost(most);
+            if ( elem.totalsize <= most )
+                totalsizeatmost += elem.totalsize;
+        }
+
+        return totalsizeatmost;
+    }
+
+    long getDeletionSize(long neededsize, long currentmindeletionsize)
+    {
+        if ( totalsize > neededsize && totalsize < currentmindeletionsize )
+            currentmindeletionsize = totalsize;
+
+        for ( auto& elem : folders )
+            currentmindeletionsize = elem.getDeletionSize(neededsize, currentmindeletionsize);
+
+        return currentmindeletionsize;
     }
 
 private:
-    string input;
+    string name;
+    directory *back = nullptr;
+    vector<directory> folders;
+    map<string,long> files;
+    long totalsize = 0;
 };
 
 class NoSpaceLeftNoDevice
@@ -1057,44 +1139,95 @@ public:
         cout << "Size of Input: " << input.size() << endl;
 
         // Parse data
+        bool lsmode = false;
         for (auto elem : input)
-            items.push_back(item(elem));
+        {
+            if ( '$' == elem[0] )  // Command
+            {
+                lsmode = false;
+                string command = elem.substr(2,2);
+                if ( "cd" == command )
+                {
+                    string folder = elem.substr(5);
+                    if ( "/" == folder )
+                        curdir = &root;
+                    else if ( ".." == folder )
+                        curdir = curdir->getUpperDirectory();
+                    else 
+                        curdir = curdir->cd(folder);
+                } else if ( "ls" == command )
+                    lsmode = true;
+                else 
+                    cout << "Unknown Command: " << command << endl;
+            } else {
+                if ( lsmode )
+                {
+                    auto pos = elem.find(' ');
+                    if ( "dir " == elem.substr(0,4) )
+                        curdir->addDirectory(elem.substr(4));
+                    else if ( std::string::npos != pos )
+                        curdir->addFile(stoi(elem), elem.substr(pos+1));
+                    else
+                        cout << "Unknown folder entry: " << elem << endl;
+                }
+                else 
+                    cout << "Don't know what to do with: " << elem << endl;
+            }
+
+            root.getTotalSize();
+        }
     }
 
-    int getResultA()
+    void print()
     {
-        int resultA = 0;
-        for (auto e : items)
-            resultA += e.getResultA();
-
-        cout << "result A: " << resultA << endl;
-        return resultA;
+        root.print();
     }
-    int getResultB()
-    {
-        int resultB = 0;
-        for (auto e : items)
-            resultB += e.getResultB();
 
-        cout << "result B: " << resultB << endl;
-        return resultB;
+    long getTotalSizesAtMost(long most)
+    {
+        long TotalSizesAtMost = root.getTotalSizeAtMost( most );
+
+        cout << "result A: " << TotalSizesAtMost << endl;
+        return TotalSizesAtMost;
+    }
+    long getDeletionSize()
+    {
+        long DeletionSize = root.getDeletionSize(30000000-getFreeSpace(), root.getTotalSize());
+        cout << "result B: " << DeletionSize << endl;
+        return DeletionSize;
+    }
+
+    long getTotalSize()
+    {
+        return root.getTotalSize();
+    }
+
+    long getFreeSpace()
+    {
+        return disksize - root.getTotalSize();
     }
 
 private:
     const vector<string>  input;
-    vector<item> items;
+    directory root = directory("/", nullptr);
+    directory *curdir = &root;
+    long disksize = 70000000;
 };
 
 TEST_CASE ( "Testdata" )
 {
     NoSpaceLeftNoDevice NoSpaceLeftNoDeviceData(inputTestdata);
-    REQUIRE(0 == NoSpaceLeftNoDeviceData.getResultA());
-    REQUIRE(0 == NoSpaceLeftNoDeviceData.getResultB());
+    NoSpaceLeftNoDeviceData.print();
+    REQUIRE ( 48381165 == NoSpaceLeftNoDeviceData.getTotalSize() );
+    REQUIRE(95437 == NoSpaceLeftNoDeviceData.getTotalSizesAtMost(100000));
+
+    REQUIRE(21618835 == NoSpaceLeftNoDeviceData.getFreeSpace());
+    REQUIRE(24933642 == NoSpaceLeftNoDeviceData.getDeletionSize());
 }
 
 TEST_CASE("NoSpaceLeftNoDevice")
 {
     NoSpaceLeftNoDevice NoSpaceLeftNoDeviceData(inputData);
-    REQUIRE(0 == NoSpaceLeftNoDeviceData.getResultA());
-    REQUIRE(0 == NoSpaceLeftNoDeviceData.getResultB());
+    REQUIRE(1444896 == NoSpaceLeftNoDeviceData.getTotalSizesAtMost(100000));
+    REQUIRE(404395 == NoSpaceLeftNoDeviceData.getDeletionSize());
 }
