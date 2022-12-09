@@ -114,36 +114,6 @@ const vector<string> inputData = {
     "133213004320332415205534404040532521244601552314401414553622300634114003055144015221303103000233300",
     "121313142330141112135522531401154344545521012501566652210433310564254034403545252414443110303020313"};
 
-class item
-{
-public:
-    item(const string _input) : input(_input)
-    {
-    }
-
-    int getVisibleTrees()
-    {
-        int VisibleTrees = 0;
-
-        return VisibleTrees;
-    }
-
-    bool getmaxscenicscore()
-    {
-        int maxscenicscore = 0;
-
-        return maxscenicscore;
-    }
-
-    string getString()
-    {
-        return input;
-    }
-
-private:
-    string input;
-};
-
 class TreetopTreeHouse
 {
 public:
@@ -158,10 +128,6 @@ public:
             visibility[i] = visibility[0] + x * i;
         for (int i = 0; i < x * y; ++i)
             visibility[0][i] = false;
-
-        // Parse data
-        for (auto elem : input)
-            items.push_back(item(elem));
     }
 
     void calculateVisibility()
@@ -320,7 +286,6 @@ public:
 
 private:
     const vector<string> input;
-    vector<item> items;
     bool **visibility = nullptr;
 
     int x = 0,
