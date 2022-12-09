@@ -2031,36 +2031,6 @@ const vector<string> inputData = {
     "D 3",
     "U 10"};
 
-class item
-{
-public:
-    item(const string _input) : input(_input)
-    {
-    }
-
-    int getVisitedPositions()
-    {
-        int VisitedPositions = 0;
-
-        return VisitedPositions;
-    }
-
-    bool getResultB()
-    {
-        int resultB = 0;
-
-        return resultB;
-    }
-
-    string getString()
-    {
-        return input;
-    }
-
-private:
-    string input;
-};
-
 class RopeBridge
 {
 public:
@@ -2151,10 +2121,6 @@ public:
 
 private:
     const vector<string>  input;
-    //vector<item> items;
-
-    //pair<int,int> H = {0,0};
-    //pair<int,int> T = {0,0};
 
     int knots = 0;
     vector<pair<int,int>> rope;
