@@ -7,23 +7,355 @@
 using namespace std;
 
 const vector<string> inputTestdata = {
-    ""};
+    "addx 15",
+    "addx -11",
+    "addx 6",
+    "addx -3",
+    "addx 5",
+    "addx -1",
+    "addx -8",
+    "addx 13",
+    "addx 4",
+    "noop",
+    "addx -1",
+    "addx 5",
+    "addx -1",
+    "addx 5",
+    "addx -1",
+    "addx 5",
+    "addx -1",
+    "addx 5",
+    "addx -1",
+    "addx -35",
+    "addx 1",
+    "addx 24",
+    "addx -19",
+    "addx 1",
+    "addx 16",
+    "addx -11",
+    "noop",
+    "noop",
+    "addx 21",
+    "addx -15",
+    "noop",
+    "noop",
+    "addx -3",
+    "addx 9",
+    "addx 1",
+    "addx -3",
+    "addx 8",
+    "addx 1",
+    "addx 5",
+    "noop",
+    "noop",
+    "noop",
+    "noop",
+    "noop",
+    "addx -36",
+    "noop",
+    "addx 1",
+    "addx 7",
+    "noop",
+    "noop",
+    "noop",
+    "addx 2",
+    "addx 6",
+    "noop",
+    "noop",
+    "noop",
+    "noop",
+    "noop",
+    "addx 1",
+    "noop",
+    "noop",
+    "addx 7",
+    "addx 1",
+    "noop",
+    "addx -13",
+    "addx 13",
+    "addx 7",
+    "noop",
+    "addx 1",
+    "addx -33",
+    "noop",
+    "noop",
+    "noop",
+    "addx 2",
+    "noop",
+    "noop",
+    "noop",
+    "addx 8",
+    "noop",
+    "addx -1",
+    "addx 2",
+    "addx 1",
+    "noop",
+    "addx 17",
+    "addx -9",
+    "addx 1",
+    "addx 1",
+    "addx -3",
+    "addx 11",
+    "noop",
+    "noop",
+    "addx 1",
+    "noop",
+    "addx 1",
+    "noop",
+    "noop",
+    "addx -13",
+    "addx -19",
+    "addx 1",
+    "addx 3",
+    "addx 26",
+    "addx -30",
+    "addx 12",
+    "addx -1",
+    "addx 3",
+    "addx 1",
+    "noop",
+    "noop",
+    "noop",
+    "addx -9",
+    "addx 18",
+    "addx 1",
+    "addx 2",
+    "noop",
+    "noop",
+    "addx 9",
+    "noop",
+    "noop",
+    "noop",
+    "addx -1",
+    "addx 2",
+    "addx -37",
+    "addx 1",
+    "addx 3",
+    "noop",
+    "addx 15",
+    "addx -21",
+    "addx 22",
+    "addx -6",
+    "addx 1",
+    "noop",
+    "addx 2",
+    "addx 1",
+    "noop",
+    "addx -10",
+    "noop",
+    "noop",
+    "addx 20",
+    "addx 1",
+    "addx 2",
+    "addx 2",
+    "addx -6",
+    "addx -11",
+    "noop",
+    "noop",
+    "noop"};
 
 const vector<string> inputData = {
-    ""};
+    "addx 1",
+    "noop",
+    "noop",
+    "noop",
+    "addx 5",
+    "addx 5",
+    "noop",
+    "noop",
+    "addx 9",
+    "addx -5",
+    "addx 1",
+    "addx 4",
+    "noop",
+    "noop",
+    "noop",
+    "addx 6",
+    "addx -1",
+    "noop",
+    "addx 5",
+    "addx -2",
+    "addx 7",
+    "noop",
+    "addx 3",
+    "addx -2",
+    "addx -38",
+    "noop",
+    "noop",
+    "addx 32",
+    "addx -22",
+    "noop",
+    "addx 2",
+    "addx 3",
+    "noop",
+    "addx 2",
+    "addx -2",
+    "addx 7",
+    "addx -2",
+    "noop",
+    "addx 3",
+    "addx 2",
+    "addx 5",
+    "addx 2",
+    "addx -5",
+    "addx 10",
+    "noop",
+    "addx 3",
+    "noop",
+    "addx -38",
+    "addx 1",
+    "addx 27",
+    "noop",
+    "addx -20",
+    "noop",
+    "addx 2",
+    "addx 27",
+    "noop",
+    "addx -22",
+    "noop",
+    "noop",
+    "noop",
+    "noop",
+    "addx 3",
+    "addx 5",
+    "addx 2",
+    "addx -11",
+    "addx 16",
+    "addx -2",
+    "addx -17",
+    "addx 24",
+    "noop",
+    "noop",
+    "addx 1",
+    "addx -38",
+    "addx 15",
+    "addx 10",
+    "addx -15",
+    "noop",
+    "addx 2",
+    "addx 26",
+    "noop",
+    "addx -21",
+    "addx 19",
+    "addx -33",
+    "addx 19",
+    "noop",
+    "addx -6",
+    "addx 9",
+    "addx 3",
+    "addx 4",
+    "addx -21",
+    "addx 4",
+    "addx 20",
+    "noop",
+    "addx 3",
+    "addx -38",
+    "addx 28",
+    "addx -21",
+    "addx 9",
+    "addx -8",
+    "addx 2",
+    "addx 5",
+    "addx 2",
+    "addx -9",
+    "addx 14",
+    "addx -2",
+    "addx -5",
+    "addx 12",
+    "addx 3",
+    "addx -2",
+    "addx 2",
+    "addx 7",
+    "noop",
+    "noop",
+    "addx -27",
+    "addx 28",
+    "addx -36",
+    "noop",
+    "addx 1",
+    "addx 5",
+    "addx -1",
+    "noop",
+    "addx 6",
+    "addx -1",
+    "addx 5",
+    "addx 5",
+    "noop",
+    "noop",
+    "addx -2",
+    "addx 20",
+    "addx -10",
+    "addx -3",
+    "addx 1",
+    "addx 3",
+    "addx 2",
+    "addx 4",
+    "addx 3",
+    "noop",
+    "addx -30",
+    "noop"};
 
-class item
+class CathodeRayTube
 {
 public:
-    item(const string _input) : input(_input)
+    CathodeRayTube(const vector<string> &_input) : input(_input)
     {
+        cout << "Size of Input: " << input.size() << endl;
+
+        reset();
+
+        // Parse data
+        for (auto elem : input)
+            operate(elem);
     }
 
-    int getResultA()
+    void reset()
     {
-        int resultA = 0;
+        X = 1;
+        cycle = 0;
+        SignalStrength = 0;
 
-        return resultA;
+        for (int i = 0; i < 40; ++i)
+            for (int j = 0; j < 6; ++j)
+                crt[i][j] = ' ';
+    }
+
+    void operate(const string cmd)
+    {
+        if ("noop" == cmd)
+            drawpixel();
+        else if ("addx" == cmd.substr(0, 4))
+        {
+            drawpixel();
+            drawpixel();
+        }
+        else
+            cout << "Unknown command: " << cmd << endl;
+
+        if (cycle >= nextmeasure)
+        {
+            SignalStrength += nextmeasure * X;
+            nextmeasure += 40;
+        }
+
+        if ("addx" == cmd.substr(0, 4))
+            X += stoi(cmd.substr(5));
+    }
+
+    void drawpixel() 
+    {
+        xpos = cycle % 40;
+        ypos = cycle / 40;
+
+        if ( abs(xpos-X) <=1 )
+            crt[xpos][ypos] = '#';
+
+        ++cycle;
+    }
+
+    int getSignalStrength()
+    {
+        return SignalStrength;
     }
 
     bool getResultB()
@@ -33,61 +365,41 @@ public:
         return resultB;
     }
 
-    string getString()
+    void printcrt()
     {
-        return input;
+        for (int j = 0; j < 6; ++j)
+        {
+            for (int i = 0; i < 40; ++i)
+                cout << crt[i][j];
+            cout << endl;
+        }
     }
 
 private:
-    string input;
+    const vector<string> input;
+
+    int X = 1;
+    int cycle = 0;
+    int SignalStrength = 0;
+    int nextmeasure = 20;
+
+    char crt[40][6];
+    int xpos = 0;
+    int ypos = 0;
 };
 
-class problem
+TEST_CASE("Testdata")
 {
-public:
-    problem(const vector<string> &_input) : input(_input)
-    {
-        cout << "Size of Input: " << input.size() << endl;
-
-        // Parse data
-        for (auto elem : input)
-            items.push_back(item(elem));
-    }
-
-    int getResultA()
-    {
-        int resultA = 0;
-        for (auto e : items)
-            resultA += e.getResultA();
-
-        cout << "result A: " << resultA << endl;
-        return resultA;
-    }
-    int getResultB()
-    {
-        int resultB = 0;
-        for (auto e : items)
-            resultB += e.getResultB();
-
-        cout << "result B: " << resultB << endl;
-        return resultB;
-    }
-
-private:
-    const vector<string>  input;
-    vector<item> items;
-};
-
-TEST_CASE ( "Testdata" )
-{
-    problem problemData(inputTestdata);
-    REQUIRE(0 == problemData.getResultA());
-    REQUIRE(0 == problemData.getResultB());
+    CathodeRayTube CathodeRayTubeData(inputTestdata);
+    REQUIRE(13140 == CathodeRayTubeData.getSignalStrength());
+    CathodeRayTubeData.printcrt();
+    REQUIRE(0 == CathodeRayTubeData.getResultB());
 }
 
-TEST_CASE("Problem")
+TEST_CASE("CathodeRayTube")
 {
-    problem problemData(inputData);
-    REQUIRE(0 == problemData.getResultA());
-    REQUIRE(0 == problemData.getResultB());
+    CathodeRayTube CathodeRayTubeData(inputData);
+    REQUIRE(11960 == CathodeRayTubeData.getSignalStrength());
+    CathodeRayTubeData.printcrt();
+    REQUIRE(0 == CathodeRayTubeData.getResultB());
 }
