@@ -110,7 +110,7 @@ public:
             while (string::npos != pos)
             {
                 Items.push_back(stoi(itemstring));
-                itemstring = itemstring.substr(pos+1);
+                itemstring = itemstring.substr(pos + 1);
                 pos = itemstring.find(',');
             }
             Items.push_back(stoi(itemstring));
@@ -119,10 +119,12 @@ public:
         {
             string opline = line.substr(19);
             auto oppos = opline.find('+');
-            if ( string::npos != oppos)
+            if (string::npos != oppos)
             {
                 op = '+';
-            } else {
+            }
+            else
+            {
                 oppos = opline.find('*');
                 op = '*';
             }
@@ -177,6 +179,15 @@ public:
         op2 = 0;
     }
 
+    void play(vector<Monkey> &Monkeys)
+    {
+        for ( auto item : Items )
+        {
+            // Inspect
+            // ????? int worrylevel = item;
+        }
+    }
+
 private:
     string name;
 
@@ -211,6 +222,12 @@ public:
 
         // Push the last monkey on the list
         Monkeys.push_back(monkey);
+    }
+
+    void playRound()
+    {
+        for (auto monkey : Monkeys)
+            monkey.play(Monkeys);
     }
 
     int getResultA()
