@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <set>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -95,7 +96,7 @@ const vector<string> inputData = {
 class Monkey
 {
 public:
-    Monkey()
+    Monkey(unsigned long long _worrylevelreducer) : worrylevelreducer(_worrylevelreducer)
     {
     }
 
@@ -153,16 +154,9 @@ public:
             cout << "Unknown: " << line << endl;
     }
 
-    int getResultA()
-    {
-        int resultA = 0;
-
-        return resultA;
-    }
-
     bool getResultB()
     {
-        int resultB = 0;
+        unsigned long long resultB = 0;
 
         return resultB;
     }
@@ -177,39 +171,80 @@ public:
         op = ' ';
         op1 = 0;
         op2 = 0;
+        inspectcount = 0;
     }
 
     void play(vector<Monkey> &Monkeys)
     {
         for ( auto item : Items )
         {
-            // Inspect
-            // ????? int worrylevel = item;
+            // Inspect Item
+            unsigned long long worrylevel = item;
+            unsigned long long _op1 = ( -1 == op1 ? worrylevel : op1 );
+            unsigned long long _op2 = ( -1 == op2 ? worrylevel : op2 );
+            if ( '+' == op ) worrylevel = _op1 + _op2;
+            if ( '*' == op ) worrylevel = _op1 * _op2;
+            ++inspectcount;
+
+            // Monkey gets bored
+            worrylevel /= worrylevelreducer;
+
+            if ( worrylevel < 0 || worrylevel*worrylevelreducer <_op1 || worrylevel*worrylevelreducer <_op2) 
+                cout << "How did this happen?" << endl;
+
+            // Test
+            if ( 0 == worrylevel % divisibleby )
+                Monkeys[truemonkey].catchItem ( worrylevel );
+            else 
+                Monkeys[falsemonkey].catchItem ( worrylevel );
         }
+
+        Items.clear();
+    }
+    void catchItem(unsigned long long worrylevel)
+    {
+        Items.push_back(worrylevel);
+    }
+
+    unsigned long long getInspectCount()
+    {
+        return inspectcount;
+    }
+
+    void print()
+    {
+        cout << name;
+        for ( auto elem : Items )
+            cout << elem << " ";
+        cout << endl;
     }
 
 private:
     string name;
 
-    vector<int> Items;
-    int divisibleby = 1;
+    vector<unsigned long long> Items;
+    unsigned long long divisibleby = 1;
     int truemonkey = -1;
     int falsemonkey = -1;
 
     char op = ' ';
-    int op1 = 0;
-    int op2 = 0;
+    unsigned long long op1 = 0;
+    unsigned long long op2 = 0;
+
+    unsigned long long inspectcount = 0;
+
+    unsigned long long worrylevelreducer = 1;
 };
 
 class MonkeyInTheMiddle
 {
 public:
-    MonkeyInTheMiddle(const vector<string> &_input) : input(_input)
+    MonkeyInTheMiddle(const vector<string> &_input, unsigned long long _worrylevelreducer) : input(_input), worrylevelreducer(_worrylevelreducer)
     {
         cout << "Size of Input: " << input.size() << endl;
 
         // Parse data
-        Monkey monkey;
+        Monkey monkey(worrylevelreducer);
 
         for (auto elem : input)
             if ("" != elem)
@@ -224,24 +259,37 @@ public:
         Monkeys.push_back(monkey);
     }
 
-    void playRound()
+    void playRound(int rounds)
     {
-        for (auto monkey : Monkeys)
+        for ( int r = 0; r<rounds; ++r )
+        for (auto &monkey : Monkeys)
             monkey.play(Monkeys);
     }
 
-    int getResultA()
+    unsigned long long getLevelOfMonkeyBusiness(unsigned long long num)
     {
-        int resultA = 0;
+        unsigned long long LevelOfMonkeyBusiness = 1;
+        std::multiset<unsigned long long> mostactivemonkeys;
         for (auto e : Monkeys)
-            resultA += e.getResultA();
+            mostactivemonkeys.insert(e.getInspectCount());
 
-        cout << "result A: " << resultA << endl;
-        return resultA;
+        for ( auto it = mostactivemonkeys.rbegin(); it != mostactivemonkeys.rend(); ++it )
+            cout << *it << " ";
+        cout << endl;
+
+        unsigned long long c=0;
+        for ( auto it = mostactivemonkeys.rbegin(); it != mostactivemonkeys.rend(); ++it )
+        {
+            LevelOfMonkeyBusiness *= *it;
+            if (++c>=num)
+                break;
+        }
+
+        return LevelOfMonkeyBusiness;
     }
-    int getResultB()
+    unsigned long long getResultB()
     {
-        int resultB = 0;
+        unsigned long long resultB = 0;
         for (auto e : Monkeys)
             resultB += e.getResultB();
 
@@ -249,21 +297,37 @@ public:
         return resultB;
     }
 
+    void print()
+    {
+        for ( auto el : Monkeys )
+            el.print();
+    }
+
 private:
     const vector<string> input;
     vector<Monkey> Monkeys;
+    unsigned long long worrylevelreducer = 1;
 };
 
-TEST_CASE("Testdata")
+TEST_CASE("Testdata A")
 {
-    MonkeyInTheMiddle MonkeyInTheMiddleData(inputTestdata);
-    REQUIRE(0 == MonkeyInTheMiddleData.getResultA());
-    REQUIRE(0 == MonkeyInTheMiddleData.getResultB());
+    MonkeyInTheMiddle MonkeyInTheMiddleData(inputTestdata,3);
+    MonkeyInTheMiddleData.playRound(20);
+    REQUIRE(10605 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
+}
+
+TEST_CASE("Testdata B")
+{
+    MonkeyInTheMiddle MonkeyInTheMiddleData(inputTestdata,1);
+    MonkeyInTheMiddleData.playRound(20);
+    MonkeyInTheMiddleData.print();
+    REQUIRE(2713310158 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
 }
 
 TEST_CASE("MonkeyInTheMiddle")
 {
-    MonkeyInTheMiddle MonkeyInTheMiddleData(inputData);
-    REQUIRE(0 == MonkeyInTheMiddleData.getResultA());
+    MonkeyInTheMiddle MonkeyInTheMiddleData(inputData,3);
+    MonkeyInTheMiddleData.playRound(20);
+    REQUIRE(69918 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
     REQUIRE(0 == MonkeyInTheMiddleData.getResultB());
 }
