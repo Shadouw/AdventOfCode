@@ -154,13 +154,6 @@ public:
             cout << "Unknown: " << line << endl;
     }
 
-    bool getResultB()
-    {
-        unsigned long long resultB = 0;
-
-        return resultB;
-    }
-
     void clear()
     {
         name = "";
@@ -187,10 +180,10 @@ public:
             ++inspectcount;
 
             // Monkey gets bored
-            worrylevel /= worrylevelreducer;
-
-            if ( worrylevel < 0 || worrylevel*worrylevelreducer <_op1 || worrylevel*worrylevelreducer <_op2) 
-                cout << "How did this happen?" << endl;
+            if ( 1!= worrylevelreducer )
+                worrylevel /= worrylevelreducer;
+            else 
+                worrylevel %= monkeymodulo;
 
             // Test
             if ( 0 == worrylevel % divisibleby )
@@ -219,6 +212,16 @@ public:
         cout << endl;
     }
 
+    unsigned long long getMonkeyModulo()
+    {
+        return divisibleby;
+    }
+
+    void setMonkeyModulo(unsigned long long _monkeymodulo)
+    {
+        monkeymodulo = _monkeymodulo;
+    }
+
 private:
     string name;
 
@@ -234,6 +237,8 @@ private:
     unsigned long long inspectcount = 0;
 
     unsigned long long worrylevelreducer = 1;
+
+    unsigned long long monkeymodulo = 1;
 };
 
 class MonkeyInTheMiddle
@@ -257,6 +262,10 @@ public:
 
         // Push the last monkey on the list
         Monkeys.push_back(monkey);
+
+        // Trick with Modulo Monkey
+        for ( auto &elem : Monkeys )
+            elem.setMonkeyModulo(getMonkeyModulo());
     }
 
     void playRound(int rounds)
@@ -273,10 +282,6 @@ public:
         for (auto e : Monkeys)
             mostactivemonkeys.insert(e.getInspectCount());
 
-        for ( auto it = mostactivemonkeys.rbegin(); it != mostactivemonkeys.rend(); ++it )
-            cout << *it << " ";
-        cout << endl;
-
         unsigned long long c=0;
         for ( auto it = mostactivemonkeys.rbegin(); it != mostactivemonkeys.rend(); ++it )
         {
@@ -287,20 +292,21 @@ public:
 
         return LevelOfMonkeyBusiness;
     }
-    unsigned long long getResultB()
-    {
-        unsigned long long resultB = 0;
-        for (auto e : Monkeys)
-            resultB += e.getResultB();
-
-        cout << "result B: " << resultB << endl;
-        return resultB;
-    }
 
     void print()
     {
         for ( auto el : Monkeys )
             el.print();
+    }
+
+    unsigned long long getMonkeyModulo()
+    {
+        int MonkeyModulo = 1;
+
+        for ( auto &elem : Monkeys )
+            MonkeyModulo *= elem.getMonkeyModulo();
+
+        return MonkeyModulo;
     }
 
 private:
@@ -319,15 +325,32 @@ TEST_CASE("Testdata A")
 TEST_CASE("Testdata B")
 {
     MonkeyInTheMiddle MonkeyInTheMiddleData(inputTestdata,1);
-    MonkeyInTheMiddleData.playRound(20);
-    MonkeyInTheMiddleData.print();
-    REQUIRE(2713310158 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
+    MonkeyInTheMiddleData.playRound(1);
+    REQUIRE(6*4 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
+
+    MonkeyInTheMiddleData.playRound(20-1);
+    REQUIRE(103*99 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
+
+    MonkeyInTheMiddleData.playRound(1000-20);
+    REQUIRE(5204*5192 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
+
+    MonkeyInTheMiddleData.playRound(2000-1000);
+    REQUIRE(10419 *10391  == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
+
+    MonkeyInTheMiddleData.playRound(10000-2000);
+    REQUIRE(2713310158  == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
 }
 
-TEST_CASE("MonkeyInTheMiddle")
+TEST_CASE("MonkeyInTheMiddle A")
 {
     MonkeyInTheMiddle MonkeyInTheMiddleData(inputData,3);
     MonkeyInTheMiddleData.playRound(20);
     REQUIRE(69918 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
-    REQUIRE(0 == MonkeyInTheMiddleData.getResultB());
+}
+
+TEST_CASE("MonkeyInTheMiddle B")
+{
+    MonkeyInTheMiddle MonkeyInTheMiddleData(inputData,1);
+    MonkeyInTheMiddleData.playRound(10000);
+    REQUIRE(19573408701 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
 }
