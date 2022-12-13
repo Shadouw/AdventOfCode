@@ -169,27 +169,29 @@ public:
 
     void play(vector<Monkey> &Monkeys)
     {
-        for ( auto item : Items )
+        for (auto item : Items)
         {
             // Inspect Item
             unsigned long long worrylevel = item;
-            unsigned long long _op1 = ( -1 == op1 ? worrylevel : op1 );
-            unsigned long long _op2 = ( -1 == op2 ? worrylevel : op2 );
-            if ( '+' == op ) worrylevel = _op1 + _op2;
-            if ( '*' == op ) worrylevel = _op1 * _op2;
+            unsigned long long _op1 = (-1 == op1 ? worrylevel : op1);
+            unsigned long long _op2 = (-1 == op2 ? worrylevel : op2);
+            if ('+' == op)
+                worrylevel = _op1 + _op2;
+            if ('*' == op)
+                worrylevel = _op1 * _op2;
             ++inspectcount;
 
             // Monkey gets bored
-            if ( 1!= worrylevelreducer )
+            if (1 != worrylevelreducer)
                 worrylevel /= worrylevelreducer;
-            else 
+            else
                 worrylevel %= monkeymodulo;
 
             // Test
-            if ( 0 == worrylevel % divisibleby )
-                Monkeys[truemonkey].catchItem ( worrylevel );
-            else 
-                Monkeys[falsemonkey].catchItem ( worrylevel );
+            if (0 == worrylevel % divisibleby)
+                Monkeys[truemonkey].catchItem(worrylevel);
+            else
+                Monkeys[falsemonkey].catchItem(worrylevel);
         }
 
         Items.clear();
@@ -207,7 +209,7 @@ public:
     void print()
     {
         cout << name;
-        for ( auto elem : Items )
+        for (auto elem : Items)
             cout << elem << " ";
         cout << endl;
     }
@@ -264,15 +266,15 @@ public:
         Monkeys.push_back(monkey);
 
         // Trick with Modulo Monkey
-        for ( auto &elem : Monkeys )
+        for (auto &elem : Monkeys)
             elem.setMonkeyModulo(getMonkeyModulo());
     }
 
     void playRound(int rounds)
     {
-        for ( int r = 0; r<rounds; ++r )
-        for (auto &monkey : Monkeys)
-            monkey.play(Monkeys);
+        for (int r = 0; r < rounds; ++r)
+            for (auto &monkey : Monkeys)
+                monkey.play(Monkeys);
     }
 
     unsigned long long getLevelOfMonkeyBusiness(unsigned long long num)
@@ -282,11 +284,11 @@ public:
         for (auto e : Monkeys)
             mostactivemonkeys.insert(e.getInspectCount());
 
-        unsigned long long c=0;
-        for ( auto it = mostactivemonkeys.rbegin(); it != mostactivemonkeys.rend(); ++it )
+        unsigned long long c = 0;
+        for (auto it = mostactivemonkeys.rbegin(); it != mostactivemonkeys.rend(); ++it)
         {
             LevelOfMonkeyBusiness *= *it;
-            if (++c>=num)
+            if (++c >= num)
                 break;
         }
 
@@ -295,7 +297,7 @@ public:
 
     void print()
     {
-        for ( auto el : Monkeys )
+        for (auto el : Monkeys)
             el.print();
     }
 
@@ -303,7 +305,7 @@ public:
     {
         int MonkeyModulo = 1;
 
-        for ( auto &elem : Monkeys )
+        for (auto &elem : Monkeys)
             MonkeyModulo *= elem.getMonkeyModulo();
 
         return MonkeyModulo;
@@ -317,40 +319,40 @@ private:
 
 TEST_CASE("Testdata A")
 {
-    MonkeyInTheMiddle MonkeyInTheMiddleData(inputTestdata,3);
+    MonkeyInTheMiddle MonkeyInTheMiddleData(inputTestdata, 3);
     MonkeyInTheMiddleData.playRound(20);
     REQUIRE(10605 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
 }
 
 TEST_CASE("Testdata B")
 {
-    MonkeyInTheMiddle MonkeyInTheMiddleData(inputTestdata,1);
+    MonkeyInTheMiddle MonkeyInTheMiddleData(inputTestdata, 1);
     MonkeyInTheMiddleData.playRound(1);
-    REQUIRE(6*4 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
+    REQUIRE(6 * 4 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
 
-    MonkeyInTheMiddleData.playRound(20-1);
-    REQUIRE(103*99 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
+    MonkeyInTheMiddleData.playRound(20 - 1);
+    REQUIRE(103 * 99 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
 
-    MonkeyInTheMiddleData.playRound(1000-20);
-    REQUIRE(5204*5192 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
+    MonkeyInTheMiddleData.playRound(1000 - 20);
+    REQUIRE(5204 * 5192 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
 
-    MonkeyInTheMiddleData.playRound(2000-1000);
-    REQUIRE(10419 *10391  == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
+    MonkeyInTheMiddleData.playRound(2000 - 1000);
+    REQUIRE(10419 * 10391 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
 
-    MonkeyInTheMiddleData.playRound(10000-2000);
-    REQUIRE(2713310158  == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
+    MonkeyInTheMiddleData.playRound(10000 - 2000);
+    REQUIRE(2713310158 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
 }
 
 TEST_CASE("MonkeyInTheMiddle A")
 {
-    MonkeyInTheMiddle MonkeyInTheMiddleData(inputData,3);
+    MonkeyInTheMiddle MonkeyInTheMiddleData(inputData, 3);
     MonkeyInTheMiddleData.playRound(20);
     REQUIRE(69918 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
 }
 
 TEST_CASE("MonkeyInTheMiddle B")
 {
-    MonkeyInTheMiddle MonkeyInTheMiddleData(inputData,1);
+    MonkeyInTheMiddle MonkeyInTheMiddleData(inputData, 1);
     MonkeyInTheMiddleData.playRound(10000);
     REQUIRE(19573408701 == MonkeyInTheMiddleData.getLevelOfMonkeyBusiness(2));
 }
