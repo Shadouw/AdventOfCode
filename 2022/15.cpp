@@ -71,25 +71,6 @@ public:
         nextbeacon.second = stoi(input.substr(pos + 2));
     }
 
-    int getPostionsWithoutBeacon()
-    {
-        int PostionsWithoutBeacon = 0;
-
-        return PostionsWithoutBeacon;
-    }
-
-    bool getResultB()
-    {
-        int resultB = 0;
-
-        return resultB;
-    }
-
-    string getString()
-    {
-        return input;
-    }
-
 private:
     string input;
     pair<long, long> position;
@@ -171,15 +152,54 @@ public:
         cout << "result A: " << xposwithoutbeacon.size() << endl;
         return xposwithoutbeacon.size();
     }
-    
-    int getResultB()
-    {
-        int resultB = 0;
-        for (auto e : Sensors)
-            resultB += e.getResultB();
 
-        cout << "result B: " << resultB << endl;
-        return resultB;
+    int getTuningFrequency(long max)
+    {
+        int TuningFrequency = 0;
+
+        for (long row = 0; row <= max; ++row)
+        {
+            set<long> xposwithoutbeacon;
+
+            for (auto e : Sensors)
+            {
+                long manhattan = abs(e.position.first - e.nextbeacon.first) + abs(e.position.second - e.nextbeacon.second);
+
+                // How many fields are touched into both directions in that row?
+                long touchdistance = manhattan - abs(e.position.second - row);
+
+                if (touchdistance >= 0)
+                {
+                    for (long t = e.position.first - touchdistance; t <= e.position.first + touchdistance; ++t)
+                        xposwithoutbeacon.insert(t);
+                }
+            }
+
+            // Remove everything below 0 and above max
+            for (auto it = xposwithoutbeacon.begin(); it != xposwithoutbeacon.end();)
+            {
+                if (*it < 0 || max < *it)
+                    xposwithoutbeacon.erase(it++);
+                else
+                    ++it;
+            }
+
+            if (xposwithoutbeacon.size() <= max)
+            {
+                cout << "Found: " << row << endl;
+                // Find the missing number
+                long xpos = 0;
+                for (auto elem : xposwithoutbeacon)
+                {
+                    if (xpos != elem)
+                        return xpos * 4000000 + row;
+
+                    ++xpos;
+                }
+            }
+        }
+
+        return -1;
     }
 
 private:
@@ -194,12 +214,12 @@ TEST_CASE("Testdata")
 {
     BeaconExclusionZone BeaconExclusionZoneData(inputTestdata);
     REQUIRE(26 == BeaconExclusionZoneData.getPostionsWithoutBeacon(10));
-    REQUIRE(0 == BeaconExclusionZoneData.getResultB());
+    REQUIRE(56000011 == BeaconExclusionZoneData.getTuningFrequency(20));
 }
 
 TEST_CASE("BeaconExclusionZone")
 {
     BeaconExclusionZone BeaconExclusionZoneData(inputData);
     REQUIRE(5564017 == BeaconExclusionZoneData.getPostionsWithoutBeacon(2000000));
-    REQUIRE(0 == BeaconExclusionZoneData.getResultB());
+    REQUIRE(0 == BeaconExclusionZoneData.getTuningFrequency(4000000));
 }
