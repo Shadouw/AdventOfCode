@@ -40,6 +40,8 @@ public:
 
 private:
     string input;
+
+    friend class problem;
 };
 
 class problem
