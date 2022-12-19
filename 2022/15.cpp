@@ -3,6 +3,7 @@
 #include <vector>
 #include <utility>
 #include <set>
+#include <stdexcept>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -50,14 +51,15 @@ const vector<string> inputData = {
     "Sensor at x=2881987, y=1923522: closest beacon is at x=2528182, y=2000000",
     "Sensor at x=3059723, y=2540501: closest beacon is at x=3008934, y=2768339"};
 
+typedef pair<long, long> point;
+typedef pair<long, long> range;
+
 class Sensor
 {
 public:
     Sensor(const string _input) : input(_input)
     {
-
         // Parse
-
         auto pos = input.find("x=");
         position.first = stoi(input.substr(pos + 2));
 
@@ -73,10 +75,145 @@ public:
 
 private:
     string input;
-    pair<long, long> position;
-    pair<long, long> nextbeacon;
+    point position;
+    point nextbeacon;
 
     friend class BeaconExclusionZone;
+};
+
+class Line
+{
+public:
+    void addValues(range area)
+    {
+        bool merged = false;
+        for (auto it = ranges.begin(); it != ranges.end(); ++it)
+        {
+            try
+            {
+                range m = merge(*it, area);
+                it->first = m.first;
+                it->second = m.second;
+
+                merged = true;
+
+                break;
+            }
+            catch (const std::exception &e)
+            {
+                // std::cerr << e.what() << '\n';
+            }
+        }
+
+        if (!merged)
+            ranges.push_back(area);
+
+        if (ranges.size() > 1)
+            for (auto it1 = ranges.begin(); it1 != ranges.end(); ++it1)
+                for (auto it2 = it1 + 1; it2 != ranges.end();)
+                {
+                    try
+                    {
+                        range m = merge(*it1, *it2);
+                        it1->first = m.first;
+                        it1->second = m.second;
+
+                        it2 = ranges.erase(it2);
+                    }
+                    catch (const std::exception &e)
+                    {
+                        ++it2;
+                    }
+                }
+    }
+
+    void removeValue(long x)
+    {
+        for (auto it = ranges.begin(); it != ranges.end();)
+        {
+            if (it->first == x && it->second == x)
+            {
+                ranges.erase(it);
+                return;
+            }
+            else if (it->first == x)
+            {
+                ++(it->first);
+                return;
+            }
+            else if (it->second == x)
+            {
+                --(it->second);
+                return;
+            }
+            if (it->first < x && x < it->second)
+            {
+                long second = it->second;
+                it->second = x - 1;
+                ranges.push_back(range(x + 1, second));
+                return;
+            }
+            else
+                ++it;
+        }
+    }
+
+    static range merge(range r1, range r2)
+    {
+        // Case 1: first point of r1 in r2
+        if (r2.first <= r1.first && r1.first <= r2.second)
+            return (range(min(r1.first, r2.first), max(r1.second, r2.second)));
+
+        // Case 2: second point of r1 in r2
+        if (r2.first <= r1.second && r1.second <= r2.second)
+            return (range(min(r1.first, r2.first), max(r1.second, r2.second)));
+
+        // Case 3: r2 in r1
+        if ((r1.first <= r2.first && r2.first <= r1.second) && (r1.first <= r2.second && r2.second <= r1.second))
+            return (range(min(r1.first, r2.first), max(r1.second, r2.second)));
+
+        throw range_error("No ovlerap");
+    }
+
+    long getElements()
+    {
+        long elements = 0;
+
+        for (auto e : ranges)
+            elements += e.second - e.first + 1;
+
+        return elements;
+    }
+
+    long getTuningPosition(range r)
+    {
+        long tuningFrequency = -1;
+
+        if (ranges.size() > 1)
+        {
+            for (auto e : ranges)
+            {
+                if (r.first < e.first && e.first <= r.second)
+                    return e.first - 1;
+
+                if (r.first <= e.second && e.second < r.second)
+                    return e.second + 1;
+            }
+        }
+        else if (r.first + 1 == ranges[0].first)
+        {
+            return ranges[0].first;
+        }
+        else if (r.second - 1 == ranges[0].second)
+        {
+            return ranges[0].second;
+        }
+
+        return tuningFrequency;
+    }
+
+private:
+    vector<range> ranges;
 };
 
 class BeaconExclusionZone
@@ -124,7 +261,7 @@ public:
 
     int getPostionsWithoutBeacon(long row)
     {
-        set<long> xposwithoutbeacon;
+        Line xLine;
 
         for (auto e : Sensors)
         {
@@ -134,71 +271,56 @@ public:
             long touchdistance = manhattan - abs(e.position.second - row);
 
             if (touchdistance >= 0)
-            {
-                for (long t = e.position.first - touchdistance; t <= e.position.first + touchdistance; ++t)
-                    xposwithoutbeacon.insert(t);
-            }
+                xLine.addValues(range(e.position.first - touchdistance, e.position.first + touchdistance));
         }
 
         // Remove beacons and sensors from list
         for (auto e : Sensors)
         {
             if (e.position.second == row)
-                xposwithoutbeacon.erase(e.position.first);
+                xLine.removeValue(e.position.first);
+
             if (e.nextbeacon.second == row)
-                xposwithoutbeacon.erase(e.nextbeacon.first);
+                xLine.removeValue(e.nextbeacon.first);
         }
 
-        cout << "result A: " << xposwithoutbeacon.size() << endl;
-        return xposwithoutbeacon.size();
+        cout << "result A: " << xLine.getElements() << endl;
+        return xLine.getElements();
     }
 
-    int getTuningFrequency(long max)
+    long getTuningFrequency(const size_t max)
     {
-        int TuningFrequency = 0;
+        long TuningFrequency = 0;
 
         for (long row = 0; row <= max; ++row)
         {
-            set<long> xposwithoutbeacon;
+            Line xLine;
 
             for (auto e : Sensors)
             {
-                long manhattan = abs(e.position.first - e.nextbeacon.first) + abs(e.position.second - e.nextbeacon.second);
+                auto epf = e.position.first;
+                auto eps = e.position.second;
+
+                long manhattan = abs(epf - e.nextbeacon.first) + abs(eps - e.nextbeacon.second);
 
                 // How many fields are touched into both directions in that row?
-                long touchdistance = manhattan - abs(e.position.second - row);
+                long touchdistance = manhattan - abs(eps - row);
 
                 if (touchdistance >= 0)
                 {
-                    for (long t = e.position.first - touchdistance; t <= e.position.first + touchdistance; ++t)
-                        xposwithoutbeacon.insert(t);
+                    long tmin = (epf - touchdistance < 0 ? 0 : epf - touchdistance);
+                    long tmax = (epf + touchdistance > max ? max : epf + touchdistance);
+                    xLine.addValues(range(tmin, tmax));
                 }
             }
 
-            // Remove everything below 0 and above max
-            for (auto it = xposwithoutbeacon.begin(); it != xposwithoutbeacon.end();)
+            if (xLine.getTuningPosition(range(0, max)) > 0)
             {
-                if (*it < 0 || max < *it)
-                    xposwithoutbeacon.erase(it++);
-                else
-                    ++it;
-            }
-
-            if (xposwithoutbeacon.size() <= max)
-            {
-                cout << "Found: " << row << endl;
-                // Find the missing number
-                long xpos = 0;
-                for (auto elem : xposwithoutbeacon)
-                {
-                    if (xpos != elem)
-                        return xpos * 4000000 + row;
-
-                    ++xpos;
-                }
+                long resB = xLine.getTuningPosition(range(0, max)) * 4000000 + row;
+                cout << "result B: " << resB << endl;
+                return resB;
             }
         }
-
         return -1;
     }
 
@@ -221,5 +343,5 @@ TEST_CASE("BeaconExclusionZone")
 {
     BeaconExclusionZone BeaconExclusionZoneData(inputData);
     REQUIRE(5564017 == BeaconExclusionZoneData.getPostionsWithoutBeacon(2000000));
-    REQUIRE(0 == BeaconExclusionZoneData.getTuningFrequency(4000000));
+    REQUIRE(11558423398893 == BeaconExclusionZoneData.getTuningFrequency(4000000));
 }
