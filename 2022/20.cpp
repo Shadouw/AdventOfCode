@@ -5041,7 +5041,10 @@ public:
         if (elem.first == 0) // Nothing moves
             return;
 
-        long newposition = elem.second + elem.first;
+        // Modulo with negative numbers is unexpected (but correct), therefore:
+        // Calculate the modulo of the positive number abs(elem.first)
+        // Then multiply by the original sign
+        long newposition = elem.second + ((elem.first < 0 ? -1 : 1) * (abs(elem.first) % (gps.size()-1)));
 
         // Normalize newposition
         while (newposition < 0)
@@ -5050,17 +5053,11 @@ public:
             newposition += gps.size();
         }
         // newposition %= gps.size();
-        while (newposition > gps.size())
+        while (newposition >= gps.size())
         {
             ++newposition;
             newposition -= gps.size();
         }
-
-        // Overflow? Moving wrong direction?
-        /* if (elem.second < newposition && elem.first < 0)
-            --newposition;
-        else if (elem.second > newposition && elem.first > 0)
-            ++newposition; */
 
         // Fix all other positions
         for (auto &e : gps)
@@ -5162,7 +5159,7 @@ public:
         long pos3000 = getNumberOnPos((posof0 + 3000) % gps.size());
         GrooveCoordinates = pos1000 + pos2000 + pos3000;
 
-        cout << "result A: " << GrooveCoordinates << endl;
+        cout << "Groove Coordinates: " << GrooveCoordinates << endl;
         return GrooveCoordinates;
     }
     long getResultB()
@@ -5210,29 +5207,36 @@ TEST_CASE("Testdata A")
 
 TEST_CASE("Testdata B")
 {
-    // GrovePositioningSystem GrovePositioningSystemData(inputTestdata, 811589153);
-    // REQUIRE("0, 3246356612, 811589153, 1623178306, -2434767459, 2434767459, -1623178306" == GrovePositioningSystemData.getGPSString());
-    // GrovePositioningSystemData.moveAllGPSElements();
-    // REQUIRE("0, -2434767459, 3246356612, -1623178306, 2434767459, 1623178306, 811589153" == GrovePositioningSystemData.getGPSString());
-    // GrovePositioningSystemData.moveAllGPSElements();
-    // REQUIRE("0, 2434767459, 1623178306, 3246356612, -2434767459, -1623178306, 811589153" == GrovePositioningSystemData.getGPSString());
-    // GrovePositioningSystemData.moveAllGPSElements();
-    // REQUIRE("0, 811589153, 2434767459, 3246356612, 1623178306, -1623178306, -2434767459" == GrovePositioningSystemData.getGPSString());
-    // GrovePositioningSystemData.moveAllGPSElements();
-    // REQUIRE("0, 1623178306, -2434767459, 811589153, 2434767459, 3246356612, -1623178306" == GrovePositioningSystemData.getGPSString());
-    // GrovePositioningSystemData.moveAllGPSElements();
-    // REQUIRE("0, 811589153, -1623178306, 1623178306, -2434767459, 3246356612, 2434767459" == GrovePositioningSystemData.getGPSString());
-    // GrovePositioningSystemData.moveAllGPSElements();
-    // REQUIRE("0, 811589153, -1623178306, 3246356612, -2434767459, 1623178306, 2434767459" == GrovePositioningSystemData.getGPSString());
-    // GrovePositioningSystemData.moveAllGPSElements();
-    // REQUIRE("0, -2434767459, 2434767459, 1623178306, -1623178306, 811589153, 3246356612" == GrovePositioningSystemData.getGPSString());
-    // GrovePositioningSystemData.moveAllGPSElements();
-    // REQUIRE("0, 1623178306, 3246356612, 811589153, -2434767459, 2434767459, -1623178306" == GrovePositioningSystemData.getGPSString());
-    // GrovePositioningSystemData.moveAllGPSElements();
-    // REQUIRE("0, 811589153, 1623178306, -2434767459, 3246356612, 2434767459, -1623178306" == GrovePositioningSystemData.getGPSString());
-    // GrovePositioningSystemData.moveAllGPSElements();
-    // REQUIRE("0, -2434767459, 1623178306, 3246356612, -1623178306, 2434767459, 811589153" == GrovePositioningSystemData.getGPSString());
-    // // REQUIRE(1623178306 == GrovePositioningSystemData.getGrooveCoordinates());
+    GrovePositioningSystem GrovePositioningSystemData(inputTestdata, 811589153);
+    REQUIRE("0, 3246356612, 811589153, 1623178306, -2434767459, 2434767459, -1623178306" == GrovePositioningSystemData.getGPSString());
+    GrovePositioningSystemData.moveAllGPSElements();
+    REQUIRE("0, -2434767459, 3246356612, -1623178306, 2434767459, 1623178306, 811589153" == GrovePositioningSystemData.getGPSString());
+    GrovePositioningSystemData.moveAllGPSElements();
+    REQUIRE("0, 2434767459, 1623178306, 3246356612, -2434767459, -1623178306, 811589153" == GrovePositioningSystemData.getGPSString());
+    GrovePositioningSystemData.moveAllGPSElements();
+    REQUIRE("0, 811589153, 2434767459, 3246356612, 1623178306, -1623178306, -2434767459" == GrovePositioningSystemData.getGPSString());
+    GrovePositioningSystemData.moveAllGPSElements();
+    REQUIRE("0, 1623178306, -2434767459, 811589153, 2434767459, 3246356612, -1623178306" == GrovePositioningSystemData.getGPSString());
+    GrovePositioningSystemData.moveAllGPSElements();
+    REQUIRE("0, 811589153, -1623178306, 1623178306, -2434767459, 3246356612, 2434767459" == GrovePositioningSystemData.getGPSString());
+    GrovePositioningSystemData.moveAllGPSElements();
+    REQUIRE("0, 811589153, -1623178306, 3246356612, -2434767459, 1623178306, 2434767459" == GrovePositioningSystemData.getGPSString());
+    GrovePositioningSystemData.moveAllGPSElements();
+    REQUIRE("0, -2434767459, 2434767459, 1623178306, -1623178306, 811589153, 3246356612" == GrovePositioningSystemData.getGPSString());
+    GrovePositioningSystemData.moveAllGPSElements();
+    REQUIRE("0, 1623178306, 3246356612, 811589153, -2434767459, 2434767459, -1623178306" == GrovePositioningSystemData.getGPSString());
+    GrovePositioningSystemData.moveAllGPSElements();
+    REQUIRE("0, 811589153, 1623178306, -2434767459, 3246356612, 2434767459, -1623178306" == GrovePositioningSystemData.getGPSString());
+    GrovePositioningSystemData.moveAllGPSElements();
+    REQUIRE("0, -2434767459, 1623178306, 3246356612, -1623178306, 2434767459, 811589153" == GrovePositioningSystemData.getGPSString());
+    REQUIRE(1623178306 == GrovePositioningSystemData.getGrooveCoordinates());
+}
+
+TEST_CASE("Testdata B2")
+{
+    GrovePositioningSystem GrovePositioningSystemData(inputTestdata, 811589153);
+    GrovePositioningSystemData.moveAllGPSElements(10);
+    REQUIRE(1623178306 == GrovePositioningSystemData.getGrooveCoordinates());
 }
 
 TEST_CASE("GrovePositioningSystem")
@@ -5240,4 +5244,11 @@ TEST_CASE("GrovePositioningSystem")
     GrovePositioningSystem GrovePositioningSystemData(inputData);
     GrovePositioningSystemData.moveAllGPSElements();
     REQUIRE(17490 == GrovePositioningSystemData.getGrooveCoordinates());
+}
+
+TEST_CASE("GrovePositioningSystem B")
+{
+    GrovePositioningSystem GrovePositioningSystemData(inputData, 811589153);
+    GrovePositioningSystemData.moveAllGPSElements(10);
+    REQUIRE(1632917375836 == GrovePositioningSystemData.getGrooveCoordinates());
 }
