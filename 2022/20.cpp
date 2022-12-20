@@ -7,7 +7,7 @@
 
 using namespace std;
 
-const vector<int> inputTestdata = {
+const vector<long> inputTestdata = {
     1,
     2,
     -3,
@@ -16,7 +16,7 @@ const vector<int> inputTestdata = {
     0,
     4};
 
-const vector<int> inputData = {
+const vector<long> inputData = {
     4684,
     2398,
     -3344,
@@ -5021,7 +5021,7 @@ const vector<int> inputData = {
 class GrovePositioningSystem
 {
 public:
-    GrovePositioningSystem(const vector<int> &_input) : input(_input)
+    GrovePositioningSystem(const vector<long> &_input, long _decryptionkey = 1) : input(_input), decryptionkey(_decryptionkey)
     {
         cout << "Size of Input: " << input.size() << endl;
         fillgps();
@@ -5031,22 +5031,17 @@ public:
     {
         gps.clear();
 
-        int pos = 0;
+        long pos = 0;
         for (auto elem : input)
-            gps.push_back(pair<int, int>(elem, pos++));
+            gps.push_back(pair<long, long>(elem * decryptionkey, pos++));
     }
 
-    void movegpselement(pair<int, int> &elem)
+    void movegpselement(pair<long, long> &elem)
     {
         if (elem.first == 0) // Nothing moves
             return;
 
-        int newposition = elem.second + elem.first;
-
-        // if (newposition < 0 )
-        //     --newposition;
-        // else if ( newposition >= gps.size() )
-        //     ++newposition;
+        long newposition = elem.second + elem.first;
 
         // Normalize newposition
         while (newposition < 0)
@@ -5084,7 +5079,7 @@ public:
         elem.second = newposition;
     }
 
-    void movegpselement(int n)
+    void movegpselement(long n)
     {
         for (auto &e : gps)
             if (e.first == n)
@@ -5095,16 +5090,16 @@ public:
     }
 
     void
-    moveAllGPSElements(int n = 1)
+    moveAllGPSElements(long n = 1)
     {
-        for (int i = 0; i < n; ++i)
+        for (long i = 0; i < n; ++i)
             for (auto &e : gps)
                 movegpselement(e);
     }
 
     void printGPS()
     {
-        for (int i = 0; i < gps.size(); ++i)
+        for (long i = 0; i < gps.size(); ++i)
             for (auto e : gps)
                 if (e.second == i)
                 {
@@ -5117,8 +5112,8 @@ public:
     string getGPSString()
     {
         string gpsstring;
-        int posof0 = getPosOfNumber(0);
-        for (int i = posof0; i < gps.size(); ++i)
+        long posof0 = getPosOfNumber(0);
+        for (long i = posof0; i < gps.size(); ++i)
             for (auto e : gps)
                 if (e.second == i)
                 {
@@ -5129,7 +5124,7 @@ public:
                 }
 
         if (0 != posof0)
-            for (int i = 0; i < posof0; ++i)
+            for (long i = 0; i < posof0; ++i)
                 for (auto e : gps)
                     if (e.second == i)
                     {
@@ -5140,7 +5135,7 @@ public:
                     }
         return gpsstring;
     }
-    int getPosOfNumber(int n)
+    long getPosOfNumber(long n)
     {
         for (auto e : gps)
             if (e.first == n)
@@ -5148,7 +5143,7 @@ public:
 
         throw range_error("Not found");
     }
-    int getNumberOnPos(int n)
+    long getNumberOnPos(long n)
     {
         for (auto e : gps)
             if (e.second == n)
@@ -5157,30 +5152,31 @@ public:
         throw range_error("Not found");
     }
 
-    int getGrooveCoordinates()
+    long getGrooveCoordinates()
     {
-        int GrooveCoordinates = 0;
+        long GrooveCoordinates = 0;
 
-        int posof0 = getPosOfNumber(0);
-        int pos1000 = getNumberOnPos((posof0 + 1000) % gps.size());
-        int pos2000 = getNumberOnPos((posof0 + 2000) % gps.size());
-        int pos3000 = getNumberOnPos((posof0 + 3000) % gps.size());
+        long posof0 = getPosOfNumber(0);
+        long pos1000 = getNumberOnPos((posof0 + 1000) % gps.size());
+        long pos2000 = getNumberOnPos((posof0 + 2000) % gps.size());
+        long pos3000 = getNumberOnPos((posof0 + 3000) % gps.size());
         GrooveCoordinates = pos1000 + pos2000 + pos3000;
 
         cout << "result A: " << GrooveCoordinates << endl;
         return GrooveCoordinates;
     }
-    int getResultB()
+    long getResultB()
     {
-        int resultB = 0;
+        long resultB = 0;
 
         cout << "result B: " << resultB << endl;
         return resultB;
     }
 
 private:
-    const vector<int> input;
-    vector<pair<int, int>> gps;
+    const vector<long> input;
+    vector<pair<long, long>> gps;
+    long decryptionkey;
 };
 
 TEST_CASE("First Moves")
@@ -5203,14 +5199,40 @@ TEST_CASE("First Moves")
     REQUIRE("0, 3, -2, 1, 2, -3, 4" == GrovePositioningSystemData.getGPSString());
 }
 
-TEST_CASE("Testdata")
+TEST_CASE("Testdata A")
 {
     GrovePositioningSystem GrovePositioningSystemData(inputTestdata);
     GrovePositioningSystemData.moveAllGPSElements();
     REQUIRE("0, 3, -2, 1, 2, -3, 4" == GrovePositioningSystemData.getGPSString());
 
     REQUIRE(3 == GrovePositioningSystemData.getGrooveCoordinates());
-    REQUIRE(0 == GrovePositioningSystemData.getResultB());
+}
+
+TEST_CASE("Testdata B")
+{
+    // GrovePositioningSystem GrovePositioningSystemData(inputTestdata, 811589153);
+    // REQUIRE("0, 3246356612, 811589153, 1623178306, -2434767459, 2434767459, -1623178306" == GrovePositioningSystemData.getGPSString());
+    // GrovePositioningSystemData.moveAllGPSElements();
+    // REQUIRE("0, -2434767459, 3246356612, -1623178306, 2434767459, 1623178306, 811589153" == GrovePositioningSystemData.getGPSString());
+    // GrovePositioningSystemData.moveAllGPSElements();
+    // REQUIRE("0, 2434767459, 1623178306, 3246356612, -2434767459, -1623178306, 811589153" == GrovePositioningSystemData.getGPSString());
+    // GrovePositioningSystemData.moveAllGPSElements();
+    // REQUIRE("0, 811589153, 2434767459, 3246356612, 1623178306, -1623178306, -2434767459" == GrovePositioningSystemData.getGPSString());
+    // GrovePositioningSystemData.moveAllGPSElements();
+    // REQUIRE("0, 1623178306, -2434767459, 811589153, 2434767459, 3246356612, -1623178306" == GrovePositioningSystemData.getGPSString());
+    // GrovePositioningSystemData.moveAllGPSElements();
+    // REQUIRE("0, 811589153, -1623178306, 1623178306, -2434767459, 3246356612, 2434767459" == GrovePositioningSystemData.getGPSString());
+    // GrovePositioningSystemData.moveAllGPSElements();
+    // REQUIRE("0, 811589153, -1623178306, 3246356612, -2434767459, 1623178306, 2434767459" == GrovePositioningSystemData.getGPSString());
+    // GrovePositioningSystemData.moveAllGPSElements();
+    // REQUIRE("0, -2434767459, 2434767459, 1623178306, -1623178306, 811589153, 3246356612" == GrovePositioningSystemData.getGPSString());
+    // GrovePositioningSystemData.moveAllGPSElements();
+    // REQUIRE("0, 1623178306, 3246356612, 811589153, -2434767459, 2434767459, -1623178306" == GrovePositioningSystemData.getGPSString());
+    // GrovePositioningSystemData.moveAllGPSElements();
+    // REQUIRE("0, 811589153, 1623178306, -2434767459, 3246356612, 2434767459, -1623178306" == GrovePositioningSystemData.getGPSString());
+    // GrovePositioningSystemData.moveAllGPSElements();
+    // REQUIRE("0, -2434767459, 1623178306, 3246356612, -1623178306, 2434767459, 811589153" == GrovePositioningSystemData.getGPSString());
+    // // REQUIRE(1623178306 == GrovePositioningSystemData.getGrooveCoordinates());
 }
 
 TEST_CASE("GrovePositioningSystem")
