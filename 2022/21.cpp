@@ -2563,16 +2563,18 @@ public:
         }
     }
 
-
     string getString() { return input; }
 
     string getName() { return name; }
 
     // bool getIKnowMyNumber() { return IKnowMyNumber; }
-    long getNumber(map<string, Monkey> &Monkeys)
+    long getNumber(map<string, Monkey> &Monkeys, bool &dephumn)
     {
         if (!IKnowMyNumber)
             calculate(Monkeys);
+
+        if (dependsOnHuman)
+            dephumn = true;
 
         return number;
     }
@@ -2582,25 +2584,86 @@ public:
         if (IKnowMyNumber)
             return;
 
+        bool dephumn = false;
+
         switch (oper)
         {
         case '+':
-            number = Monkeys[lname].getNumber(Monkeys) + Monkeys[rname].getNumber(Monkeys);
+            number = Monkeys[lname].getNumber(Monkeys, dephumn) + Monkeys[rname].getNumber(Monkeys, dephumn);
             break;
         case '-':
-            number = Monkeys[lname].getNumber(Monkeys) - Monkeys[rname].getNumber(Monkeys);
+            number = Monkeys[lname].getNumber(Monkeys, dephumn) - Monkeys[rname].getNumber(Monkeys, dephumn);
             break;
         case '*':
-            number = Monkeys[lname].getNumber(Monkeys) * Monkeys[rname].getNumber(Monkeys);
+            number = Monkeys[lname].getNumber(Monkeys, dephumn) * Monkeys[rname].getNumber(Monkeys, dephumn);
             break;
         case '/':
-            number = Monkeys[lname].getNumber(Monkeys) / Monkeys[rname].getNumber(Monkeys);
+            number = Monkeys[lname].getNumber(Monkeys, dephumn) / Monkeys[rname].getNumber(Monkeys, dephumn);
+            break;
+        case '=':
+            number = Monkeys[lname].getNumber(Monkeys, dephumn) == Monkeys[rname].getNumber(Monkeys, dephumn);
             break;
         default:
             cout << "Don't know my operator: " << oper << endl;
             break;
         }
-        IKnowMyNumber = true;
+
+        if (dephumn)
+            dependsOnHuman = true;
+        else
+            IKnowMyNumber = true;
+    }
+
+    void solve(map<string, Monkey> &Monkeys)
+    {
+        bool dephumn = false;
+
+        switch (oper)
+        {
+        case '+':
+            if (Monkeys[lname].dependsOnHuman)
+                Monkeys[lname].number = number - Monkeys[rname].number;
+            if (Monkeys[rname].dependsOnHuman)
+                Monkeys[rname].number = number - Monkeys[lname].number;
+            break;
+        case '-':
+            // n = l - r;
+            // l = n + r;
+            // r = l - n
+            if (Monkeys[lname].dependsOnHuman)
+                Monkeys[lname].number = number + Monkeys[rname].number;
+            if (Monkeys[rname].dependsOnHuman)
+                Monkeys[rname].number = Monkeys[lname].number - number;
+            break;
+        case '*':
+            if (Monkeys[lname].dependsOnHuman)
+                Monkeys[lname].number = number / Monkeys[rname].number;
+            if (Monkeys[rname].dependsOnHuman)
+                Monkeys[rname].number = number / Monkeys[lname].number;
+            break;
+        case '/':
+            // n = l / r;
+            // l = n * r;
+            // r = l / n
+            if (Monkeys[lname].dependsOnHuman)
+                Monkeys[lname].number = number * Monkeys[rname].number;
+            if (Monkeys[rname].dependsOnHuman)
+                Monkeys[rname].number = Monkeys[lname].number / number;
+            break;
+        case '=':
+            if (Monkeys[lname].dependsOnHuman)
+                Monkeys[lname].number = Monkeys[rname].number;
+            if (Monkeys[rname].dependsOnHuman)
+                Monkeys[rname].number = Monkeys[lname].number;
+            break;
+        default:
+            cout << "Don't know my operator: " << oper << endl;
+            break;
+        }
+        if (Monkeys[lname].dependsOnHuman)
+            Monkeys[lname].solve(Monkeys);
+        if (Monkeys[rname].dependsOnHuman)
+            Monkeys[rname].solve(Monkeys);
     }
 
 private:
@@ -2608,6 +2671,7 @@ private:
     string name;
     long number = 0;
     bool IKnowMyNumber = false;
+    bool dependsOnHuman = false;
 
     string lname, rname;
     char oper = ' ';
@@ -2629,23 +2693,33 @@ public:
             const auto [it, success] = Monkeys.insert(pair<string, Monkey>(m.getName(), m));
             if (!success)
                 cout << "Failed to insert " << it->first << endl;
+            ;
+            ;
+            ;
         }
+        Monkeys["humn"].dependsOnHuman = true;
     }
 
-    long getrootnumber()
+    long getRootNumber()
     {
         long rootnumber = 0;
+        bool dephumn = false;
 
-        rootnumber = Monkeys["root"].getNumber(Monkeys);
+        rootnumber = Monkeys["root"].getNumber(Monkeys, dephumn);
         cout << "result A: " << rootnumber << endl;
         return rootnumber;
     }
-    int getResultB()
-    {
-        int resultB = 0;
 
-        cout << "result B: " << resultB << endl;
-        return resultB;
+    long getMyYell()
+    {
+        long MyYell = 0;
+        Monkeys["root"].oper = '=';
+        Monkeys["root"].calculate(Monkeys);
+        Monkeys["root"].solve(Monkeys);
+
+        MyYell = Monkeys["humn"].number;
+        cout << "result B: " << MyYell << endl;
+        return MyYell;
     }
 
 private:
@@ -2657,13 +2731,13 @@ private:
 TEST_CASE("Testdata")
 {
     MonkeyMath MonkeyMathData(inputTestdata);
-    REQUIRE(152 == MonkeyMathData.getrootnumber());
-    REQUIRE(0 == MonkeyMathData.getResultB());
+    REQUIRE(152 == MonkeyMathData.getRootNumber());
+    REQUIRE(301 == MonkeyMathData.getMyYell());
 }
 
 TEST_CASE("MonkeyMath")
 {
     MonkeyMath MonkeyMathData(inputData);
-    REQUIRE(38914458159166 == MonkeyMathData.getrootnumber());
-    REQUIRE(0 == MonkeyMathData.getResultB());
+    REQUIRE(38914458159166 == MonkeyMathData.getRootNumber());
+    REQUIRE(3665520865940 == MonkeyMathData.getMyYell());
 }
