@@ -4,8 +4,19 @@
 #include <utility>
 #include <cassert>
 
+template <class T, std::size_t N>
+T manhattandistance(std::array<T, N> v1, std::array<T, N> v2)
+{
+    T mhd = 0;
+
+    for (T t = 0; t < N; ++t)
+        mhd += abs(v1[t] - v2[t]);
+
+    return mhd;
+}
+
 template<class T>
-T manhattandistance(std::vector <T>v1, std::vector<T> v2)
+T manhattandistanceV(std::vector <T>v1, std::vector<T> v2)
 {
     T mhd = 0;
     assert(v1.size() == v2.size());
@@ -15,7 +26,6 @@ T manhattandistance(std::vector <T>v1, std::vector<T> v2)
 
     return mhd;
 }
-
 
 // The pair version gets its own name, otherwise we have ambiguous bracket enclosed list.
 template <class T>
@@ -27,4 +37,4 @@ T manhattandistanceP(std::pair<T,T> v1, std::pair<T,T> v2)
     return mhd;
 }
 
-template long manhattandistance<long>(std::vector<long>, std::vector<long>);
+template long manhattandistanceV<long>(std::vector<long>, std::vector<long>);
