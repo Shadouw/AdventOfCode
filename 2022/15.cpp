@@ -4,6 +4,7 @@
 #include <utility>
 #include <set>
 #include <stdexcept>
+#include <manhattan.h>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -265,7 +266,7 @@ public:
 
         for (auto e : Sensors)
         {
-            long manhattan = abs(e.position.first - e.nextbeacon.first) + abs(e.position.second - e.nextbeacon.second);
+            long manhattan = manhattandistanceP<long>(e.position, e.nextbeacon);
 
             // How many fields are touched into both directions in that row?
             long touchdistance = manhattan - abs(e.position.second - row);
@@ -301,7 +302,7 @@ public:
                 auto epf = e.position.first;
                 auto eps = e.position.second;
 
-                long manhattan = abs(epf - e.nextbeacon.first) + abs(eps - e.nextbeacon.second);
+                long manhattan = manhattandistanceP<long>(e.position, e.nextbeacon);
 
                 // How many fields are touched into both directions in that row?
                 long touchdistance = manhattan - abs(eps - row);
