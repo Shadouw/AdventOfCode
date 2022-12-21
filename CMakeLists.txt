@@ -9,6 +9,8 @@ find_package(Catch2 REQUIRED)
 include(CTest)
 enable_testing()
 
+set(CMAKE_CXX_STANDARD 17)
+
 include_directories ( include )
 
 # Template

@@ -19,24 +19,21 @@ public:
     {
     }
 
-    int getResultA()
+    long getResultA()
     {
-        int resultA = 0;
+        long resultA = 0;
 
         return resultA;
     }
 
-    bool getResultB()
+    long getResultB()
     {
-        int resultB = 0;
+        long resultB = 0;
 
         return resultB;
     }
 
-    string getString()
-    {
-        return input;
-    }
+    string getString() { return input; }
 
 private:
     string input;
@@ -56,18 +53,18 @@ public:
             items.push_back(item(elem));
     }
 
-    int getResultA()
+    long getResultA()
     {
-        int resultA = 0;
+        long resultA = 0;
         for (auto e : items)
             resultA += e.getResultA();
 
         cout << "result A: " << resultA << endl;
         return resultA;
     }
-    int getResultB()
+    long getResultB()
     {
-        int resultB = 0;
+        long resultB = 0;
         for (auto e : items)
             resultB += e.getResultB();
 
@@ -76,11 +73,11 @@ public:
     }
 
 private:
-    const vector<string>  input;
+    const vector<string> input;
     vector<item> items;
 };
 
-TEST_CASE ( "Testdata" )
+TEST_CASE("Testdata")
 {
     problem problemData(inputTestdata);
     REQUIRE(0 == problemData.getResultA());
