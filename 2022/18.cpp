@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const vector<array<long,3>> inputTestdata = {
+const vector<array<long, 3>> inputTestdata = {
     {2, 2, 2},
     {1, 2, 2},
     {3, 2, 2},
@@ -23,7 +23,7 @@ const vector<array<long,3>> inputTestdata = {
     {2, 1, 5},
     {2, 3, 5}};
 
-const vector<array<long,3>> inputData = {
+const vector<array<long, 3>> inputData = {
     {1, 8, 8},
     {12, 8, 3},
     {13, 16, 7},
@@ -2161,82 +2161,88 @@ const vector<array<long,3>> inputData = {
     {6, 6, 10},
     {7, 5, 14}};
 
-class item
-{
-public:
-    item(const array<long,3> _input) : input(_input)
-    {
-    }
-
-    long getSurfaceArea()
-    {
-        long SurfaceArea = 0;
-
-        return SurfaceArea;
-    }
-
-    long getResultB()
-    {
-        long resultB = 0;
-
-        return resultB;
-    }
-
-private:
-    array<long,3> input;
-
-    friend class BoilingBoulders;
-};
-
 class BoilingBoulders
 {
 public:
-    BoilingBoulders(const vector<array<long,3>> &_input) : input(_input)
+    BoilingBoulders(const vector<array<long, 3>> &_input) : input(_input)
     {
         cout << "Size of Input: " << input.size() << endl;
-
-        // Parse data
-        for (auto elem : input)
-            items.push_back(item(elem));
     }
 
     long getSurfaceArea()
     {
-        long SurfaceArea = input.size()*6;
+        long SurfaceArea = input.size() * 6;
 
-        for (auto it1 = input.begin(); it1 != input.end();++it1)
-            for (auto it2 = it1+1; it2 != input.end(); ++it2)
-                if (manhattandistance<long,3>(*it1,*it2)==1 )
+        for (auto it1 = input.begin(); it1 != input.end(); ++it1)
+            for (auto it2 = it1 + 1; it2 != input.end(); ++it2)
+                if (manhattandistance<long, 3>(*it1, *it2) == 1)
                     SurfaceArea -= 2;
 
-                cout << "result A: " << SurfaceArea << endl;
+        cout << "Surface Area: " << SurfaceArea << endl;
         return SurfaceArea;
     }
-    long getResultB()
+    long getExteriorSurfaceArea()
     {
-        long resultB = 0;
-        for (auto e : items)
-            resultB += e.getResultB();
+        // This approach is based on the assumption that the bubbles have size 1.
+        // Since it fails on the input I doubt this.
 
-        cout << "result B: " << resultB << endl;
-        return resultB;
+        long ExteriorSurfaceArea = getSurfaceArea();
+
+        // for (auto it1 = input.begin(); it1 != input.end(); ++it1)
+        for (auto e : input)
+        {
+            // 6 possible Bubbles to test
+            for (int x = -1; x <= 1; ++x)
+                for (int y = -1; y <= 1; ++y)
+                    for (int z = -1; z <= 1; ++z)
+                    {
+                        if (abs(x) + abs(y) + abs(z) == 1)
+                        {
+                            array<long, 3> possibleBubble = {e[0] + x, e[1] + y, e[2] + z};
+                            bool found = false;
+
+                            if (possibleBubble[0] == 2 && possibleBubble[1] == 2 && possibleBubble[2] == 5)
+                                cout << "My candidate found" << endl;
+
+                            for (auto c : input)
+                                if (c == possibleBubble)
+                                {
+                                    found = true;
+                                    break;
+                                }
+
+                            if (!found)
+                            {
+                                int countneighbours = 0;
+                                for (auto c : input)
+                                    if (manhattandistance<long, 3>(c, possibleBubble) == 1)
+                                        countneighbours++;
+
+                                if (6 == countneighbours)
+                                    ExteriorSurfaceArea -= 1;
+                            }
+                        }
+                    }
+        }
+
+        cout << "ExteriorSurfaceArea: " << ExteriorSurfaceArea << endl;
+        return ExteriorSurfaceArea;
     }
 
 private:
-    const vector<array<long,3>> input;
-    vector<item> items;
+    const vector<array<long, 3>> input;
 };
 
 TEST_CASE("Testdata")
 {
     BoilingBoulders BoilingBouldersData(inputTestdata);
     REQUIRE(64 == BoilingBouldersData.getSurfaceArea());
-    REQUIRE(0 == BoilingBouldersData.getResultB());
+    REQUIRE(58 == BoilingBouldersData.getExteriorSurfaceArea());
 }
 
 TEST_CASE("BoilingBoulders")
 {
     BoilingBoulders BoilingBouldersData(inputData);
     REQUIRE(3470 == BoilingBouldersData.getSurfaceArea());
-    REQUIRE(0 == BoilingBouldersData.getResultB());
+    REQUIRE(2210 > BoilingBouldersData.getExteriorSurfaceArea());
 }
