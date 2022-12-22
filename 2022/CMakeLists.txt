@@ -1,5 +1,9 @@
 # 2022 
 
+add_executable(2022.22 2022/22.cpp)
+target_link_libraries ( 2022.22 PRIVATE Catch2::Catch2WithMain )
+add_test ( 2022.22 ${CMAKE_BINARY_DIR}/2022.22 )
+
 add_executable(2022.21 2022/21.cpp)
 target_link_libraries ( 2022.21 PRIVATE Catch2::Catch2WithMain )
 add_test ( 2022.21 ${CMAKE_BINARY_DIR}/2022.21 )
