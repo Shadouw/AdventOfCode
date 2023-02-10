@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <algorithm>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -174,13 +175,107 @@ class PacketData
 public:
     PacketData(const string _input) : input(_input)
     {
+        // Remove surrounding []
+        if ('[' == input[0])
+        {
+            input = input.substr(1, input.length() - 2);
+        }
+
+        // Parse it
+        string tmpstring(input);
+        while (tmpstring.length())
+        {
+            if ('[' == tmpstring[0])
+            {
+                int countbracket = 0;
+                for (int i = 0; i < tmpstring.length(); ++i)
+                {
+                    switch (tmpstring[i])
+                    {
+                    case '[':
+                        ++countbracket;
+                        break;
+                    case ']':
+                        --countbracket;
+                        break;
+                    default:
+                        break;
+                    }
+                    if (0 == countbracket)
+                    {
+                        terms.push_back(tmpstring.substr(0, i + 1)); // Include surrounding []
+                        try
+                        {
+                            tmpstring = tmpstring.substr(i + 2); // Remove ],
+                        }
+                        catch (const std::out_of_range &e)
+                        {
+                            tmpstring.clear();
+                        }
+
+                        break;
+                    }
+                }
+            }
+            else
+            { // Number
+                auto pos = tmpstring.find(',');
+                if (string::npos == pos)
+                {
+                    terms.push_back(tmpstring);
+                    tmpstring.clear();
+                }
+                else
+                {
+                    terms.push_back(tmpstring.substr(0, pos));
+                    try
+                    {
+                        tmpstring = tmpstring.substr(pos + 1);
+                    }
+                    catch (const std::out_of_range &e)
+                    {
+                        tmpstring.clear();
+                    }
+                }
+            }
+        }
     }
 
+    friend bool operator<(const PacketData &l, const PacketData &r)
+    {
+        for (int t = 0; t < std::min(l.terms.size(), r.terms.size()); ++t)
+        {
+            if ('[' == l.terms[t][0] || '[' == r.terms[t][0])
+            {
+                PacketData left('[' == l.terms[t][0] ? l.terms[t] : "[" + l.terms[t]  + "]");
+                PacketData right('[' == r.terms[t][0] ? r.terms[t] : "[" + r.terms[t] + "]");
 
-    string getString() { return input; }
+                if (left < right)
+                    return true;
+                if (right < left)
+                    return false;
+            }
+            else 
+            {
+                int left = stoi(l.terms[t]);
+                int right = stoi(r.terms[t]);
+
+                if (left < right)
+                    return true;
+                if (right < left)
+                    return false;
+            }
+        }
+
+        if (l.terms.size() < r.terms.size())
+            return true;
+
+        return false;
+    }
 
 private:
     string input;
+    vector<string> terms;
 
     friend class DistressSignal;
 };
@@ -188,7 +283,7 @@ private:
 class DistressSignal
 {
 public:
-    DistressSignal(const vector<pair<string,string>> &_input) : input(_input)
+    DistressSignal(const vector<pair<string, string>> &_input) : input(_input)
     {
         cout << "Size of Input: " << input.size() << endl;
 
@@ -200,8 +295,8 @@ public:
     long getResultA()
     {
         long resultA = 0;
-//        for (auto e : items)
-//            resultA += e.getResultA();
+        for (int e = 0; e < items.size();++e)
+            resultA += (items[e].first < items[e].second ? e + 1 : 0);
 
         cout << "result A: " << resultA << endl;
         return resultA;
@@ -209,22 +304,32 @@ public:
     long getResultB()
     {
         long resultB = 0;
-//        for (auto e : items)
-//            resultB += e.getResultB();
+        //        for (auto e : items)
+        //            resultB += e.getResultB();
 
         cout << "result B: " << resultB << endl;
         return resultB;
     }
 
 private:
-    const vector<pair<string,string>> input;
-    vector<pair<PacketData,PacketData>> items;
+    const vector<pair<string, string>> input;
+    vector<pair<PacketData, PacketData>> items;
 };
 
 TEST_CASE("Testdata")
 {
     DistressSignal problemData(inputTestdata);
-    REQUIRE(0 == problemData.getResultA());
+
+    REQUIRE(PacketData("[1,1,3,1,1]") < PacketData("[1,1,5,1,1]"));
+    REQUIRE(PacketData("[[1],[2,3,4]]") < PacketData("[[1],4]"));
+    REQUIRE(!(PacketData("[9]") < PacketData("[[8,7,6]]")));
+    REQUIRE(PacketData("[[4,4],4,4]") < PacketData("[[4,4],4,4,4]"));
+    REQUIRE(!(PacketData("[7,7,7,7]") < PacketData("[7,7,7]")));
+    REQUIRE(PacketData("[]") < PacketData("[3]"));
+    REQUIRE(!(PacketData("[[[]]]") < PacketData("[[]]")));
+    REQUIRE(!(PacketData("[1,[2,[3,[4,[5,6,7]]]],8,9]") < PacketData("[1,[2,[3,[4,[5,6,0]]]],8,9]")));
+
+    REQUIRE(13 == problemData.getResultA());
     REQUIRE(0 == problemData.getResultB());
 }
 
