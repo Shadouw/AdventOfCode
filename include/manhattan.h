@@ -1,7 +1,9 @@
 #pragma once
 
+#include <array>
 #include <vector>
 #include <utility>
+
 #include <cassert>
 
 template <class T, std::size_t N>
