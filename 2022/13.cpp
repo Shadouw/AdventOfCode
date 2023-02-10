@@ -247,7 +247,7 @@ public:
         {
             if ('[' == l.terms[t][0] || '[' == r.terms[t][0])
             {
-                PacketData left('[' == l.terms[t][0] ? l.terms[t] : "[" + l.terms[t]  + "]");
+                PacketData left('[' == l.terms[t][0] ? l.terms[t] : "[" + l.terms[t] + "]");
                 PacketData right('[' == r.terms[t][0] ? r.terms[t] : "[" + r.terms[t] + "]");
 
                 if (left < right)
@@ -255,7 +255,7 @@ public:
                 if (right < left)
                     return false;
             }
-            else 
+            else
             {
                 int left = stoi(l.terms[t]);
                 int right = stoi(r.terms[t]);
@@ -289,23 +289,37 @@ public:
 
         // Parse data
         for (auto elem : input)
-            items.push_back({PacketData(elem.first), PacketData(elem.second)});
+        {
+            itempairs.push_back({PacketData(elem.first), PacketData(elem.second)});
+            packets.push_back(PacketData(elem.first));
+            packets.push_back(PacketData(elem.second));
+        }
+        // Add divider packets
+        packets.push_back(PacketData("[[2]]"));
+        packets.push_back(PacketData("[[6]]"));
     }
 
     long getResultA()
     {
         long resultA = 0;
-        for (int e = 0; e < items.size();++e)
-            resultA += (items[e].first < items[e].second ? e + 1 : 0);
+        for (int e = 0; e < itempairs.size(); ++e)
+            resultA += (itempairs[e].first < itempairs[e].second ? e + 1 : 0);
 
         cout << "result A: " << resultA << endl;
         return resultA;
     }
     long getResultB()
     {
-        long resultB = 0;
-        //        for (auto e : items)
-        //            resultB += e.getResultB();
+        long resultB = 1;
+        std::sort(packets.begin(), packets.end());
+
+        // Search divider package
+        for (int i = 0; i < packets.size(); ++i)
+        {
+            // Remember: The constructor removed the outer []
+            if ("[2]" == packets[i].input || "[6]" ==packets[i].input)
+                resultB *= i + 1;
+        }
 
         cout << "result B: " << resultB << endl;
         return resultB;
@@ -313,7 +327,8 @@ public:
 
 private:
     const vector<pair<string, string>> input;
-    vector<pair<PacketData, PacketData>> items;
+    vector<pair<PacketData, PacketData>> itempairs;
+    vector<PacketData> packets;
 };
 
 TEST_CASE("Testdata")
@@ -330,12 +345,12 @@ TEST_CASE("Testdata")
     REQUIRE(!(PacketData("[1,[2,[3,[4,[5,6,7]]]],8,9]") < PacketData("[1,[2,[3,[4,[5,6,0]]]],8,9]")));
 
     REQUIRE(13 == problemData.getResultA());
-    REQUIRE(0 == problemData.getResultB());
+    REQUIRE(140 == problemData.getResultB());
 }
 
 TEST_CASE("Problem")
 {
     DistressSignal problemData(inputData);
-    REQUIRE(0 == problemData.getResultA());
-    REQUIRE(0 == problemData.getResultB());
+    REQUIRE(5905 == problemData.getResultA());
+    REQUIRE(21691 == problemData.getResultB());
 }
