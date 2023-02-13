@@ -168,37 +168,6 @@ const vector<vector<position>> inputData = {
     {{496, 36}, {496, 34}, {496, 36}, {498, 36}, {498, 30}, {498, 36}, {500, 36}, {500, 31}, {500, 36}, {502, 36}, {502, 27}, {502, 36}, {504, 36}, {504, 29}, {504, 36}, {506, 36}, {506, 34}, {506, 36}, {508, 36}, {508, 34}, {508, 36}, {510, 36}, {510, 30}, {510, 36}, {512, 36}, {512, 30}, {512, 36}},
     {{507, 149}, {507, 151}, {502, 151}, {502, 155}, {516, 155}, {516, 151}, {511, 151}, {511, 149}}};
 
-/*
-class item
-{
-public:
-    item(const string _input) : input(_input)
-    {
-    }
-
-    long getResultA()
-    {
-        long resultA = 0;
-
-        return resultA;
-    }
-
-    long getResultB()
-    {
-        long resultB = 0;
-
-        return resultB;
-    }
-
-    string getString() { return input; }
-
-private:
-    string input;
-
-    friend class RegolithReservoir;
-};
-*/
-
 class RegolithReservoir
 {
 public:
@@ -222,6 +191,13 @@ public:
 
         // Print limits:
         cout << "Min(" << --mindistright << "/" << mindistdown << ") - Max(" << ++maxdistright << "/" << ++maxdistdown << ")" << endl;
+
+        buildArea();
+    }
+
+    void buildArea()
+    {
+        area.clear();
 
         // Parse data
         for (auto path : input)
@@ -280,7 +256,7 @@ public:
         }
     }
 
-    bool addSand()
+    bool addSand(bool endlessfloor = false)
     {
         // Return: true: Everything is okay
         //         false: Down to the abyss
@@ -309,29 +285,38 @@ public:
                 moving = false;
         }
 
-        area[sand] = 2;
-        //printfield();
+        if ( mindistright > sand.first )
+            mindistright = sand.first;
+        if ( maxdistright < sand.first )
+            maxdistright = sand.first;
 
-        return (sand.second != maxdistdown);
+        area[sand] = 2;
+
+        if ( endlessfloor )
+            return (sand.second != mindistdown);
+        else
+            return (sand.second != maxdistdown);
     }
 
     long getResultA()
     {
         long resultA = 0;
-        // for (auto e : items)
-        //     resultA += e.getResultA();
 
         while ( addSand() )
             ++resultA;
-
+ 
         cout << "result A: " << resultA << endl;
         return resultA;
     }
     long getResultB()
     {
-        long resultB = 0;
-        // for (auto e : items)
-        //     resultB += e.getResultB();
+        area.clear();
+        buildArea();
+
+        long resultB = 1; // The last one will not be counted. Therefore start with 1.
+
+        while (addSand(true))
+            ++resultB;
 
         cout << "result B: " << resultB << endl;
         return resultB;
@@ -343,7 +328,6 @@ private:
         mindistright = numeric_limits<int>::max(),
         maxdistdown = numeric_limits<int>::min(),
         mindistdown = 0;
-    // vector<item> items;
     map<position, int> area; // 1 Rock, 2 Sand
 };
 
@@ -351,12 +335,12 @@ TEST_CASE("Testdata")
 {
     RegolithReservoir problemData(inputTestdata);
     REQUIRE(24 == problemData.getResultA());
-    REQUIRE(0 == problemData.getResultB());
+    REQUIRE(93 == problemData.getResultB());
 }
 
 TEST_CASE("Problem")
 {
     RegolithReservoir problemData(inputData);
     REQUIRE(614 == problemData.getResultA());
-    REQUIRE(0 == problemData.getResultB());
+    REQUIRE(26170 == problemData.getResultB());
 }
