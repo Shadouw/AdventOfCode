@@ -2,16 +2,20 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <limits>
+#include <map>
 
 #include <catch2/catch_test_macros.hpp>
 
 using namespace std;
 
-const vector<vector<pair<int,int>>> inputTestdata = {
+typedef pair<int, int> position;
+
+const vector<vector<position>> inputTestdata = {
     {{498, 4}, {498, 6}, {496, 6}},
     {{503, 4}, {502, 4}, {502, 9}, {494, 9}}};
 
-const vector<vector<pair<int, int>>> inputData = {
+const vector<vector<position>> inputData = {
     {{494, 23}, {494, 17}, {494, 23}, {496, 23}, {496, 20}, {496, 23}, {498, 23}, {498, 16}, {498, 23}, {500, 23}, {500, 18}, {500, 23}, {502, 23}, {502, 19}, {502, 23}, {504, 23}, {504, 18}, {504, 23}},
     {{496, 36}, {496, 34}, {496, 36}, {498, 36}, {498, 30}, {498, 36}, {500, 36}, {500, 31}, {500, 36}, {502, 36}, {502, 27}, {502, 36}, {504, 36}, {504, 29}, {504, 36}, {506, 36}, {506, 34}, {506, 36}, {508, 36}, {508, 34}, {508, 36}, {510, 36}, {510, 30}, {510, 36}, {512, 36}, {512, 30}, {512, 36}},
     {{511, 79}, {511, 77}, {511, 79}, {513, 79}, {513, 70}, {513, 79}, {515, 79}, {515, 73}, {515, 79}, {517, 79}, {517, 77}, {517, 79}, {519, 79}, {519, 77}, {519, 79}, {521, 79}, {521, 76}, {521, 79}},
@@ -198,20 +202,127 @@ private:
 class RegolithReservoir
 {
 public:
-    RegolithReservoir(const vector<vector<pair<int, int>>> _input) : input(_input)
+    RegolithReservoir(const vector<vector<position>> _input) : input(_input)
     {
         cout << "Size of Input: " << input.size() << endl;
 
+        // Find min/max values
+        for (auto path : input)
+            for (auto coord : path)
+            {
+                if (coord.first < mindistright)
+                    mindistright = coord.first;
+                if (coord.first > maxdistright)
+                    maxdistright = coord.first;
+                if (coord.second < mindistdown)
+                    mindistdown = coord.second;
+                if (coord.second > maxdistdown)
+                    maxdistdown = coord.second;
+            }
+
+        // Print limits:
+        cout << "Min(" << --mindistright << "/" << mindistdown << ") - Max(" << ++maxdistright << "/" << ++maxdistdown << ")" << endl;
+
         // Parse data
-        //for (auto elem : input)
-        //    items.push_back(item(elem));
+        for (auto path : input)
+        {
+            if (path.size() < 2)
+                cout << "Path too short!" << endl;
+
+            for (auto coord = path.begin(), coord2 = path.begin() + 1; coord2 != path.end(); ++coord, ++coord2)
+            {
+                // cout << "Draw line: (" << coord->first <<"/"<<coord->second<< ") - ("<< coord2->first<< "/"<< coord2->second<<")" << endl;
+                if (coord->first == coord2->first)
+                {
+                    for (auto c = min(coord->second, coord2->second); c <= max(coord->second, coord2->second); ++c)
+                    {
+                        area[{coord->first, c}] = 1;
+                    }
+                }
+                else if (coord->second == coord2->second)
+                {
+                    for (auto c = min(coord->first, coord2->first); c <= max(coord->first, coord2->first); ++c)
+                    {
+                        area[{c, coord->second}] = 1;
+                    }
+                }
+                else
+                {
+                    cout << "Both coordinates are different, that's unexpected" << endl;
+                }
+            }
+        }
+    }
+
+    void printfield()
+    {
+        for (int d = mindistdown; d <= maxdistdown; ++d)
+        {
+            for (int r = mindistright; r <= maxdistright; ++r)
+            {
+                switch (area[{r, d}])
+                {
+                case 0:
+                    cout << ' ';
+                    break;
+                case 1:
+                    cout << '#';
+                    break;
+                case 2:
+                    cout << "o";
+                    break;
+                default:
+                    cout << "Didn't expect this: " << area[{r, d}] << endl;
+                    break;
+                }
+            }
+            cout << endl;
+        }
+    }
+
+    bool addSand()
+    {
+        // Return: true: Everything is okay
+        //         false: Down to the abyss
+        position sand{500, 0};
+        bool moving = true;
+
+        while (moving)
+        {
+            if (0 == area[{sand.first, sand.second + 1}])
+                ++sand.second;
+            else if (0 == area[{sand.first - 1, sand.second + 1}])
+            {
+                --sand.first;
+                ++sand.second;
+            }
+            else if (0 == area[{sand.first + 1, sand.second + 1}])
+            {
+                ++sand.first;
+                ++sand.second;
+            }
+            else{
+                moving = false;
+            }
+
+            if ( sand.second == maxdistdown) // Reached the Abyss
+                moving = false;
+        }
+
+        area[sand] = 2;
+        //printfield();
+
+        return (sand.second != maxdistdown);
     }
 
     long getResultA()
     {
         long resultA = 0;
-        //for (auto e : items)
-        //    resultA += e.getResultA();
+        // for (auto e : items)
+        //     resultA += e.getResultA();
+
+        while ( addSand() )
+            ++resultA;
 
         cout << "result A: " << resultA << endl;
         return resultA;
@@ -219,28 +330,33 @@ public:
     long getResultB()
     {
         long resultB = 0;
-        //for (auto e : items)
-        //    resultB += e.getResultB();
+        // for (auto e : items)
+        //     resultB += e.getResultB();
 
         cout << "result B: " << resultB << endl;
         return resultB;
     }
 
 private:
-    const vector<vector<pair<int, int>>> input;
-    //vector<item> items;
+    const vector<vector<position>> input;
+    int maxdistright = numeric_limits<int>::min(),
+        mindistright = numeric_limits<int>::max(),
+        maxdistdown = numeric_limits<int>::min(),
+        mindistdown = 0;
+    // vector<item> items;
+    map<position, int> area; // 1 Rock, 2 Sand
 };
 
 TEST_CASE("Testdata")
 {
     RegolithReservoir problemData(inputTestdata);
-    REQUIRE(0 == problemData.getResultA());
+    REQUIRE(24 == problemData.getResultA());
     REQUIRE(0 == problemData.getResultB());
 }
 
 TEST_CASE("Problem")
 {
     RegolithReservoir problemData(inputData);
-    REQUIRE(0 == problemData.getResultA());
+    REQUIRE(614 == problemData.getResultA());
     REQUIRE(0 == problemData.getResultB());
 }
