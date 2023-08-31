@@ -59,7 +59,7 @@ public:
         for (auto e : items)
             resultA += e.getResultA();
 
-        cout << "result A: " << resultA << endl;
+        cout << "resultA: " << resultA << endl;
         return resultA;
     }
     long getResultB()
@@ -68,7 +68,7 @@ public:
         for (auto e : items)
             resultB += e.getResultB();
 
-        cout << "result B: " << resultB << endl;
+        cout << "resultB: " << resultB << endl;
         return resultB;
     }
 
