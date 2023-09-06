@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <limits.h>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -142,5 +143,5 @@ TEST_CASE("CorruptionChecksum")
 {
     CorruptionChecksum CorruptionChecksumData(inputData);
     REQUIRE(53978 == CorruptionChecksumData.getChecksum());
-    REQUIRE(0 == CorruptionChecksumData.getEvenlyDivisbleValue());
+    REQUIRE(314 == CorruptionChecksumData.getEvenlyDivisbleValue());
 }
