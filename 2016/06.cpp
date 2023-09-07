@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <utility>
+#include <climits>
 
 #include <catch2/catch_test_macros.hpp>
 
