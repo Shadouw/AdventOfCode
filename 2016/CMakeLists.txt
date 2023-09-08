@@ -1,5 +1,9 @@
 # 2016
 
+add_executable(2016.08 2016/08.cpp)
+target_link_libraries ( 2016.08 PRIVATE Catch2::Catch2WithMain crypto )
+add_test ( 2016.08 ${CMAKE_BINARY_DIR}/2016.08 )
+
 add_executable(2016.07 2016/07.cpp)
 target_link_libraries ( 2016.07 PRIVATE Catch2::Catch2WithMain crypto )
 add_test ( 2016.07 ${CMAKE_BINARY_DIR}/2016.07 )
