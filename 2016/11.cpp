@@ -70,11 +70,91 @@ public:
         }
     }
 
+    /* From the description (https://adventofcode.com/2016/day/11)
+     * The experimental RTGs have poor radiation containment, so they're dangerously radioactive.
+     * The chips are prototypes and don't have normal radiation shielding,
+     * but they do have the ability to generate an electromagnetic radiation shield when powered.
+     * Unfortunately, they can only be powered by their corresponding RTG.
+     * An RTG powering a microchip is still dangerous to other microchips.
+     *
+     * In other words, if a chip is ever left in the same area as another RTG,
+     * and it's not connected to its own RTG, the chip will be fried.
+     * Therefore, it is assumed that you will follow procedure and keep chips connected to their corresponding
+     * RTG when they're in the same room, and away from other RTGs otherwise.
+     */
+    bool checkStatus()
+    {
+        for (auto mc : microchips)
+        {
+            bool owngenerator = false, othergenerator = false;
+            int floor = mc.second;
+
+            if (generators[mc.first] == floor)
+                break;
+            else
+                for (auto g : generators)
+                    if (floor == g.second && g.first != mc.first)
+                        return false;
+        }
+
+        return true;
+    }
+
+    bool checkAllOnFloor(int f)
+    {
+        for (auto mc : microchips)
+            if (mc.second != f)
+                return false;
+
+        for (auto g : generators)
+            if (g.second != f)
+                return false;
+
+        return true;
+    }
+
+    bool checkValidMove(const int targetfloor, bool chip1, string elem1, bool chip2, string elem2) const
+    {
+        if (4 < targetfloor)
+            return false;
+        if (1 > targetfloor)
+            return false;
+        if (abs(elevator - targetfloor) != 1)
+            return false;
+
+        if (elevator != (chip1 ? microchips : generators).at(elem1))
+            return false;
+        if (elevator != (chip2 ? microchips : generators).at(elem2))
+            return false;
+
+        return true;
+    }
+
+    bool Move(const int targetfloor, bool chip1, string elem1, bool chip2, string elem2)
+    {
+        (chip1 ? microchips : generators)[elem1] = targetfloor;
+        (chip2 ? microchips : generators)[elem2] = targetfloor;
+        elevator = targetfloor;
+
+        return checkStatus();
+    }
+
+    // Copy Constructor
+    /*
+    status(const status &stat) : generators(stat.generators),
+                                 microchips(stat.microchips),
+                                 iteration(stat.iteration),
+                                 elevator(stat.elevator)
+    {
+    }
+    */
+
 private:
     map<string, int> generators;
     map<string, int> microchips;
 
     int iteration;
+    int elevator = 1;
 
     friend class RadioisotopeThermoelectricGenerators;
 };
@@ -92,14 +172,79 @@ public:
         for (auto elem : input)
             initstatus.parseline(elem);
 
-        statuss.push_back(initstatus);
+        stati.push_back(initstatus);
     }
 
     long getResultA()
     {
         long resultA = 0;
-        // for (auto e : statuss)
-        //     resultA += e.getResultA();
+
+        while (0 == resultA)
+        {
+            const status firststatus = stati.front();
+            stati.erase(stati.begin());
+            oldstati.push_back(firststatus);
+
+            for (int e = firststatus.elevator - 1; e <= firststatus.elevator + 1; e += 2)
+            {
+                if (0 < e && e <= 4)
+                {
+                    for (auto c1 : firststatus.microchips)
+                        for (auto c2 : firststatus.microchips)
+                            if (firststatus.checkValidMove(e, true, c1.first, true, c2.first))
+                            {
+                                status newstatus(firststatus);
+                                ++newstatus.iteration;
+                                if (newstatus.Move(e, true, c1.first, true, c2.first))
+                                {
+                                    stati.push_back(newstatus);
+                                    if (newstatus.checkAllOnFloor(4))
+                                    {
+                                        // Check if we already had this status
+                                        resultA = newstatus.iteration;
+                                        break;
+                                    }
+                                }
+                            }
+
+                    for (auto g1 : firststatus.generators)
+                        for (auto g2 : firststatus.generators)
+                            if (firststatus.checkValidMove(e, false, g1.first, false, g2.first))
+                            {
+                                status newstatus(firststatus);
+                                ++newstatus.iteration;
+                                if (newstatus.Move(e, false, g1.first, false, g2.first))
+                                {
+                                    stati.push_back(newstatus);
+                                    if (newstatus.checkAllOnFloor(4))
+                                    {
+                                        // Check if we already had this status
+                                        resultA = newstatus.iteration;
+                                        break;
+                                    }
+                                }
+                            }
+
+                    for (auto c1 : firststatus.microchips)
+                        for (auto g2 : firststatus.generators)
+                            if (firststatus.checkValidMove(e, true, c1.first, false, g2.first))
+                            {
+                                status newstatus(firststatus);
+                                ++newstatus.iteration;
+                                if (newstatus.Move(e, true, c1.first, false, g2.first))
+                                {
+                                    stati.push_back(newstatus);
+                                    if (newstatus.checkAllOnFloor(4))
+                                    {
+                                        // Check if we already had this status
+                                        resultA = newstatus.iteration;
+                                        break;
+                                    }
+                                }
+                            }
+                }
+            }
+        }
 
         cout << "resultA: " << resultA << endl;
         return resultA;
@@ -107,7 +252,7 @@ public:
     long getResultB()
     {
         long resultB = 0;
-        // for (auto e : statuss)
+        // for (auto e : stati)
         //     resultB += e.getResultB();
 
         cout << "resultB: " << resultB << endl;
@@ -116,7 +261,8 @@ public:
 
 private:
     const vector<string> input;
-    vector<status> statuss;
+    vector<status> stati;
+    vector<status> oldstati;
 };
 
 TEST_CASE("Testdata")
