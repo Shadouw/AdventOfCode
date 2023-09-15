@@ -89,9 +89,7 @@ public:
             bool owngenerator = false, othergenerator = false;
             int floor = mc.second;
 
-            if (generators[mc.first] == floor)
-                break;
-            else
+            if (generators[mc.first] != floor)
                 for (auto g : generators)
                     if (floor == g.second && g.first != mc.first)
                         return false;
@@ -139,6 +137,41 @@ public:
         return checkStatus();
     }
 
+    bool operator==(const status &other) const {
+        return generators == other.generators
+            && microchips == other.microchips
+            && elevator == other.elevator;
+    }
+    bool operator!=(const status &other) const { return !(*this == other); }
+
+    friend std::ostream &operator<<(std::ostream &os, const status &rhs) {
+        os << "Iteration: " << rhs.iteration << endl;
+
+        for ( int e=4; e>=1; --e )
+        {
+            os << "F" << e << ": ";
+
+            if (rhs.elevator == e ) 
+                os << " E ";
+            else
+                os << "   ";
+
+            os << "G: ";
+            for ( auto g : rhs.generators )
+                if (g.second==e)
+                    os << g.first << " ";
+
+            os << "M: ";
+            for ( auto m : rhs.microchips )
+                if (m.second==e)
+                    os << m.first << " ";
+
+            os << endl;
+        }
+
+        return os;
+    }
+
     // Copy Constructor
     /*
     status(const status &stat) : generators(stat.generators),
@@ -175,15 +208,35 @@ public:
         stati.push_back(initstatus);
     }
 
+    bool checkIfStatusExists(const status &s)
+    {
+        for ( auto e : oldstati )
+            if ( s == e )
+                return true;
+
+        for ( auto e : stati )
+            if ( s == e )
+                return true;
+
+        return false;        
+    }
+
     long getResultA()
     {
         long resultA = 0;
+        long currentIteration = 0;
 
         while (0 == resultA)
         {
             const status firststatus = stati.front();
             stati.erase(stati.begin());
             oldstati.push_back(firststatus);
+
+            if ( firststatus.iteration != currentIteration)
+            {
+                currentIteration = firststatus.iteration;
+                cout << "Iteration: " << currentIteration << " Size: " << oldstati.size() << endl;
+            }
 
             for (int e = firststatus.elevator - 1; e <= firststatus.elevator + 1; e += 2)
             {
@@ -197,12 +250,16 @@ public:
                                 ++newstatus.iteration;
                                 if (newstatus.Move(e, true, c1.first, true, c2.first))
                                 {
-                                    stati.push_back(newstatus);
-                                    if (newstatus.checkAllOnFloor(4))
+                                    if ( !checkIfStatusExists(newstatus) )
                                     {
-                                        // Check if we already had this status
-                                        resultA = newstatus.iteration;
-                                        break;
+                                        stati.push_back(newstatus);
+                                        //cout << newstatus << endl;
+                                        if (newstatus.checkAllOnFloor(4))
+                                        {
+                                            // Check if we already had this status
+                                            resultA = newstatus.iteration;
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -215,12 +272,16 @@ public:
                                 ++newstatus.iteration;
                                 if (newstatus.Move(e, false, g1.first, false, g2.first))
                                 {
-                                    stati.push_back(newstatus);
-                                    if (newstatus.checkAllOnFloor(4))
+                                    if ( !checkIfStatusExists(newstatus) )
                                     {
-                                        // Check if we already had this status
-                                        resultA = newstatus.iteration;
-                                        break;
+                                        stati.push_back(newstatus);
+                                        //cout << newstatus << endl;
+                                        if (newstatus.checkAllOnFloor(4))
+                                        {
+                                            // Check if we already had this status
+                                            resultA = newstatus.iteration;
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -233,12 +294,16 @@ public:
                                 ++newstatus.iteration;
                                 if (newstatus.Move(e, true, c1.first, false, g2.first))
                                 {
-                                    stati.push_back(newstatus);
-                                    if (newstatus.checkAllOnFloor(4))
+                                    if ( !checkIfStatusExists(newstatus) )
                                     {
-                                        // Check if we already had this status
-                                        resultA = newstatus.iteration;
-                                        break;
+                                        stati.push_back(newstatus);
+                                        //cout << newstatus << endl;
+                                        if (newstatus.checkAllOnFloor(4))
+                                        {
+                                            // Check if we already had this status
+                                            resultA = newstatus.iteration;
+                                            break;
+                                        }
                                     }
                                 }
                             }
