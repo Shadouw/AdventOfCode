@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <queue>
 #include <cmath>
 
 #include <catch2/catch_test_macros.hpp>
@@ -65,16 +66,20 @@ public:
             if ('-' == line[pos2])
             {
                 microchips[element] = floor;
-                ++MicrochipsOnFloor[floor];
             }
             else
             {
                 generators[element] = floor;
-                ++GeneratorsOnFloor[floor];
             }
 
             pos = line.find(" a ", pos2);
         }
+    }
+
+    void addFirstFloor(string element)
+    {
+        microchips[element] = 1;
+        generators[element] = 1;
     }
 
     /* From the description (https://adventofcode.com/2016/day/11)
@@ -138,14 +143,10 @@ public:
     bool Move(const int targetfloor, bool chip1, string elem1, bool chip2, string elem2)
     {
         (chip1 ? microchips : generators)[elem1] = targetfloor;
-        --(chip1 ? MicrochipsOnFloor : GeneratorsOnFloor)[elevator];
-        ++(chip1 ? MicrochipsOnFloor : GeneratorsOnFloor)[targetfloor];
 
         if ( chip1 != chip2 || elem1 != elem2 )
         {
             (chip2 ? microchips : generators)[elem2] = targetfloor;
-            --(chip2 ? MicrochipsOnFloor : GeneratorsOnFloor)[elevator];
-            ++(chip2 ? MicrochipsOnFloor : GeneratorsOnFloor)[targetfloor];
         }
         elevator = targetfloor;
 
@@ -154,12 +155,6 @@ public:
 
     bool operator==(const status &other) const {
         if ( elevator != other.elevator ) return false;
-
-        for ( int f = 1; f<=4; ++f )
-            if ( MicrochipsOnFloor[f] != other.MicrochipsOnFloor[f] ) return false;
-
-        for ( int f = 1; f<=4; ++f )
-            if ( GeneratorsOnFloor[f] != other.GeneratorsOnFloor[f] ) return false;
 
         if ( generators != other.generators ) return false;
         if ( microchips != other.microchips ) return false;
@@ -210,24 +205,12 @@ public:
         return checksum;
     }
 
-    // Copy Constructor
-    /*
-    status(const status &stat) : generators(stat.generators),
-                                 microchips(stat.microchips),
-                                 iteration(stat.iteration),
-                                 elevator(stat.elevator)
-    {
-    }
-    */
-
 private:
     map<string, int> generators;
     map<string, int> microchips;
 
     int iteration;
     int elevator = 1;
-    int MicrochipsOnFloor[5] = {0,0,0,0,0};
-    int GeneratorsOnFloor[5] = {0,0,0,0,0};
 
     friend class RadioisotopeThermoelectricGenerators;
 };
@@ -235,7 +218,7 @@ private:
 class RadioisotopeThermoelectricGenerators
 {
 public:
-    RadioisotopeThermoelectricGenerators(const vector<string> &_input) : input(_input)
+    RadioisotopeThermoelectricGenerators(const vector<string> &_input, bool partB=false) : input(_input)
     {
         cout << "Size of Input: " << input.size() << endl;
 
@@ -245,7 +228,13 @@ public:
         for (auto elem : input)
             initstatus.parseline(elem);
 
-        stati.push_back(initstatus);
+        if ( partB )
+        {
+            initstatus.addFirstFloor("elerium");
+            initstatus.addFirstFloor("dilithium");
+        }
+
+        stati.push(initstatus);
     }
 
     bool checkIfStatusExists(const status &s)
@@ -263,15 +252,16 @@ public:
         return false;        
     }
 
-    long getResultA()
+    long getAllOn4thFloor()
     {
-        long resultA = 0;
+        long AllOn4thFloor = 0;
         long currentIteration = 0;
         long statuscounter = -1;
 
-        while (0 == resultA)
+        while (0 == AllOn4thFloor)
         {
-            const status currentstatus = stati[++statuscounter];
+            const status currentstatus = stati.front();
+            stati.pop();
 
             if ( currentstatus.iteration != currentIteration)
             {
@@ -293,12 +283,12 @@ public:
                                 {
                                     if ( !checkIfStatusExists(newstatus) )
                                     {
-                                        stati.push_back(newstatus);
+                                        stati.push(newstatus);
                                         //cout << newstatus << endl;
                                         if (newstatus.checkAllOnFloor(4))
                                         {
                                             // Check if we already had this status
-                                            resultA = newstatus.iteration;
+                                            AllOn4thFloor = newstatus.iteration;
                                             break;
                                         }
                                     }
@@ -315,12 +305,12 @@ public:
                                 {
                                     if ( !checkIfStatusExists(newstatus) )
                                     {
-                                        stati.push_back(newstatus);
+                                        stati.push(newstatus);
                                         //cout << newstatus << endl;
                                         if (newstatus.checkAllOnFloor(4))
                                         {
                                             // Check if we already had this status
-                                            resultA = newstatus.iteration;
+                                            AllOn4thFloor = newstatus.iteration;
                                             break;
                                         }
                                     }
@@ -337,12 +327,12 @@ public:
                                 {
                                     if ( !checkIfStatusExists(newstatus) )
                                     {
-                                        stati.push_back(newstatus);
+                                        stati.push(newstatus);
                                         //cout << newstatus << endl;
                                         if (newstatus.checkAllOnFloor(4))
                                         {
                                             // Check if we already had this status
-                                            resultA = newstatus.iteration;
+                                            AllOn4thFloor = newstatus.iteration;
                                             break;
                                         }
                                     }
@@ -352,35 +342,30 @@ public:
             }
         }
 
-        cout << "resultA: " << resultA << endl;
-        return resultA;
-    }
-    long getResultB()
-    {
-        long resultB = 0;
-        // for (auto e : stati)
-        //     resultB += e.getResultB();
-
-        cout << "resultB: " << resultB << endl;
-        return resultB;
+        cout << "AllOn4thFloor: " << AllOn4thFloor << endl;
+        return AllOn4thFloor;
     }
 
 private:
     const vector<string> input;
-    vector<status> stati;
+    queue<status> stati;
     map<long,bool> seenstati;
 };
 
 TEST_CASE("Testdata")
 {
     RadioisotopeThermoelectricGenerators RadioisotopeThermoelectricGeneratorsData(inputTestdata);
-    REQUIRE(11 == RadioisotopeThermoelectricGeneratorsData.getResultA());
-    REQUIRE(0 == RadioisotopeThermoelectricGeneratorsData.getResultB());
+    REQUIRE(11 == RadioisotopeThermoelectricGeneratorsData.getAllOn4thFloor());
 }
 
 TEST_CASE("RadioisotopeThermoelectricGenerators")
 {
     RadioisotopeThermoelectricGenerators RadioisotopeThermoelectricGeneratorsData(inputData);
-    REQUIRE(0 == RadioisotopeThermoelectricGeneratorsData.getResultA());
-    REQUIRE(0 == RadioisotopeThermoelectricGeneratorsData.getResultB());
+    REQUIRE(47 == RadioisotopeThermoelectricGeneratorsData.getAllOn4thFloor());
+}
+
+TEST_CASE("RadioisotopeThermoelectricGeneratorsB")
+{
+    RadioisotopeThermoelectricGenerators RadioisotopeThermoelectricGeneratorsData(inputData, true);
+    REQUIRE(71 == RadioisotopeThermoelectricGeneratorsData.getAllOn4thFloor());
 }
