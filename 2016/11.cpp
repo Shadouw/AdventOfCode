@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <cmath>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -62,9 +63,15 @@ public:
             string element = line.substr(pos + 3, pos2 - (pos + 3));
 
             if ('-' == line[pos2])
+            {
                 microchips[element] = floor;
+                ++MicrochipsOnFloor[floor];
+            }
             else
+            {
                 generators[element] = floor;
+                ++GeneratorsOnFloor[floor];
+            }
 
             pos = line.find(" a ", pos2);
         }
@@ -131,16 +138,33 @@ public:
     bool Move(const int targetfloor, bool chip1, string elem1, bool chip2, string elem2)
     {
         (chip1 ? microchips : generators)[elem1] = targetfloor;
-        (chip2 ? microchips : generators)[elem2] = targetfloor;
+        --(chip1 ? MicrochipsOnFloor : GeneratorsOnFloor)[elevator];
+        ++(chip1 ? MicrochipsOnFloor : GeneratorsOnFloor)[targetfloor];
+
+        if ( chip1 != chip2 || elem1 != elem2 )
+        {
+            (chip2 ? microchips : generators)[elem2] = targetfloor;
+            --(chip2 ? MicrochipsOnFloor : GeneratorsOnFloor)[elevator];
+            ++(chip2 ? MicrochipsOnFloor : GeneratorsOnFloor)[targetfloor];
+        }
         elevator = targetfloor;
 
         return checkStatus();
     }
 
     bool operator==(const status &other) const {
-        return generators == other.generators
-            && microchips == other.microchips
-            && elevator == other.elevator;
+        if ( elevator != other.elevator ) return false;
+
+        for ( int f = 1; f<=4; ++f )
+            if ( MicrochipsOnFloor[f] != other.MicrochipsOnFloor[f] ) return false;
+
+        for ( int f = 1; f<=4; ++f )
+            if ( GeneratorsOnFloor[f] != other.GeneratorsOnFloor[f] ) return false;
+
+        if ( generators != other.generators ) return false;
+        if ( microchips != other.microchips ) return false;
+
+        return true;
     }
     bool operator!=(const status &other) const { return !(*this == other); }
 
@@ -172,6 +196,20 @@ public:
         return os;
     }
 
+    long getChecksum() const
+    {
+        int  checkpos = 0;
+        long checksum = elevator-1;
+        
+        for ( auto g : generators )
+            checksum += (g.second-1) * pow(4,++checkpos);
+        
+        for ( auto m : microchips )
+            checksum += (m.second-1) * pow(4,++checkpos);
+
+        return checksum;
+    }
+
     // Copy Constructor
     /*
     status(const status &stat) : generators(stat.generators),
@@ -188,6 +226,8 @@ private:
 
     int iteration;
     int elevator = 1;
+    int MicrochipsOnFloor[5] = {0,0,0,0,0};
+    int GeneratorsOnFloor[5] = {0,0,0,0,0};
 
     friend class RadioisotopeThermoelectricGenerators;
 };
@@ -210,13 +250,15 @@ public:
 
     bool checkIfStatusExists(const status &s)
     {
-        for ( auto e : oldstati )
-            if ( s == e )
-                return true;
-
+        /*
         for ( auto e : stati )
+        //for ( auto e = stati.rbegin(); e != stati.rend(); ++e ) 
             if ( s == e )
                 return true;
+        */
+        bool ret = seenstati[s.getChecksum()];
+        seenstati[s.getChecksum()] = true; 
+        return ret;
 
         return false;        
     }
@@ -225,28 +267,27 @@ public:
     {
         long resultA = 0;
         long currentIteration = 0;
+        long statuscounter = -1;
 
         while (0 == resultA)
         {
-            const status firststatus = stati.front();
-            stati.erase(stati.begin());
-            oldstati.push_back(firststatus);
+            const status currentstatus = stati[++statuscounter];
 
-            if ( firststatus.iteration != currentIteration)
+            if ( currentstatus.iteration != currentIteration)
             {
-                currentIteration = firststatus.iteration;
-                cout << "Iteration: " << currentIteration << " Size: " << oldstati.size() << endl;
+                currentIteration = currentstatus.iteration;
+                cout << "Iteration: " << currentIteration << " Size: " << stati.size() << endl;
             }
 
-            for (int e = firststatus.elevator - 1; e <= firststatus.elevator + 1; e += 2)
+            for (int e = currentstatus.elevator - 1; e <= currentstatus.elevator + 1; e += 2)
             {
                 if (0 < e && e <= 4)
                 {
-                    for (auto c1 : firststatus.microchips)
-                        for (auto c2 : firststatus.microchips)
-                            if (firststatus.checkValidMove(e, true, c1.first, true, c2.first))
+                    for (auto c1 : currentstatus.microchips)
+                        for (auto c2 : currentstatus.microchips)
+                            if (currentstatus.checkValidMove(e, true, c1.first, true, c2.first))
                             {
-                                status newstatus(firststatus);
+                                status newstatus(currentstatus);
                                 ++newstatus.iteration;
                                 if (newstatus.Move(e, true, c1.first, true, c2.first))
                                 {
@@ -264,11 +305,11 @@ public:
                                 }
                             }
 
-                    for (auto g1 : firststatus.generators)
-                        for (auto g2 : firststatus.generators)
-                            if (firststatus.checkValidMove(e, false, g1.first, false, g2.first))
+                    for (auto g1 : currentstatus.generators)
+                        for (auto g2 : currentstatus.generators)
+                            if (currentstatus.checkValidMove(e, false, g1.first, false, g2.first))
                             {
-                                status newstatus(firststatus);
+                                status newstatus(currentstatus);
                                 ++newstatus.iteration;
                                 if (newstatus.Move(e, false, g1.first, false, g2.first))
                                 {
@@ -286,11 +327,11 @@ public:
                                 }
                             }
 
-                    for (auto c1 : firststatus.microchips)
-                        for (auto g2 : firststatus.generators)
-                            if (firststatus.checkValidMove(e, true, c1.first, false, g2.first))
+                    for (auto c1 : currentstatus.microchips)
+                        for (auto g2 : currentstatus.generators)
+                            if (currentstatus.checkValidMove(e, true, c1.first, false, g2.first))
                             {
-                                status newstatus(firststatus);
+                                status newstatus(currentstatus);
                                 ++newstatus.iteration;
                                 if (newstatus.Move(e, true, c1.first, false, g2.first))
                                 {
@@ -327,7 +368,7 @@ public:
 private:
     const vector<string> input;
     vector<status> stati;
-    vector<status> oldstati;
+    map<long,bool> seenstati;
 };
 
 TEST_CASE("Testdata")
