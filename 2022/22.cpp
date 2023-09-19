@@ -2,8 +2,11 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <array>
 
 #include <catch2/catch_test_macros.hpp>
+
+#include <manhattan.h>
 
 using namespace std;
 
@@ -237,13 +240,73 @@ public:
         cout << "Size of map: " << mapsize.first << "x" << mapsize.second << endl;
 
         // Check all lines if they have the same length
-        for ( auto l : map)
-            if (l.size() != mapsize.first )
+        for (auto l : map)
+            if (l.size() != mapsize.first)
                 cout << "Line has wrong size: " << l << endl;
 
         // Find start position
         backToStart();
         cout << "Start position: " << position.first << "x" << position.second << endl;
+
+        // Detect the cube area (3x4) or (4x3)
+        if (0 == mapsize.first % 3)
+        {
+            if (mapsize.first / 3 != mapsize.second / 4)
+                cout << "ERROR: Cube Area: 3x4, Each area" << mapsize.first / 3 << "x" << mapsize.second / 4 << endl;
+            cubelength = mapsize.first / 3;
+        }
+        else
+        {
+            if (mapsize.first / 4 != mapsize.second / 3)
+                cout << "Cube Area: 4x3, Each area" << mapsize.first / 4 << "x" << mapsize.second / 3 << endl;
+            cubelength = mapsize.first / 4;
+        }
+        cout << "Cubelength: " << cubelength << endl;
+
+        vector<postype> foundareas;
+        // Paint the cube
+        for (int y = cubelength / 2; y < mapsize.second; y += cubelength)
+        {
+            for (int x = cubelength / 2; x < mapsize.first; x += cubelength)
+            {
+                if (getCharOnPosition({x, y}) == ' ')
+                    cout << ' ';
+                else
+                {
+                    cout << '*';
+                    foundareas.push_back({x/cubelength, y/cubelength});
+                }
+            }
+            cout << endl;
+        }
+
+        // Reference Cube:
+        // 314   203
+        //  2     1
+        //  6     5
+        //  5     4
+
+        // Definition: The first found is number 1
+        cube[0].first = *foundareas.begin();
+        cube[0].second = 0;
+        foundareas.erase(foundareas.begin());
+
+        while (foundareas.size())
+        {
+            for (auto f = foundareas.begin(); f != foundareas.end(); ++f)
+                for (auto c = 0; c < 6 - foundareas.size(); ++c)
+                {
+                    int md = manhattandistanceP(cube[c].first, *f);
+                    if (1 == manhattandistanceP(cube[c].first, *f))
+                    {
+                        cout << "Found Neighbour of: " << c << "(" << cube[c].first.first << "/" << cube[c].first.second << ") : (" << f->first<< "/"<<f->second<<")" << endl;
+                        int localorientation = getOrientation({f->first - cube[c].first.first, f->second-cube[c].first.second});
+                        cout << " Orientation: " << localorientation << endl;
+                        foundareas.erase(f);
+                        break;
+                    }
+                }
+        }
     }
 
     void backToStart()
@@ -280,10 +343,53 @@ public:
         }
     }
 
+    void runStep(const char d)
+    {
+        if (d == 'R')
+        {
+            ++orientation;
+            orientation %= 4;
+        }
+        else if (d == 'L')
+        {
+            --orientation;
+            if (orientation < 0)
+                orientation += 4;
+        }
+    }
+
     void runStep(int n)
     {
-        postype movement = {0, 0}; 
-        switch (orientation)
+        for (int i = 0; i < n; ++i)
+        {
+            postype targetposition = getNewPosition();
+            if ('.' == getCharOnPosition(targetposition))
+                position = targetposition;
+        }
+    }
+
+    postype getNewPosition()
+    {
+        postype movement = getMovement(orientation);
+
+        postype newposition = {position.first + movement.first, position.second + movement.second};
+        fixposition(newposition);
+
+        while (' ' == getCharOnPosition(newposition))
+        {
+            newposition = {newposition.first + movement.first, newposition.second + movement.second};
+            fixposition(newposition);
+        }
+
+        return newposition;
+    }
+
+    // getMovement translate the orientation (0 to 3) into a one-step movement vector
+    postype getMovement(int ori)
+    {
+        postype movement = {0, 0};
+
+        switch (ori)
         {
         case 0: // Right/East
             movement.first = +1;
@@ -298,22 +404,22 @@ public:
             movement.second = -1;
             break;
         default:
-            cout << "Running into wrong direction: " << orientation << endl;
+            cout << "Running into wrong direction: " << ori << endl;
             break;
         }
 
-        for (int i = 0; i < n; ++i)
-        {
-            postype targetposition = {position.first + movement.first, position.second + movement.second};
-            fixposition(targetposition);
-            while (' ' == getCharOnPosition(targetposition))
-            {
-                targetposition = {targetposition.first + movement.first, targetposition.second + movement.second};
-                fixposition(targetposition);
-            }
-            if ('.' == getCharOnPosition(targetposition))
-                position = targetposition;
-        }
+        return movement;
+    }
+
+    // get Orientation from Movement vector
+    int getOrientation(postype pos)
+    {
+        for (int p = 0; p < 4;++p)
+            if (getMovement(p)==pos)
+            return p;
+
+        cout << "ERROR wrong movement (for orientation): " << pos.first << "/" << pos.second << endl;
+        return -1;
     }
 
     char getCharOnPosition(postype pos)
@@ -333,21 +439,6 @@ public:
             pos.second += mapsize.second;
         if (pos.second >= mapsize.second)
             pos.second %= mapsize.second;
-    }
-
-    void runStep(const char d)
-    {
-        if (d == 'R')
-        {
-            ++orientation;
-            orientation %= 4;
-        }
-        else if (d == 'L')
-        {
-            --orientation;
-            if (orientation < 0)
-                orientation += 4;
-        }
     }
 
     long getResultA()
@@ -374,6 +465,8 @@ private:
     int orientation = 0; // 0: Right/East, 1: Down/South, 2: Left/West, 3: Top/North
     postype mapsize;
     postype position;
+    int cubelength = 0;
+    array<pair<postype, int>, 6> cube; // Position (on either 3x4 or 4x3 grid) and orientation.
 };
 
 TEST_CASE("Testdata")
