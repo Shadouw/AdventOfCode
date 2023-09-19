@@ -100,6 +100,12 @@ public:
         return stoi(token);
     }
 
+    void reset()
+    {
+        PC = 0;
+        reg.clear();
+    }
+
 
     long getResultA()
     {
@@ -111,7 +117,10 @@ public:
     }
     long getResultB()
     {
-        long resultB = 0;
+        reset();
+        reg["c"]=1;
+        runProgram();
+        long resultB = reg["a"];
 
         cout << "resultB: " << resultB << endl;
         return resultB;
@@ -128,12 +137,11 @@ TEST_CASE("Testdata")
 {
     LeonardosMonorail LeonardosMonorailData(inputTestdata);
     REQUIRE(42 == LeonardosMonorailData.getResultA());
-    REQUIRE(0 == LeonardosMonorailData.getResultB());
 }
 
 TEST_CASE("LeonardosMonorail")
 {
     LeonardosMonorail LeonardosMonorailData(inputData);
     REQUIRE(318007 == LeonardosMonorailData.getResultA());
-    REQUIRE(0 == LeonardosMonorailData.getResultB());
+    REQUIRE(9227661 == LeonardosMonorailData.getResultB());
 }
