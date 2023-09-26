@@ -244,17 +244,9 @@ public:
 
     bool checkIfStatusExists(const status &s)
     {
-        /*
-        for ( auto e : stati )
-        //for ( auto e = stati.rbegin(); e != stati.rend(); ++e )
-            if ( s == e )
-                return true;
-        */
         bool ret = seenstati[s.getChecksum()];
         seenstati[s.getChecksum()] = true;
         return ret;
-
-        return false;
     }
 
     long getAllOn4thFloor()
