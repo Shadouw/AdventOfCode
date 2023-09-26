@@ -144,7 +144,7 @@ public:
     {
         (chip1 ? microchips : generators)[elem1] = targetfloor;
 
-        if ( chip1 != chip2 || elem1 != elem2 )
+        if (chip1 != chip2 || elem1 != elem2)
         {
             (chip2 ? microchips : generators)[elem2] = targetfloor;
         }
@@ -153,36 +153,41 @@ public:
         return checkStatus();
     }
 
-    bool operator==(const status &other) const {
-        if ( elevator != other.elevator ) return false;
+    bool operator==(const status &other) const
+    {
+        if (elevator != other.elevator)
+            return false;
 
-        if ( generators != other.generators ) return false;
-        if ( microchips != other.microchips ) return false;
+        if (generators != other.generators)
+            return false;
+        if (microchips != other.microchips)
+            return false;
 
         return true;
     }
     bool operator!=(const status &other) const { return !(*this == other); }
 
-    friend std::ostream &operator<<(std::ostream &os, const status &rhs) {
+    friend std::ostream &operator<<(std::ostream &os, const status &rhs)
+    {
         os << "Iteration: " << rhs.iteration << endl;
 
-        for ( int e=4; e>=1; --e )
+        for (int e = 4; e >= 1; --e)
         {
             os << "F" << e << ": ";
 
-            if (rhs.elevator == e ) 
+            if (rhs.elevator == e)
                 os << " E ";
             else
                 os << "   ";
 
             os << "G: ";
-            for ( auto g : rhs.generators )
-                if (g.second==e)
+            for (auto g : rhs.generators)
+                if (g.second == e)
                     os << g.first << " ";
 
             os << "M: ";
-            for ( auto m : rhs.microchips )
-                if (m.second==e)
+            for (auto m : rhs.microchips)
+                if (m.second == e)
                     os << m.first << " ";
 
             os << endl;
@@ -193,14 +198,14 @@ public:
 
     long getChecksum() const
     {
-        int  checkpos = 0;
-        long checksum = elevator-1;
-        
-        for ( auto g : generators )
-            checksum += (g.second-1) * pow(4,++checkpos);
-        
-        for ( auto m : microchips )
-            checksum += (m.second-1) * pow(4,++checkpos);
+        int checkpos = 0;
+        long checksum = elevator - 1;
+
+        for (auto g : generators)
+            checksum += (g.second - 1) * pow(4, ++checkpos);
+
+        for (auto m : microchips)
+            checksum += (m.second - 1) * pow(4, ++checkpos);
 
         return checksum;
     }
@@ -218,7 +223,7 @@ private:
 class RadioisotopeThermoelectricGenerators
 {
 public:
-    RadioisotopeThermoelectricGenerators(const vector<string> &_input, bool partB=false) : input(_input)
+    RadioisotopeThermoelectricGenerators(const vector<string> &_input, bool partB = false) : input(_input)
     {
         cout << "Size of Input: " << input.size() << endl;
 
@@ -228,7 +233,7 @@ public:
         for (auto elem : input)
             initstatus.parseline(elem);
 
-        if ( partB )
+        if (partB)
         {
             initstatus.addFirstFloor("elerium");
             initstatus.addFirstFloor("dilithium");
@@ -241,15 +246,15 @@ public:
     {
         /*
         for ( auto e : stati )
-        //for ( auto e = stati.rbegin(); e != stati.rend(); ++e ) 
+        //for ( auto e = stati.rbegin(); e != stati.rend(); ++e )
             if ( s == e )
                 return true;
         */
         bool ret = seenstati[s.getChecksum()];
-        seenstati[s.getChecksum()] = true; 
+        seenstati[s.getChecksum()] = true;
         return ret;
 
-        return false;        
+        return false;
     }
 
     long getAllOn4thFloor()
@@ -263,7 +268,7 @@ public:
             const status currentstatus = stati.front();
             stati.pop();
 
-            if ( currentstatus.iteration != currentIteration)
+            if (currentstatus.iteration != currentIteration)
             {
                 currentIteration = currentstatus.iteration;
                 cout << "Iteration: " << currentIteration << " Size: " << stati.size() << endl;
@@ -281,10 +286,10 @@ public:
                                 ++newstatus.iteration;
                                 if (newstatus.Move(e, true, c1.first, true, c2.first))
                                 {
-                                    if ( !checkIfStatusExists(newstatus) )
+                                    if (!checkIfStatusExists(newstatus))
                                     {
                                         stati.push(newstatus);
-                                        //cout << newstatus << endl;
+                                        // cout << newstatus << endl;
                                         if (newstatus.checkAllOnFloor(4))
                                         {
                                             // Check if we already had this status
@@ -303,10 +308,10 @@ public:
                                 ++newstatus.iteration;
                                 if (newstatus.Move(e, false, g1.first, false, g2.first))
                                 {
-                                    if ( !checkIfStatusExists(newstatus) )
+                                    if (!checkIfStatusExists(newstatus))
                                     {
                                         stati.push(newstatus);
-                                        //cout << newstatus << endl;
+                                        // cout << newstatus << endl;
                                         if (newstatus.checkAllOnFloor(4))
                                         {
                                             // Check if we already had this status
@@ -325,10 +330,10 @@ public:
                                 ++newstatus.iteration;
                                 if (newstatus.Move(e, true, c1.first, false, g2.first))
                                 {
-                                    if ( !checkIfStatusExists(newstatus) )
+                                    if (!checkIfStatusExists(newstatus))
                                     {
                                         stati.push(newstatus);
-                                        //cout << newstatus << endl;
+                                        // cout << newstatus << endl;
                                         if (newstatus.checkAllOnFloor(4))
                                         {
                                             // Check if we already had this status
@@ -349,7 +354,7 @@ public:
 private:
     const vector<string> input;
     queue<status> stati;
-    map<long,bool> seenstati;
+    map<long, bool> seenstati;
 };
 
 TEST_CASE("Testdata")
