@@ -77,7 +77,7 @@ public:
 
     bool checkIfStatusExists(const status &s)
     {
-        if ( 1==s.position.first && 1==s.position.second )
+        if (1 == s.position.first && 1 == s.position.second)
             return true;
 
         int ret = seenstati[s.position];
@@ -90,18 +90,10 @@ public:
 
     long getToPosition(const POSITION dest)
     {
-        long currentIteration = 0;
-
         while (stati.size() != 0)
         {
             const status currentstatus = stati.front();
             stati.pop();
-
-            if (currentstatus.iteration != currentIteration)
-            {
-                currentIteration = currentstatus.iteration;
-                cout << "Iteration: " << currentIteration << " Size: " << stati.size() << endl;
-            }
 
             for (int _x = -1; _x <= 1; ++_x)
             {
@@ -129,12 +121,40 @@ public:
         return 0;
     }
 
-    long getResultB()
+    long getSteps(int steps)
     {
-        long resultB = 0;
+        long currentIteration = 0;
 
-        cout << "resultB: " << resultB << endl;
-        return resultB;
+        while (currentIteration < steps)
+        {
+            const status currentstatus = stati.front();
+            stati.pop();
+
+            currentIteration = currentstatus.iteration;
+            if ( currentIteration == steps )
+                break;
+
+            for (int _x = -1; _x <= 1; ++_x)
+            {
+                for (int _y = -1; _y <= 1; ++_y)
+                {
+                    if ((_x == 0 || _y == 0) && (_x != 0 || _y != 0))
+                    {
+                        status newstatus({currentstatus.position.first + _x, currentstatus.position.second + _y}, dfn, currentstatus.iteration + 1);
+
+                        if (newstatus.isValid())
+                        {
+                            if (!checkIfStatusExists(newstatus))
+                            {
+                                stati.push(newstatus);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return seenstati.size()+1;
     }
 
 private:
@@ -144,16 +164,26 @@ private:
     const int dfn; // designer's favorite number
 };
 
-TEST_CASE("Testdata")
+TEST_CASE("TestdataA")
 {
     AMazeOfTwistyLittleCubicles AMazeOfTwistyLittleCubiclesData(10);
     REQUIRE(11 == AMazeOfTwistyLittleCubiclesData.getToPosition({7, 4}));
-    REQUIRE(0 == AMazeOfTwistyLittleCubiclesData.getResultB());
 }
 
-TEST_CASE("AMazeOfTwistyLittleCubicles")
+TEST_CASE("TestdataB")
+{
+    AMazeOfTwistyLittleCubicles AMazeOfTwistyLittleCubiclesData(10);
+    REQUIRE(3 == AMazeOfTwistyLittleCubiclesData.getSteps(1));
+}
+
+TEST_CASE("AMazeOfTwistyLittleCubiclesA")
 {
     AMazeOfTwistyLittleCubicles AMazeOfTwistyLittleCubiclesData(1352);
     REQUIRE(90 == AMazeOfTwistyLittleCubiclesData.getToPosition({31, 39}));
-    // REQUIRE(0 == AMazeOfTwistyLittleCubiclesData.getResultB());
+}
+
+TEST_CASE("AMazeOfTwistyLittleCubiclesB")
+{
+    AMazeOfTwistyLittleCubicles AMazeOfTwistyLittleCubiclesData(1352);
+    REQUIRE(135 == AMazeOfTwistyLittleCubiclesData.getSteps(50));
 }
