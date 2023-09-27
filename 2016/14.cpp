@@ -19,25 +19,38 @@ public:
         cout << "Size of salt: " << salt.size() << endl;
     }
 
+    string gethash(unsigned long c)
+    {
+            string md5hex(salt + to_string(c));
+            return getmd5hexhash(md5hex);
+    }
+
     void getFive()
     {
-        while (true)
+        bool searching = true;
+        while (searching)
         {
-            string md5hex(salt + to_string(counter++));
-            string md5hexresult = getmd5hexhash(md5hex);
+            string md5hash = gethash(counter++);
 
-            for (int i = 0; i < md5hexresult.size() - 3; ++i)
-                if (md5hexresult[i] == md5hexresult[i + 1] && md5hexresult[i] == md5hexresult[i + 2])
-                    keythree[md5hexresult[i]].insert(counter - 1);
-
-            for (int i = 0; i < md5hexresult.size() - 5; ++i)
-                if (md5hexresult[i] == md5hexresult[i + 1] &&
-                    md5hexresult[i] == md5hexresult[i + 2] &&
-                    md5hexresult[i] == md5hexresult[i + 3] &&
-                    md5hexresult[i] == md5hexresult[i + 4])
+            for (int i = 0; i < md5hash.size() - 2; ++i)
+                if (md5hash[i] == md5hash[i + 1] && md5hash[i] == md5hash[i + 2])
+                // if (i == md5hash.size() - 4 || md5hash[i] != md5hash[i + 3])
                 {
-                    keyfive[md5hexresult[i]].insert(counter - 1);
-                    return;
+                    keythree[md5hash[i]].insert(counter - 1);
+                    break;
+                }
+
+            for (int i = 0; i < md5hash.size() - 4; ++i)
+                if (md5hash[i] == md5hash[i + 1] &&
+                    md5hash[i] == md5hash[i + 2] &&
+                    md5hash[i] == md5hash[i + 3] &&
+                    md5hash[i] == md5hash[i + 4])
+                {
+                    // if (i == md5hash.size() - 6 || md5hash[i] != md5hash[i + 5])
+                    {
+                        keyfive[md5hash[i]].insert(counter - 1);
+                        searching = false;
+                    }
                 }
         }
     }
@@ -50,8 +63,8 @@ public:
                 auto &key5 = keyfive[key.first];
 
                 for (auto &index2 : key5)
-                    if (index < index2 && index + 1000 > index2)
-                        keys[index] = true;
+                    if (index < index2 && index2 <= index + 1000)
+                        keys.insert(index);
             }
     }
 
@@ -63,7 +76,29 @@ public:
             confirmKeys();
         }
 
-        long resultA = keys.rbegin()->first;
+        unsigned long c = 0;
+        long resultA=0;
+        for (const auto &elem : keys)
+        {
+            if (c++ == 63)
+            {
+                resultA = elem;
+                break;
+            }
+        }
+
+        /* cout << "Print the shit: " << endl;
+        for (auto key3 : keythree)
+        {
+            cout << key3.first << endl;
+            for (auto elem : key3.second)
+                cout << elem << ", ";
+            cout << endl
+                 << endl;
+            for (auto elem : keyfive[key3.first])
+                cout << elem << ", ";
+            cout << endl;
+        } */
 
         cout << "resultA: " << resultA << endl;
         return resultA;
@@ -81,7 +116,7 @@ private:
     unsigned long counter = 0;
     map<char, set<unsigned long>> keythree;
     map<char, set<unsigned long>> keyfive;
-    map<unsigned long, bool> keys;
+    set<unsigned long> keys;
 };
 
 TEST_CASE("Testdata")
@@ -94,7 +129,6 @@ TEST_CASE("Testdata")
 TEST_CASE("OneTimePad")
 {
     OneTimePad OneTimePadData("ahsbgdzn");
-    REQUIRE(24438 > OneTimePadData.getResultA());
-    REQUIRE(0 == OneTimePadData.getResultA());
+    REQUIRE(23890 == OneTimePadData.getResultA());
     REQUIRE(0 == OneTimePadData.getResultB());
 }
