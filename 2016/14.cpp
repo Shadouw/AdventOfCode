@@ -16,7 +16,6 @@ class OneTimePad
 public:
     OneTimePad(const string &_salt) : salt(_salt)
     {
-        cout << "Size of salt: " << salt.size() << endl;
     }
 
     string gethash(unsigned long c)
@@ -25,12 +24,22 @@ public:
             return getmd5hexhash(md5hex);
     }
 
-    void getFive()
+    string getStretchedHash(string hash)
+    {
+        for ( int i=0; i<2016; ++i )
+            hash = getmd5hexhash(hash);
+
+        return hash;
+    }
+
+    void getFive(bool stretch)
     {
         bool searching = true;
         while (searching)
         {
             string md5hash = gethash(counter++);
+            if ( stretch )
+                md5hash = getStretchedHash(md5hash);
 
             for (int i = 0; i < md5hash.size() - 2; ++i)
                 if (md5hash[i] == md5hash[i + 1] && md5hash[i] == md5hash[i + 2])
@@ -68,47 +77,27 @@ public:
             }
     }
 
-    long getResultA()
+    long getResult(bool stretch)
     {
         while (keys.size() < 64)
         {
-            getFive();
+            getFive(stretch);
             confirmKeys();
         }
 
         unsigned long c = 0;
-        long resultA=0;
+        long result=0;
         for (const auto &elem : keys)
         {
             if (c++ == 63)
             {
-                resultA = elem;
+                result = elem;
                 break;
             }
         }
 
-        /* cout << "Print the shit: " << endl;
-        for (auto key3 : keythree)
-        {
-            cout << key3.first << endl;
-            for (auto elem : key3.second)
-                cout << elem << ", ";
-            cout << endl
-                 << endl;
-            for (auto elem : keyfive[key3.first])
-                cout << elem << ", ";
-            cout << endl;
-        } */
-
-        cout << "resultA: " << resultA << endl;
-        return resultA;
-    }
-    long getResultB()
-    {
-        long resultB = 0;
-
-        cout << "resultB: " << resultB << endl;
-        return resultB;
+        cout << "result: " << result << endl;
+        return result;
     }
 
 private:
@@ -119,16 +108,26 @@ private:
     set<unsigned long> keys;
 };
 
-TEST_CASE("Testdata")
+TEST_CASE("TestdataA")
 {
     OneTimePad OneTimePadData("abc");
-    REQUIRE(22728 == OneTimePadData.getResultA());
-    REQUIRE(0 == OneTimePadData.getResultB());
+    REQUIRE(22728 == OneTimePadData.getResult(false));
 }
 
-TEST_CASE("OneTimePad")
+TEST_CASE("TestdataB")
+{
+    OneTimePad OneTimePadData("abc");
+    REQUIRE(22551 == OneTimePadData.getResult(true));
+}
+
+TEST_CASE("OneTimePadA")
 {
     OneTimePad OneTimePadData("ahsbgdzn");
-    REQUIRE(23890 == OneTimePadData.getResultA());
-    REQUIRE(0 == OneTimePadData.getResultB());
+    REQUIRE(23890 == OneTimePadData.getResult(false));
+}
+
+TEST_CASE("OneTimePadB")
+{
+    OneTimePad OneTimePadData("ahsbgdzn");
+    REQUIRE(22696 == OneTimePadData.getResult(true));
 }
