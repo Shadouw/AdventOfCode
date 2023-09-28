@@ -43,7 +43,6 @@ public:
 
             for (int i = 0; i < md5hash.size() - 2; ++i)
                 if (md5hash[i] == md5hash[i + 1] && md5hash[i] == md5hash[i + 2])
-                // if (i == md5hash.size() - 4 || md5hash[i] != md5hash[i + 3])
                 {
                     keythree[md5hash[i]].insert(counter - 1);
                     break;
@@ -55,7 +54,6 @@ public:
                     md5hash[i] == md5hash[i + 3] &&
                     md5hash[i] == md5hash[i + 4])
                 {
-                    // if (i == md5hash.size() - 6 || md5hash[i] != md5hash[i + 5])
                     {
                         keyfive[md5hash[i]].insert(counter - 1);
                         searching = false;
