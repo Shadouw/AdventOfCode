@@ -28,18 +28,18 @@ public:
         sscanf(input.c_str(), "Disc #%d has %d positions; at time=0, it is at position %d.", &discnumber, &positions, &pos0);
     }
 
-    long getResultA()
+    // This function returns if disc is free on time t 
+    bool capsuleFalls(unsigned long t)
     {
-        long resultA = 0;
+        int currentposition = (pos0 + t) % positions;
 
-        return resultA;
+        return (0 == currentposition);
     }
 
-    long getResultB()
+    // This function returns if disc is free on time t but includes the disc position
+    bool getStartButton(unsigned long t)
     {
-        long resultB = 0;
-
-        return resultB;
+        return capsuleFalls(t+discnumber);
     }
 
     string getString() { return input; }
@@ -63,23 +63,29 @@ public:
             discs.push_back(disc(elem));
     }
 
-    long getResultA()
+    void addDisc(string d)
     {
-        long resultA = 0;
-        for (auto e : discs)
-            resultA += e.getResultA();
-
-        cout << "resultA: " << resultA << endl;
-        return resultA;
+        discs.push_back(d);
     }
-    long getResultB()
-    {
-        long resultB = 0;
-        for (auto e : discs)
-            resultB += e.getResultB();
 
-        cout << "resultB: " << resultB << endl;
-        return resultB;
+    unsigned long getStartButton()
+    {
+        unsigned long StartButton = 0;
+
+        bool testing = true;
+        while (testing)
+        {
+            testing = false;
+            for ( auto  d : discs )
+                if ( !d.getStartButton(StartButton) )
+                    testing = true;
+            
+            if ( testing )
+                ++StartButton;
+        }
+
+        cout << "StartButton: " << StartButton << endl;
+        return StartButton;
     }
 
 private:
@@ -90,13 +96,19 @@ private:
 TEST_CASE("Testdata")
 {
     TimingIsEverything TimingIsEverythingData(inputTestdata);
-    REQUIRE(5 == TimingIsEverythingData.getResultA());
-    REQUIRE(0 == TimingIsEverythingData.getResultB());
+    REQUIRE(5 == TimingIsEverythingData.getStartButton());
 }
 
 TEST_CASE("TimingIsEverything")
 {
     TimingIsEverything TimingIsEverythingData(inputData);
-    REQUIRE(0 == TimingIsEverythingData.getResultA());
-    REQUIRE(0 == TimingIsEverythingData.getResultB());
+    REQUIRE(122318 == TimingIsEverythingData.getStartButton());
+}
+
+TEST_CASE("TimingIsEverythingB")
+{
+    TimingIsEverything TimingIsEverythingData(inputData);
+    TimingIsEverythingData.addDisc("Disc #7 has 11 positions; at time=0, it is at position 0.");
+
+    REQUIRE(3208583 == TimingIsEverythingData.getStartButton());
 }
