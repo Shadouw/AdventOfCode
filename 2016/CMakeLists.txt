@@ -1,5 +1,9 @@
 # 2016
 
+add_executable(2016.16 2016/16.cpp)
+target_link_libraries ( 2016.16 PRIVATE Catch2::Catch2WithMain )
+add_test ( 2016.16 ${CMAKE_BINARY_DIR}/2016.16 )
+
 add_executable(2016.15 2016/15.cpp)
 target_link_libraries ( 2016.15 PRIVATE Catch2::Catch2WithMain )
 add_test ( 2016.15 ${CMAKE_BINARY_DIR}/2016.15 )
