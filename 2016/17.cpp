@@ -95,10 +95,14 @@ public:
         statuses.push(input);
     }
 
-    string getResultA()
+    void reset()
     {
-        long resultA = 0;
+        statuses.empty();
+        statuses.push(input);
+    }
 
+    string getShortestPath()
+    {
         while (statuses.size() > 0)
         {
             const status currentstatus = statuses.front();
@@ -134,15 +138,53 @@ public:
             }
         }
 
-        cout << "resultA: " << resultA << endl;
         return "";
     }
-    long getResultB()
-    {
-        long resultB = 0;
 
-        cout << "resultB: " << resultB << endl;
-        return resultB;
+    long getLogestPath()
+    {
+        long LogestPath = 0;
+
+        while (statuses.size() > 0)
+        {
+            const status currentstatus = statuses.front();
+            statuses.pop();
+
+            if (currentstatus.canGo('U'))
+            {
+                status currentstatus2 = currentstatus.move('U');
+                if (currentstatus2.checkFinal())
+                    LogestPath = currentstatus2.path.size();
+                else
+                    statuses.push(currentstatus2);
+            }
+            if (currentstatus.canGo('D'))
+            {
+                status currentstatus2 = currentstatus.move('D');
+                if (currentstatus2.checkFinal())
+                    LogestPath = currentstatus2.path.size();
+                else
+                    statuses.push(currentstatus2);
+            }
+            if (currentstatus.canGo('L'))
+            {
+                status currentstatus2 = currentstatus.move('L');
+                if (currentstatus2.checkFinal())
+                    LogestPath = currentstatus2.path.size();
+                else
+                    statuses.push(currentstatus2);
+            }
+            if (currentstatus.canGo('R'))
+            {
+                status currentstatus2 = currentstatus.move('R');
+                if (currentstatus2.checkFinal())
+                    LogestPath = currentstatus2.path.size();
+                else
+                    statuses.push(currentstatus2);
+            }
+        }
+
+        return LogestPath;
     }
 
 private:
@@ -153,34 +195,36 @@ private:
 TEST_CASE("Testdata")
 {
     TwoStepsForward TwoStepsForwardData("hijkl");
-    REQUIRE("" == TwoStepsForwardData.getResultA());
-    REQUIRE(0 == TwoStepsForwardData.getResultB());
+    REQUIRE("" == TwoStepsForwardData.getShortestPath());
 }
 
 TEST_CASE("Testdata2")
 {
     TwoStepsForward TwoStepsForwardData("ihgpwlah");
-    REQUIRE("DDRRRD" == TwoStepsForwardData.getResultA());
-    REQUIRE(0 == TwoStepsForwardData.getResultB());
+    REQUIRE("DDRRRD" == TwoStepsForwardData.getShortestPath());
+    TwoStepsForwardData.reset();
+    REQUIRE(370 == TwoStepsForwardData.getLogestPath());
 }
 
 TEST_CASE("Testdata3")
 {
     TwoStepsForward TwoStepsForwardData("kglvqrro");
-    REQUIRE("DDUDRLRRUDRD" == TwoStepsForwardData.getResultA());
-    REQUIRE(0 == TwoStepsForwardData.getResultB());
+    REQUIRE("DDUDRLRRUDRD" == TwoStepsForwardData.getShortestPath());
+    TwoStepsForwardData.reset();
+    REQUIRE(492 == TwoStepsForwardData.getLogestPath());
 }
 
 TEST_CASE("Testdata4")
 {
     TwoStepsForward TwoStepsForwardData("ulqzkmiv");
-    REQUIRE("DRURDRUDDLLDLUURRDULRLDUUDDDRR" == TwoStepsForwardData.getResultA());
-    REQUIRE(0 == TwoStepsForwardData.getResultB());
+    REQUIRE("DRURDRUDDLLDLUURRDULRLDUUDDDRR" == TwoStepsForwardData.getShortestPath());
+    TwoStepsForwardData.reset();
+    REQUIRE(830 == TwoStepsForwardData.getLogestPath());
 }
 
 TEST_CASE("TwoStepsForward")
 {
     TwoStepsForward TwoStepsForwardData("pslxynzg");
-    REQUIRE("DDRRUDLRRD" == TwoStepsForwardData.getResultA());
-    REQUIRE(0 == TwoStepsForwardData.getResultB());
+    REQUIRE("DDRRUDLRRD" == TwoStepsForwardData.getShortestPath());
+    REQUIRE(488 == TwoStepsForwardData.getLogestPath());
 }
