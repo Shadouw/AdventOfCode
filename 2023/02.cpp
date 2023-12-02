@@ -153,9 +153,19 @@ public:
 
     long getResultB()
     {
-        long resultB = 0;
+        long r=1, g=1, b=1;
 
-        return resultB;
+        for ( auto e1 : gamemap )
+        {
+            if ( r < e1["red"] )
+                r = e1["red"];
+            if ( g < e1["green"] )
+                g = e1["green"];
+            if ( b < e1["blue"] )
+                b = e1["blue"];
+        }
+
+        return r*g*b;
     }
 
     string getString() { return input; }
@@ -212,12 +222,12 @@ TEST_CASE("Testdata")
 {
     CubeConundrum CubeConundrumData(inputTestdata, 12, 13, 14);
     REQUIRE(8 == CubeConundrumData.getResultA());
-    REQUIRE(0 == CubeConundrumData.getResultB());
+    REQUIRE(2286 == CubeConundrumData.getResultB());
 }
 
 TEST_CASE("CubeConundrum")
 {
     CubeConundrum CubeConundrumData(inputData, 12, 13, 14);
-    REQUIRE(0 == CubeConundrumData.getResultA());
-    REQUIRE(0 == CubeConundrumData.getResultB());
+    REQUIRE(2348 == CubeConundrumData.getResultA());
+    REQUIRE(76008 == CubeConundrumData.getResultB());
 }
