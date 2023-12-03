@@ -172,6 +172,9 @@ struct Number
         number.clear();
         adjacentsymbol = 0;
     }
+
+    long gearx = -1;
+    long geary = -1;
 };
 
 class GearRatios
@@ -223,7 +226,14 @@ public:
                 {
                     char currentchar = input[n.row-1][s];
                     if ( currentchar != '.' && (currentchar < '0' || '9' < currentchar) )
+                    {
                         n.adjacentsymbol = currentchar;
+                        if ( '*' == currentchar )
+                        {
+                            n.gearx=n.row-1;
+                            n.geary=s;
+                        }
+                    }
                 }
             }
 
@@ -231,14 +241,28 @@ public:
             {
                 char currentchar = input[n.row][n.col-1];
                 if ( currentchar != '.' && (currentchar < '0' || '9' < currentchar) )
+                {
                     n.adjacentsymbol = currentchar;
+                    if ( '*' == currentchar )
+                    {
+                        n.gearx=n.row;
+                        n.geary=n.col-1;
+                    }
+                }
             }
 
             if ( n.col+n.number.size()<maxcol )
             {
                 char currentchar = input[n.row][n.col+n.number.size()];
                 if ( currentchar != '.' && (currentchar < '0' || '9' < currentchar) )
+                {
                     n.adjacentsymbol = currentchar;
+                    if ( '*' == currentchar )
+                    {
+                        n.gearx=n.row;
+                        n.geary=n.col+n.number.size();
+                    }                    
+                }
             }            
 
             if ( n.row < maxrow)
@@ -247,7 +271,14 @@ public:
                 {
                     char currentchar = input[n.row+1][s];
                     if ( currentchar != '.' && (currentchar < '0' || '9' < currentchar) )
+                    {
                         n.adjacentsymbol = currentchar;
+                        if ( '*' == currentchar )
+                        {
+                            n.gearx=n.row+1;
+                            n.geary=s;
+                        }
+                    }
                 }
             }
         }
@@ -268,6 +299,13 @@ public:
     {
         long resultB = 0;
 
+        for ( int i=0; i<Numbers.size()-1; ++i )
+            for ( int j=i+1; j<Numbers.size(); ++j )
+            {
+                if ( Numbers[i].gearx == Numbers[j].gearx && Numbers[i].geary == Numbers[j].geary && Numbers[i].gearx != -1 )
+                    resultB += stoi(Numbers[i].number) *  stoi(Numbers[j].number);
+            }
+
         cout << "resultB: " << resultB << endl;
         return resultB;
     }
@@ -283,12 +321,12 @@ TEST_CASE("Testdata")
 {
     GearRatios GearRatiosData(inputTestdata);
     REQUIRE(4361 == GearRatiosData.getResultA());
-    REQUIRE(0 == GearRatiosData.getResultB());
+    REQUIRE(467835 == GearRatiosData.getResultB());
 }
 
 TEST_CASE("GearRatios")
 {
     GearRatios GearRatiosData(inputData);
-    REQUIRE(0 == GearRatiosData.getResultA());
-    REQUIRE(0 == GearRatiosData.getResultB());
+    REQUIRE(546312 == GearRatiosData.getResultA());
+    REQUIRE(87449461 == GearRatiosData.getResultB());
 }
