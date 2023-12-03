@@ -12,7 +12,8 @@ const vector<string> inputTestdata = {
     "1abc2",
     "pqr3stu8vwx",
     "a1b2c3d4e5f",
-    "treb7uchet"};
+    "treb7uchet"
+};
 
 const vector<string> inputTestdata2 = {
     "two1nine",
@@ -21,7 +22,8 @@ const vector<string> inputTestdata2 = {
     "xtwone3four",
     "4nineeightseven2",
     "zoneight234",
-    "7pqrstsixteen"};    
+    "7pqrstsixteen"
+};
 
 const vector<string> inputData = {
     "9dlvndqbddghpxc",
@@ -1023,57 +1025,51 @@ const vector<string> inputData = {
     "twodn8",
     "one5six913lbrcc",
     "foureightmppchbgz8lqbzqbjztwo7cksqxns",
-    "zvhzgfpkhkone93nine"};
+    "zvhzgfpkhkone93nine"
+};
 
-class item
-{
+class item {
 public:
-    item(const string _input) : input(_input), inputspell(_input)
+    item(const string _input)
+        : input(_input)
+        , inputspell(_input)
     {
         //ReplaceStringInPlace(inputspell,"zero", "0");
-        ReplaceStringInPlace(inputspell,"one", "o1e");
-        ReplaceStringInPlace(inputspell,"two", "t2w");
-        ReplaceStringInPlace(inputspell,"three", "t3e");
-        ReplaceStringInPlace(inputspell,"four", "f4r");
-        ReplaceStringInPlace(inputspell,"five", "f5e");
-        ReplaceStringInPlace(inputspell,"six", "s6x");
-        ReplaceStringInPlace(inputspell,"seven", "s7n");
-        ReplaceStringInPlace(inputspell,"eight", "e8t");
-        ReplaceStringInPlace(inputspell,"nine", "n9e");
+        ReplaceStringInPlace(inputspell, "one", "o1e");
+        ReplaceStringInPlace(inputspell, "two", "t2w");
+        ReplaceStringInPlace(inputspell, "three", "t3e");
+        ReplaceStringInPlace(inputspell, "four", "f4r");
+        ReplaceStringInPlace(inputspell, "five", "f5e");
+        ReplaceStringInPlace(inputspell, "six", "s6x");
+        ReplaceStringInPlace(inputspell, "seven", "s7n");
+        ReplaceStringInPlace(inputspell, "eight", "e8t");
+        ReplaceStringInPlace(inputspell, "nine", "n9e");
 
-        for ( auto c : input )
-        {
-            if ( c>='0' and c<='9' )
-            {
-                if ( -1 == first )
-                {
+        for (auto c : input) {
+            if (c >= '0' and c <= '9') {
+                if (-1 == first) {
                     first = c - '0';
-                    last = c-'0';
-                }
-                else
-                    last = c-'0';
+                    last = c - '0';
+                } else
+                    last = c - '0';
             }
-        }    
+        }
 
-        for ( auto c : inputspell )
-        {
-            if ( c>='0' and c<='9' )
-            {
-                if ( -1 == firstspell )
-                {
+        for (auto c : inputspell) {
+            if (c >= '0' and c <= '9') {
+                if (-1 == firstspell) {
                     firstspell = c - '0';
-                    lastspell = c-'0';
-                }
-                else
-                    lastspell = c-'0';
+                    lastspell = c - '0';
+                } else
+                    lastspell = c - '0';
             }
-        }        
+        }
     }
 
     long getResultA()
     {
         long resultA = first * 10 + last;
-        
+
         return resultA;
     }
 
@@ -1094,10 +1090,10 @@ private:
     friend class Trebuchet;
 };
 
-class Trebuchet
-{
+class Trebuchet {
 public:
-    Trebuchet(const vector<string> &_input) : input(_input)
+    Trebuchet(const vector<string>& _input)
+        : input(_input)
     {
         cout << "Size of Input: " << input.size() << endl;
 

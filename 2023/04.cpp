@@ -7,17 +7,15 @@
 using namespace std;
 
 const vector<string> inputTestdata = {
-    ""
-};
+    ""};
 
 const vector<string> inputData = {
-    ""
-};
+    ""};
 
-class item {
+class item
+{
 public:
-    item(const string _input)
-        : input(_input)
+    item(const string _input) : input(_input)
     {
     }
 
@@ -43,10 +41,10 @@ private:
     friend class problem;
 };
 
-class problem {
+class problem
+{
 public:
-    problem(const vector<string>& _input)
-        : input(_input)
+    problem(const vector<string> &_input) : input(_input)
     {
         cout << "Size of Input: " << input.size() << endl;
 

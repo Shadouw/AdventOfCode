@@ -1,7 +1,7 @@
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 #include <stringtovector.h>
 
@@ -14,7 +14,8 @@ const vector<string> inputTestdata = {
     "Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue",
     "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red",
     "Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red",
-    "Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"};
+    "Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"
+};
 
 const vector<string> inputData = {
     "Game 1: 1 red, 5 blue, 1 green; 16 blue, 3 red; 6 blue, 5 red; 4 red, 7 blue, 1 green",
@@ -116,25 +117,27 @@ const vector<string> inputData = {
     "Game 97: 10 red, 1 green, 1 blue; 4 green, 11 red, 2 blue; 4 red, 1 blue, 4 green",
     "Game 98: 3 green, 4 blue, 7 red; 7 red, 8 green; 7 green, 16 red, 1 blue; 8 green, 2 blue, 4 red; 5 green, 3 blue, 18 red",
     "Game 99: 6 green, 12 red, 1 blue; 5 blue, 1 red, 7 green; 5 green, 7 red, 10 blue; 8 blue, 1 red, 7 green; 17 red, 4 blue, 9 green",
-    "Game 100: 6 blue, 10 green; 3 green, 4 blue, 1 red; 7 blue, 1 red, 12 green"};
+    "Game 100: 6 blue, 10 green; 3 green, 4 blue, 1 red; 7 blue, 1 red, 12 green"
+};
 
-class Game
-{
+class Game {
 public:
-    Game(const string _input, long _red, long _green, long _blue) : input(_input), red(_red), green(_green), blue(_blue)
+    Game(const string _input, long _red, long _green, long _blue)
+        : input(_input)
+        , red(_red)
+        , green(_green)
+        , blue(_blue)
     {
         auto pos = input.find(':');
         game = stoi(input.substr(5));
-        gamepart = stringtovector(input.substr(pos+1), ';');
+        gamepart = stringtovector(input.substr(pos + 1), ';');
 
-        for ( auto e1 : gamepart )
-        {
+        for (auto e1 : gamepart) {
             vector<string> g = stringtovector(e1, ',');
             map<string, long> gm;
-            for ( auto e2: g )
-            {
+            for (auto e2 : g) {
                 auto pos2 = e2.substr(2).find(' ');
-                gm[e2.substr(pos2+3)]=stoi(e2);
+                gm[e2.substr(pos2 + 3)] = stoi(e2);
             }
             gamemap.push_back(gm);
         }
@@ -142,9 +145,8 @@ public:
 
     long getResultA()
     {
-        for ( auto e1 : gamemap )
-        {
-            if (e1["red"] > red || e1["green"] > green || e1["blue"] > blue) 
+        for (auto e1 : gamemap) {
+            if (e1["red"] > red || e1["green"] > green || e1["blue"] > blue)
                 return 0;
         }
 
@@ -153,19 +155,18 @@ public:
 
     long getResultB()
     {
-        long r=1, g=1, b=1;
+        long r = 1, g = 1, b = 1;
 
-        for ( auto e1 : gamemap )
-        {
-            if ( r < e1["red"] )
+        for (auto e1 : gamemap) {
+            if (r < e1["red"])
                 r = e1["red"];
-            if ( g < e1["green"] )
+            if (g < e1["green"])
                 g = e1["green"];
-            if ( b < e1["blue"] )
+            if (b < e1["blue"])
                 b = e1["blue"];
         }
 
-        return r*g*b;
+        return r * g * b;
     }
 
     string getString() { return input; }
@@ -180,10 +181,13 @@ private:
     friend class CubeConundrum;
 };
 
-class CubeConundrum
-{
+class CubeConundrum {
 public:
-    CubeConundrum(const vector<string> &_input, long _red, long _green, long _blue) : input(_input), red(_red), green(_green), blue(_blue)
+    CubeConundrum(const vector<string>& _input, long _red, long _green, long _blue)
+        : input(_input)
+        , red(_red)
+        , green(_green)
+        , blue(_blue)
     {
         cout << "Size of Input: " << input.size() << endl;
 
