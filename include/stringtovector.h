@@ -14,7 +14,8 @@ std::vector <std::string> stringtovector(const std::string &inputstring, const c
 
     while ( getline( sstream, token, separator ) )
     {
-        tokens.push_back(token);
+        if ( token.size() )
+            tokens.push_back(token);
     }
 
     return tokens;
