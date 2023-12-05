@@ -1,8 +1,8 @@
+#include <climits>
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
-#include <climits>
 
 #include <stringtovector.h>
 
@@ -302,31 +302,16 @@ public:
     {
     }
 
-    long long getResultA()
-    {
-        long long resultA = 0;
-
-        return resultA;
-    }
-
-    long long getResultB()
-    {
-        long long resultB = 0;
-
-        return resultB;
-    }
-
     void addEntry(string entry)
     {
         vector<string> parsedentry(stringtovector(entry, ' '));
         mapentries.push_back(mapentry(stoll(parsedentry[0]), stoll(parsedentry[1]), stoll(parsedentry[2])));
     }
 
-    long long transfer( long long n )
+    long long transfer(long long n)
     {
-        for ( auto m : mapentries )
-        {
-            if ( m.source <= n && n < m.source + m.range )
+        for (auto m : mapentries) {
+            if (m.source <= n && n < m.source + m.range)
                 return m.dest + n - m.source;
         }
 
@@ -357,7 +342,7 @@ public:
             if ("" != elem) {
                 auto pos = elem.find(':');
                 if (string::npos != pos)
-                    currentMap = elem.substr(0, pos-4);
+                    currentMap = elem.substr(0, pos - 4);
                 else
                     itemMaps[currentMap].addEntry(elem);
             }
@@ -367,48 +352,82 @@ public:
     long long getResultA()
     {
         long long resultA = LONG_LONG_MAX;
-        
+
         vector<long long> values(seeds);
         // seed-to-soil map
-        for ( auto &e : values )
+        for (auto& e : values)
             e = itemMaps["seed-to-soil"].transfer(e);
 
         // soil-to-fertilizer map
-        for ( auto &e : values )
+        for (auto& e : values)
             e = itemMaps["soil-to-fertilizer"].transfer(e);
 
         // fertilizer-to-water map
-        for ( auto &e : values )
+        for (auto& e : values)
             e = itemMaps["fertilizer-to-water"].transfer(e);
 
         // water-to-light map
-        for ( auto &e : values )
+        for (auto& e : values)
             e = itemMaps["water-to-light"].transfer(e);
 
         // light-to-temperature map
-        for ( auto &e : values )
+        for (auto& e : values)
             e = itemMaps["light-to-temperature"].transfer(e);
 
         // temperature-to-humidity map
-        for ( auto &e : values )
+        for (auto& e : values)
             e = itemMaps["temperature-to-humidity"].transfer(e);
 
         // humidity-to-location map
-        for ( auto &e : values )
-            e = itemMaps["humidity-to-location"].transfer(e);               
+        for (auto& e : values)
+            e = itemMaps["humidity-to-location"].transfer(e);
 
         // Find minimum
-        for ( auto &e : values )
-            if ( e < resultA )
+        for (auto& e : values)
+            if (e < resultA)
                 resultA = e;
-                                         
 
         cout << "resultA: " << resultA << endl;
         return resultA;
     }
     long long getResultB()
     {
-        long long resultB = 0;
+        long long resultB = LONG_LONG_MAX;
+
+        while (seeds.size()) {
+            long long seed = seeds[0];
+            seeds.erase(seeds.begin());
+
+            long long range = seeds[0];
+            seeds.erase(seeds.begin());
+
+            for ( long long value = seed; value < seed+range; ++value )
+            {
+                // seed-to-soil
+                long long v = itemMaps["seed-to-soil"].transfer(value);
+
+                // soil-to-fertilizer map
+                v = itemMaps["soil-to-fertilizer"].transfer(v);
+
+                // fertilizer-to-water map
+                v = itemMaps["fertilizer-to-water"].transfer(v);
+
+                // water-to-light map
+                v = itemMaps["water-to-light"].transfer(v);
+
+                // light-to-temperature map
+                v = itemMaps["light-to-temperature"].transfer(v);
+
+                // temperature-to-humidity map
+                v = itemMaps["temperature-to-humidity"].transfer(v);
+
+                // humidity-to-location map
+                v = itemMaps["humidity-to-location"].transfer(v);
+
+                if ( v < resultB )
+                    resultB = v;
+            }
+        }
         // for (auto e : itemMaps)
         //     resultB += e.getResultB();
 
@@ -427,12 +446,12 @@ TEST_CASE("Testdata")
 {
     IfYouGiveASeedAFertilizer IfYouGiveASeedAFertilizerData(inputTestdata);
     REQUIRE(35 == IfYouGiveASeedAFertilizerData.getResultA());
-    REQUIRE(0 == IfYouGiveASeedAFertilizerData.getResultB());
+    REQUIRE(46 == IfYouGiveASeedAFertilizerData.getResultB());
 }
 
 TEST_CASE("IfYouGiveASeedAFertilizer")
 {
     IfYouGiveASeedAFertilizer IfYouGiveASeedAFertilizerData(inputData);
     REQUIRE(107430936 == IfYouGiveASeedAFertilizerData.getResultA());
-    REQUIRE(0 == IfYouGiveASeedAFertilizerData.getResultB());
+    REQUIRE(23738616 == IfYouGiveASeedAFertilizerData.getResultB());
 }
