@@ -458,6 +458,6 @@ TEST_CASE("GearRatios")
 TEST_CASE("GearRatios2")
 {
     GearRatios GearRatiosData(inputData2);
-    REQUIRE(0 == GearRatiosData.getResultA());
-    REQUIRE(0 == GearRatiosData.getResultB());
+    REQUIRE(507214 == GearRatiosData.getResultA());
+    REQUIRE(72553319 == GearRatiosData.getResultB());
 }
