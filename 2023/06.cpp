@@ -13,25 +13,16 @@ const vector<string> inputTestdata = {
     "Distance:  9  40  200"
 };
 
-const vector<string> inputTestdata2 = {
-    "Time:      71530",
-    "Distance:  940200"
-};
-
 const vector<string> inputData = {
     "Time:        38     67     76     73",
     "Distance:   234   1027   1157   1236"
 };
 
-const vector<string> inputData2 = {
-    "Time:        38677673",
-    "Distance:   234102711571236"
-};
-
 class Boat {
 public:
     Boat(const long long _time, const long long _distance)
-        : time(_time), distance(_distance)
+        : time(_time)
+        , distance(_distance)
     {
     }
 
@@ -39,9 +30,8 @@ public:
     {
         long long numOfWins = 0;
 
-        for ( long long i=0; i<time; ++i)
-        {
-            if ( (time-i)*i > distance )
+        for (long long i = 0; i < time; ++i) {
+            if ((time - i) * i > distance)
                 ++numOfWins;
         }
 
@@ -62,50 +52,57 @@ public:
         cout << "Size of Input: " << input.size() << endl;
 
         // Time
-        vector<string> strtime ( stringtovector(input[0], ' '));
+        vector<string> strtime(stringtovector(input[0], ' '));
         // Distance
-        vector<string> strdist ( stringtovector(input[1], ' '));
+        vector<string> strdist(stringtovector(input[1], ' '));
 
         // Parse data
-        for ( long long i = 1; i<strdist.size(); ++i )
-            items.push_back(Boat(stoll(strtime[i]), stoll(strdist[i])));
+        string stime, sdist;
+        for (long long i = 1; i < strdist.size(); ++i) {
+            boats.push_back(Boat(stoll(strtime[i]), stoll(strdist[i])));
+            stime += strtime[i];
+            sdist += strdist[i];
+        }
+
+        time = stoll(stime);
+        distance = stoll(sdist);
     }
 
     long long getNumOfWins()
     {
         long long numOfWins = 1;
-        for (auto e : items)
+        for (auto e : boats)
             numOfWins *= e.getNumOfWins();
 
         cout << "numOfWins: " << numOfWins << endl;
         return numOfWins;
     }
 
+    long long getNumOfWin()
+    {
+        Boat myboat(time, distance);
+        return myboat.getNumOfWins();
+    }
+
 private:
     const vector<string> input;
-    vector<Boat> items;
+    vector<Boat> boats;
+
+    // For part II
+    long long time, distance;
 };
 
 TEST_CASE("Testdata")
 {
     WaitForIt problemData(inputTestdata);
     REQUIRE(288 == problemData.getNumOfWins());
-}
-
-TEST_CASE("Testdata2")
-{
-    WaitForIt problemData(inputTestdata2);
-    REQUIRE(71503 == problemData.getNumOfWins());
+    REQUIRE(71503 == problemData.getNumOfWin());
 }
 
 TEST_CASE("WaitForIt")
 {
     WaitForIt problemData(inputData);
     REQUIRE(303600 == problemData.getNumOfWins());
+    REQUIRE(23654842 == problemData.getNumOfWin());
 }
 
-TEST_CASE("WaitForIt2")
-{
-    WaitForIt problemData(inputData2);
-    REQUIRE(23654842 == problemData.getNumOfWins());
-}
