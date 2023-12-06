@@ -13,23 +13,33 @@ const vector<string> inputTestdata = {
     "Distance:  9  40  200"
 };
 
+const vector<string> inputTestdata2 = {
+    "Time:      71530",
+    "Distance:  940200"
+};
+
 const vector<string> inputData = {
     "Time:        38     67     76     73",
     "Distance:   234   1027   1157   1236"
 };
 
+const vector<string> inputData2 = {
+    "Time:        38677673",
+    "Distance:   234102711571236"
+};
+
 class Boat {
 public:
-    Boat(const long _time, const long _distance)
+    Boat(const long long _time, const long long _distance)
         : time(_time), distance(_distance)
     {
     }
 
-    long getNumOfWins()
+    long long getNumOfWins()
     {
-        long numOfWins = 0;
+        long long numOfWins = 0;
 
-        for ( long i=0; i<time; ++i)
+        for ( long long i=0; i<time; ++i)
         {
             if ( (time-i)*i > distance )
                 ++numOfWins;
@@ -38,15 +48,8 @@ public:
         return numOfWins;
     }
 
-    long getResultB()
-    {
-        long resultB = 0;
-
-        return resultB;
-    }
-
 private:
-    long time, distance;
+    long long time, distance;
 
     friend class WaitForIt;
 };
@@ -64,27 +67,18 @@ public:
         vector<string> strdist ( stringtovector(input[1], ' '));
 
         // Parse data
-        for ( long i = 1; i<strdist.size(); ++i )
-            items.push_back(Boat(stoi(strtime[i]), stoi(strdist[i])));
+        for ( long long i = 1; i<strdist.size(); ++i )
+            items.push_back(Boat(stoll(strtime[i]), stoll(strdist[i])));
     }
 
-    long getNumOfWins()
+    long long getNumOfWins()
     {
-        long numOfWins = 1;
+        long long numOfWins = 1;
         for (auto e : items)
             numOfWins *= e.getNumOfWins();
 
         cout << "numOfWins: " << numOfWins << endl;
         return numOfWins;
-    }
-    long getResultB()
-    {
-        long resultB = 0;
-        for (auto e : items)
-            resultB += e.getResultB();
-
-        cout << "resultB: " << resultB << endl;
-        return resultB;
     }
 
 private:
@@ -96,12 +90,22 @@ TEST_CASE("Testdata")
 {
     WaitForIt problemData(inputTestdata);
     REQUIRE(288 == problemData.getNumOfWins());
-    REQUIRE(0 == problemData.getResultB());
+}
+
+TEST_CASE("Testdata2")
+{
+    WaitForIt problemData(inputTestdata2);
+    REQUIRE(71503 == problemData.getNumOfWins());
 }
 
 TEST_CASE("WaitForIt")
 {
     WaitForIt problemData(inputData);
     REQUIRE(303600 == problemData.getNumOfWins());
-    REQUIRE(0 == problemData.getResultB());
+}
+
+TEST_CASE("WaitForIt2")
+{
+    WaitForIt problemData(inputData2);
+    REQUIRE(23654842 == problemData.getNumOfWins());
 }
