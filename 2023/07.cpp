@@ -1032,24 +1032,27 @@ public:
 
     static int getCardValue(char c)
     {
-        switch (c)
-        {
-            case 'A': return 14;
-            case 'K': return 13;
-            case 'Q': return 12;
-            case 'J': return 11;
-            case 'T': return 10;
+        switch (c) {
+        case 'A':
+            return 14;
+        case 'K':
+            return 13;
+        case 'Q':
+            return 12;
+        case 'J':
+            return 11;
+        case 'T':
+            return 10;
         }
-        return c-'0';
+        return c - '0';
     }
 
     int getType()
     {
         // Count characters
         size_t count[5];
-        for (int i = 0; i < 5; ++i)
-        {
-            count[i] = std::count_if(hand.begin(), hand.end(), [this,i](char c) { return c == hand[i]; });
+        for (int i = 0; i < 5; ++i) {
+            count[i] = std::count_if(hand.begin(), hand.end(), [this, i](char c) { return c == hand[i]; });
         }
 
         // Five of a kind
@@ -1066,19 +1069,19 @@ public:
             if (2 == count[0] || 2 == count[1] || 2 == count[2] || 2 == count[3])
                 return 35;
             else
-                return 30;    
+                return 30;
 
         // Two pair
-        int count2=0;
-        for ( int i=0; i<5; ++i )
-            if (2==count[i])
+        int count2 = 0;
+        for (int i = 0; i < 5; ++i)
+            if (2 == count[i])
                 ++count2;
-        if ( 4 == count2 )
+        if (4 == count2)
             return 25;
 
-        // One pair    
+        // One pair
         if (2 == count[0] || 2 == count[1] || 2 == count[2] || 2 == count[3])
-            return 20;    
+            return 20;
 
         return 10;
     }
@@ -1101,11 +1104,11 @@ public:
 
     friend bool operator<(const Hand& l, const Hand& r)
     {
-        if ( l.type != r.type )
+        if (l.type != r.type)
             return l.type < r.type;
 
-        for ( int i=0; i<5; ++i)
-            if ( l.hand[i] != r.hand[i] )
+        for (int i = 0; i < 5; ++i)
+            if (l.hand[i] != r.hand[i])
                 return getCardValue(l.hand[i]) < getCardValue(r.hand[i]);
 
         return false;
@@ -1138,8 +1141,8 @@ public:
     long getResultA()
     {
         long resultA = 0;
-        for ( long i=0; i<Hands.size(); ++i )
-            resultA += (i+1)*Hands[i].bid;
+        for (long i = 0; i < Hands.size(); ++i)
+            resultA += (i + 1) * Hands[i].bid;
 
         cout << "resultA: " << resultA << endl;
         return resultA;
