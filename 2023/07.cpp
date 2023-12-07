@@ -1028,9 +1028,10 @@ public:
         bid = stol(input.substr(pos + 1));
 
         type = getType();
+        JokerType = getType(true);
     }
 
-    static int getCardValue(char c)
+    static int getCardValue(char c, bool Joker = false)
     {
         switch (c) {
         case 'A':
@@ -1040,64 +1041,91 @@ public:
         case 'Q':
             return 12;
         case 'J':
-            return 11;
+            if (Joker)
+                return 1;
+            else
+                return 11;
         case 'T':
             return 10;
         }
         return c - '0';
     }
 
-    int getType()
+    int getType(bool Joker = false)
     {
         // Count characters
         size_t count[5];
         for (int i = 0; i < 5; ++i) {
-            count[i] = std::count_if(hand.begin(), hand.end(), [this, i](char c) { return c == hand[i]; });
+            if (Joker && 'J' == hand[i])
+                count[i] = 0;
+            else
+                count[i] = count_if(hand.begin(), hand.end(), [this, i](char c) { return c == hand[i]; });
         }
+
+        // Count Jokers
+        size_t countJokers = (Joker ? count_if(hand.begin(), hand.end(), [](char c) { return c == 'J'; }) : 0);
 
         // Five of a kind
         if (5 == count[0])
             return 50;
 
         // Four of a kind
-        if (4 == count[0] || 4 == count[1])
-            return 40;
-
-        // Foul house
-        // Three of a kind
-        if (3 == count[0] || 3 == count[1] || 3 == count[2])
-            if (2 == count[0] || 2 == count[1] || 2 == count[2] || 2 == count[3])
-                return 35;
+        if (4 == count[0] || 4 == count[1]) {
+            if (0 != countJokers)
+                return 50; // Five of a kind with 1J
             else
-                return 30;
+                return 40; // Four of a kind
+        }
+
+        // Full house
+        // Three of a kind
+        if (3 == count[0] || 3 == count[1] || 3 == count[2]) {
+            if (2 == count[0] || 2 == count[1] || 2 == count[2] || 2 == count[3])
+                return 35; // Full house
+            else {
+                if (2 == countJokers)
+                    return 50; // Five of a kind with 2J
+                else if (1 == countJokers)
+                    return 40; // Four of a kind with 1J
+                else
+                    return 30; // Three of a kind
+            }
+        }
 
         // Two pair
-        int count2 = 0;
-        for (int i = 0; i < 5; ++i)
-            if (2 == count[i])
-                ++count2;
-        if (4 == count2)
-            return 25;
+        int count2 = count_if(count, count + 5, [](size_t c) { return c == 2; });
+        if (4 == count2) {
+            if (0 != countJokers)
+                return 35; // Full house with 1J
+            else
+                return 25; // TWo pair
+        }
 
         // One pair
-        if (2 == count[0] || 2 == count[1] || 2 == count[2] || 2 == count[3])
-            return 20;
+        if (2 == count[0] || 2 == count[1] || 2 == count[2] || 2 == count[3]) {
+            if (3 == countJokers)
+                return 50; // Five of a kind with 3J
+            else if (2 == countJokers)
+                return 40; // Four of a kind with 2J
+            else if (1 == countJokers)
+                return 30; // Three of a kind with 1J
+            else
+                return 20;
+        }
+
+        // Nothing but probably Jokers?
+        if (5 == countJokers)
+            return 50; // Five of a kind with 5J
+        else if (4 == countJokers)
+            return 50; // Five of a kind with 4J
+        else if (3 == countJokers)
+            return 40; // Four of a kind with 3J
+        else if (2 == countJokers)
+            return 30; // Three of a kind with 2J
+        else if (1 == countJokers)
+            return 20; // Two of a kind with 1J
 
         return 10;
-    }
-
-    long getResultA()
-    {
-        long resultA = 0;
-
-        return resultA;
-    }
-
-    long getResultB()
-    {
-        long resultB = 0;
-
-        return resultB;
     }
 
     string getString() { return input; }
@@ -1119,10 +1147,24 @@ private:
 
     string hand;
     long bid;
-    double type;
+    int type;
+    int JokerType;
 
+    friend bool JokerSort(const Hand& l, const Hand& r);
     friend class CamelCards;
 };
+
+bool JokerSort(const Hand& l, const Hand& r)
+{
+    if (l.JokerType != r.JokerType)
+        return l.JokerType < r.JokerType;
+
+    for (int i = 0; i < 5; ++i)
+        if (l.hand[i] != r.hand[i])
+            return Hand::getCardValue(l.hand[i], true) < Hand::getCardValue(r.hand[i], true);
+
+    return false;
+}
 
 class CamelCards {
 public:
@@ -1134,12 +1176,12 @@ public:
         // Parse data
         for (auto elem : input)
             Hands.push_back(Hand(elem));
-
-        sort(Hands.begin(), Hands.end());
     }
 
     long getResultA()
     {
+        sort(Hands.begin(), Hands.end());
+
         long resultA = 0;
         for (long i = 0; i < Hands.size(); ++i)
             resultA += (i + 1) * Hands[i].bid;
@@ -1149,9 +1191,12 @@ public:
     }
     long getResultB()
     {
+        sort(Hands.begin(), Hands.end(), JokerSort);
+
         long resultB = 0;
-        for (auto e : Hands)
-            resultB += e.getResultB();
+        for (long i = 0; i < Hands.size(); ++i) {
+            resultB += (i + 1) * Hands[i].bid;
+        }
 
         cout << "resultB: " << resultB << endl;
         return resultB;
@@ -1172,12 +1217,12 @@ TEST_CASE("Testdata")
 {
     CamelCards CamelCardsData(inputTestdata);
     REQUIRE(6440 == CamelCardsData.getResultA());
-    REQUIRE(0 == CamelCardsData.getResultB());
+    REQUIRE(5905 == CamelCardsData.getResultB());
 }
 
 TEST_CASE("CamelCards")
 {
     CamelCards CamelCardsData(inputData);
     REQUIRE(248179786 == CamelCardsData.getResultA());
-    REQUIRE(0 == CamelCardsData.getResultB());
+    REQUIRE(247885995 == CamelCardsData.getResultB());
 }
