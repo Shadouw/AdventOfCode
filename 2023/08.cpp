@@ -1,10 +1,10 @@
+#include <algorithm>
+#include <climits>
 #include <iostream>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
-#include <algorithm>
-#include <climits>
 
 #include <kgv_ggt.h>
 
@@ -125,45 +125,40 @@ public:
 
                 if ('Z' == currentNode[2]) {
 
-                    // Search 
+                    // Search
                     bool found = false;
-                    for ( auto &node : nodeStatuses )
-                    {
-                        if ( node.startnode == startnode && node.endnode == currentNode && node.ip == ip && 0 ==node.hitdistance)
-                        {
+                    for (auto& node : nodeStatuses) {
+                        if (node.startnode == startnode && node.endnode == currentNode && node.ip == ip && 0 == node.hitdistance) {
                             node.hitdistance = stepcounter - node.firsthit;
                             found = true;
                             stillsearching = false;
                         }
                     }
-                    if ( !found )
+                    if (!found)
                         nodeStatuses.push_back((nodeStatus) { startnode, currentNode, ip, stepcounter, 0 });
                 }
 
-                if ( !stillsearching )
-                {
-                    for ( const auto& node : nodeStatuses)
-                        if ( 0==node.hitdistance )
+                if (!stillsearching) {
+                    for (const auto& node : nodeStatuses)
+                        if (0 == node.hitdistance)
                             stillsearching = true;
                 }
 
                 ++ip;
-            } while ( stillsearching );
+            } while (stillsearching);
         }
 
         // Order the data by IP
         map<long, vector<nodeStatus>> statusesbyip;
-        for ( auto nodestat : nodeStatuses )
+        for (auto nodestat : nodeStatuses)
             statusesbyip[nodestat.ip].push_back(nodestat);
 
-        for ( auto sbi : statusesbyip )
-        {
-            if ( sbi.second.size() == currentNodes.size() )
-            {
+        for (auto sbi : statusesbyip) {
+            if (sbi.second.size() == currentNodes.size()) {
                 // Calculate kgv
                 long long kgv = 1;
 
-                for ( auto s : sbi.second )
+                for (auto s : sbi.second)
                     kgv = kgV(kgv, s.firsthit);
 
                 if (kgv < resultB)
