@@ -253,6 +253,7 @@ public:
 
     void extrapolate()
     {
+        // Future
         long epvalue = 0;
         for (auto v = differences.rbegin(); v != differences.rend(); ++v) {
             auto lastvalue = v->back();
@@ -261,6 +262,16 @@ public:
         }
 
         history.push_back(history.back() + epvalue);
+
+        // Past
+        epvalue = 0;
+        for (auto v = differences.rbegin(); v != differences.rend(); ++v) {
+            auto lastvalue = v->front();
+            epvalue = lastvalue - epvalue;
+            v->insert(v->begin(), epvalue);
+        }
+
+        history.insert(history.begin(), history.front() - epvalue);
     }
 
     long getResultA()
@@ -272,7 +283,7 @@ public:
 
     long getResultB()
     {
-        long resultB = 0;
+        long resultB = history.front();
 
         return resultB;
     }
@@ -332,12 +343,12 @@ TEST_CASE("Testdata")
 {
     MirageMaintenance MirageMaintenanceData(inputTestdata);
     REQUIRE(114 == MirageMaintenanceData.getResultA());
-    REQUIRE(0 == MirageMaintenanceData.getResultB());
+    REQUIRE(2 == MirageMaintenanceData.getResultB());
 }
 
 TEST_CASE("MirageMaintenance")
 {
     MirageMaintenance MirageMaintenanceData(inputData);
-    REQUIRE(0 == MirageMaintenanceData.getResultA());
-    REQUIRE(0 == MirageMaintenanceData.getResultB());
+    REQUIRE(1938800261 == MirageMaintenanceData.getResultA());
+    REQUIRE(1112 == MirageMaintenanceData.getResultB());
 }
