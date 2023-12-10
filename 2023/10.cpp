@@ -15,6 +15,41 @@ const vector<string> inputTestdata = {
     "LJ..."
 };
 
+const vector<string> inputTestdata2 = {
+    "...........",
+    ".S-------7.",
+    ".|F-----7|.",
+    ".||.....||.",
+    ".||.....||.",
+    ".|L-7.F-J|.",
+    ".|..|.|..|.",
+    ".L--J.L--J.",
+    "..........."
+};
+const vector<string> inputTestdata3 = {
+    "..........",
+    ".S------7.",
+    ".|F----7|.",
+    ".||....||.",
+    ".||....||.",
+    ".|L-7F-J|.",
+    ".|..||..|.",
+    ".L--JL--J.",
+    ".........."
+};
+const vector<string> inputTestdata4 = {
+    ".F----7F7F7F7F-7....",
+    ".|F--7||||||||FJ....",
+    ".||.FJ||||||||L7....",
+    "FJL7L7LJLJ||LJ.L-7..",
+    "L--J.L7...LJS7F-7L7.",
+    "....F-J..F7FJ|L7L7L7",
+    "....L7.F7||L7|.L7L7|",
+    ".....|FJLJ|FJ|F7|.LJ",
+    "....FJL-7.||.||||...",
+    "....L---J.LJ.LJLJ..."
+};
+
 const vector<string> inputData = {
     "FJ.|-FL-J-F-J-L-F|7F7F7J.|J7|-FF7.7F--|-F7F-.7.F--F-J.F|7FJ-77.|-|-F|7FL|FF|7.FF-L|-J7L-|-L-|-L-F.F.L7F..|7F|.F-JF77F7.FL7F-7.F---7L|77FJ7-J",
     "L-FL.-J|.L|.|7J7JJ|LJ7..FLJF--F.|7FF7J..F.JFL.FL--J|L7.L|L|.L77..J7FJL7JL--J77-L.F|7.7J|||.|J.LFJ.L..FF7FF-JLF7.|F||-JJ-L7-L7F7.FJL.|7-|LFJ|",
@@ -166,7 +201,6 @@ class PipeMaze {
 public:
     PipeMaze(const vector<string>& _input)
         : maze(_input)
-        , loop(_input)
     {
         mazesize.first = maze.size(); // y coordinate
         mazesize.second = maze[0].size(); // x coordinate
@@ -272,16 +306,19 @@ public:
             break;
         default:
             cout << "Unknown pipe: " << pipe;
+            return dir;
         }
 
         return dir;
     }
 
-    long getResultA()
+    long getResultA(bool fillPath = false)
     {
         long resultA = 0;
         pair<long, long> curpos(spos);
         char lastdirection = ' ';
+
+        auto tempmaze = maze;
 
         do {
             direction dir = getDirection(curpos);
@@ -306,35 +343,73 @@ public:
             } else if (dir.w) {
                 --curpos.second;
                 lastdirection = 'w';
-            } else
+            } else {
                 cout << "No possible move at << " << curpos.first << "x" << curpos.second << endl;
+                return 0;
+            }
 
-            loop[curpos.first][curpos.second] = '0';
+            tempmaze[curpos.first][curpos.second] = '0';
 
             ++resultA;
         } while (curpos != spos);
 
         resultA /= 2;
 
+        if (fillPath)
+            maze = tempmaze;
+
         cout << "resultA: " << resultA << endl;
         return resultA;
     }
+
     long getResultB()
     {
         long resultB = 0;
 
+        // Make the loop double the size of the maze
+        vector<string> loop;
+        for (long line = 0; line < mazesize.first; ++line) {
+            string currentline;
+            for (long row = 0; row < mazesize.second; ++row) {
+                currentline += maze[line][row];
+                if (getDirection({ line, row }).e && getDirection({ line, row + 1 }).w)
+                    currentline += "-";
+                else
+                    currentline += ";";
+            }
+            loop.push_back(currentline);
+
+            // Add additional line
+            currentline.erase();
+            for (long row = 0; row < mazesize.second; ++row) {
+                if (getDirection({ line, row }).s && getDirection({ line + 1, row }).n)
+                    currentline += "|;";
+                else
+                    currentline += ";;";
+            }
+            loop.push_back(currentline);
+        }
+
+        maze = loop;
+        mazesize.first *= 2;
+        mazesize.second *= 2;
+        spos.first *= 2;
+        spos.second *= 2;
+
+        getResultA(true);
+
         // Erase Border
         for (long line = 0; line < mazesize.first; ++line) {
-            if ('0' != loop[line][0])
-                loop[line][0] = ' ';
-            if ('0' != loop[line][mazesize.first - 1])
-                loop[line][mazesize.first - 1] = ' ';
+            if ('0' != maze[line][0])
+                maze[line][0] = ' ';
+            if ('0' != maze[line][mazesize.first - 1])
+                maze[line][mazesize.first - 1] = ' ';
         }
         for (long row = 0; row < mazesize.second; ++row) {
-            if ('0' != loop[0][row])
-                loop[0][row] = ' ';
-            if ('0' != loop[mazesize.first - 1][row])
-                loop[mazesize.first - 1][row] = ' ';
+            if ('0' != maze[0][row])
+                maze[0][row] = ' ';
+            if ('0' != maze[mazesize.first - 1][row])
+                maze[mazesize.first - 1][row] = ' ';
         }
 
         bool found = true;
@@ -343,25 +418,64 @@ public:
 
             for (long line = 1; line < mazesize.first - 1; ++line)
                 for (long row = 1; row < mazesize.second - 1; ++row)
-                    if ('0' != loop[line][row] && ' ' != loop[line][row])
+                    if ('0' != maze[line][row] && ' ' != maze[line][row])
                         for (long l = line - 1; l <= line + 1; ++l)
                             for (long r = row - 1; r <= row + 1; ++r)
-                                if (' ' == loop[l][r] && (line != l || row != r)) {
-                                    loop[line][row] = ' ';
+                                if (' ' == maze[l][r] && (line != l || row != r)) {
+                                    maze[line][row] = ' ';
                                     found = true;
                                 }
         }
 
-        for (auto e : loop)
-            cout << e << endl;
+        // Count fields
+        for (long line = 1; line < mazesize.first; ++line)
+            for (long row = 1; row < mazesize.second; ++row)
+                if (maze[line][row] == '.')
+                    ++resultB;
+
+        /*         // Mark inner fields with x
+        for (long line = 1; line < mazesize.first - 1; ++line)
+            for (long row = 1; row < mazesize.second - 1; ++row)
+                if (' ' != maze[line][row] && '0' != maze[line][row]) {
+                    maze[line][row] = '.';
+                    ++resultB;
+                } */
+
+        // Re-paint maze
+        for (long line = 1; line < mazesize.first; ++line)
+            for (long row = 1; row < mazesize.second; ++row)
+                if ('0' == maze[line][row]) {
+                    switch (maze[line][row]) {
+                    case 'F':
+                        maze[line][row] = 218;
+                        break;
+                    case 'L':
+                        maze[line][row] = 192;
+                        break;
+                    case 'J':
+                        maze[line][row] = 217;
+                        break;
+                    case '7':
+                        maze[line][row] = 191;
+                        break;
+                    case '-':
+                        maze[line][row] = 196;
+                        break;
+                    default:
+                        maze[line][row] = maze[line][row];
+                        break;
+                    }
+                }
+
+        // for (auto e : maze)
+        //     cout << e << endl;
 
         cout << "resultB: " << resultB << endl;
         return resultB;
     }
 
 private:
-    const vector<string> maze;
-    vector<string> loop;
+    vector<string> maze;
 
     pair<long, long> mazesize;
     pair<long, long> spos;
@@ -372,12 +486,31 @@ TEST_CASE("Testdata")
 {
     PipeMaze PipeMazeData(inputTestdata);
     REQUIRE(8 == PipeMazeData.getResultA());
-    REQUIRE(0 == PipeMazeData.getResultB());
+    REQUIRE(1 == PipeMazeData.getResultB());
+}
+
+TEST_CASE("Testdata2")
+{
+    PipeMaze PipeMazeData(inputTestdata2);
+    REQUIRE(4 == PipeMazeData.getResultB());
+}
+
+TEST_CASE("Testdata3")
+{
+    PipeMaze PipeMazeData(inputTestdata3);
+    REQUIRE(4 == PipeMazeData.getResultB());
+}
+
+TEST_CASE("Testdata4")
+{
+    PipeMaze PipeMazeData(inputTestdata4);
+    REQUIRE(8 == PipeMazeData.getResultB());
 }
 
 TEST_CASE("PipeMaze")
 {
     PipeMaze PipeMazeData(inputData);
     REQUIRE(6778 == PipeMazeData.getResultA());
-    REQUIRE(0 == PipeMazeData.getResultB());
+    REQUIRE(537 > PipeMazeData.getResultB());
+    REQUIRE(44 != PipeMazeData.getResultB());
 }
