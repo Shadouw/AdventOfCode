@@ -285,6 +285,7 @@ public:
                 maze[mazesize.first - 1][column] = ' ';
         }
 
+        // Floodfil outer area
         bool found = true;
         while (found) {
             found = false;
