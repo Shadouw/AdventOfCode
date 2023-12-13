@@ -1409,26 +1409,25 @@ public:
         return ret;
     }
 
-    void findMirror()
+    void findMirror(int mr = -1, int mc = -1)
     {
-        if ("..#.#......#." == ashandrocks[0] && "###.#.####.#." == ashandrocks[1])
-            cout << "Found it." << endl;
         mirrorrow = -1;
         mirrorcolumn = -1;
         // Find matching row
         for (int r = 0; r < rows - 1; ++r) {
             if (getRow(r) == getRow(r + 1)) {
                 mirrorrow = r;
-                for (int rt = 0; rt < r; ++rt) {
-                    string r1 = getRow(rt);
-                    string r2 = getRow(2 * mirrorrow + 1 - rt);
-                    if (r1 != r2 && "" != r2) {
-                        mirrorrow = -1;
-                        break;
+                if (mirrorrow != mr)
+                    for (int rt = 0; rt < r; ++rt) {
+                        string r1 = getRow(rt);
+                        string r2 = getRow(2 * mirrorrow + 1 - rt);
+                        if (r1 != r2 && "" != r2) {
+                            mirrorrow = -1;
+                            break;
+                        }
                     }
-                }
             }
-            if (-1 != mirrorrow)
+            if (-1 != mirrorrow && mr != mirrorrow)
                 break;
         }
 
@@ -1436,27 +1435,35 @@ public:
         for (int c = 0; c < columns - 1; ++c) {
             if (getColumn(c) == getColumn(c + 1)) {
                 mirrorcolumn = c;
-                for (int ct = 0; ct < c; ++ct) {
-                    string c1 = getColumn(ct);
-                    string c2 = getColumn(2 * mirrorcolumn + 1 - ct);
-                    if (c1 != c2 && "" != c2) {
-                        mirrorcolumn = -1;
-                        break;
+                if (mirrorcolumn != mc)
+                    for (int ct = 0; ct < c; ++ct) {
+                        string c1 = getColumn(ct);
+                        string c2 = getColumn(2 * mirrorcolumn + 1 - ct);
+                        if (c1 != c2 && "" != c2) {
+                            mirrorcolumn = -1;
+                            break;
+                        }
                     }
-                }
             }
-            if ( -1 != mirrorcolumn )
+            if (-1 != mirrorcolumn && mc != mirrorcolumn)
                 break;
         }
     }
 
-    long getResultA()
+    bool valid()
     {
         if (-1 != mirrorrow && -1 != mirrorcolumn)
-            cout << "Detected both, mirror column and row." << endl;
-
+            return false;
         if (-1 == mirrorrow && -1 == mirrorcolumn)
-            cout << "Detected neither mirror column nor row." << endl;
+            return false;
+
+        return true;
+    }
+
+    long getResultA()
+    {
+        if (!valid())
+            cout << "Detected either both, mirror column and row, or nothing." << endl;
 
         long resultA = 0;
         if (-1 != mirrorcolumn)
@@ -1467,16 +1474,37 @@ public:
         return resultA;
     }
 
-    long getResultB()
+    void fixSmudge()
     {
-        long resultB = 0;
+        int oldmirrorrow = mirrorrow;
+        int oldmirrorcolumn = mirrorcolumn;
 
-        return resultB;
+        for (int r = 0; r < rows; ++r)
+            for (int c = 0; c < columns; ++c) {
+                char old = ashandrocks[r][c];
+                ashandrocks[r][c] = ('#' == old ? '.' : '#');
+
+                findMirror(oldmirrorrow, oldmirrorcolumn);
+                if (oldmirrorrow != mirrorrow || oldmirrorcolumn != mirrorcolumn) {
+                    if (oldmirrorrow == mirrorrow)
+                        mirrorrow = -1;
+                    if (oldmirrorcolumn == mirrorcolumn)
+                        mirrorcolumn = -1;
+                    if (valid())
+                        return;
+                }
+
+                ashandrocks[r][c] = old;
+            }
+
+        cout << "I was unable to fix the smudge." << endl;
     }
 
-    friend bool operator<(const AshAndRocks& l, const AshAndRocks& r)
+    long getResultB()
     {
-        return l.ashandrocks < r.ashandrocks;
+        fixSmudge();
+
+        return getResultA();
     }
 
 private:
@@ -1485,8 +1513,6 @@ private:
     int mirrorrow;
     int mirrorcolumn;
     const int rows, columns;
-
-    friend class PointOfIncidence;
 };
 
 class PointOfIncidence {
@@ -1538,12 +1564,12 @@ TEST_CASE("Testdata")
 {
     PointOfIncidence PointOfIncidenceData(inputTestdata);
     REQUIRE(405 == PointOfIncidenceData.getResultA());
-    REQUIRE(0 == PointOfIncidenceData.getResultB());
+    REQUIRE(400 == PointOfIncidenceData.getResultB());
 }
 
 TEST_CASE("PointOfIncidence")
 {
     PointOfIncidence PointOfIncidenceData(inputData);
     REQUIRE(28895 == PointOfIncidenceData.getResultA());
-    REQUIRE(0 == PointOfIncidenceData.getResultB());
+    REQUIRE(31603 == PointOfIncidenceData.getResultB());
 }
