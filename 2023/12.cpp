@@ -1,4 +1,5 @@
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -1022,93 +1023,92 @@ const vector<string> inputData = {
 
 class Springs {
 public:
-    Springs(const string _input)
+    Springs(const string _input, int fold)
         : input(_input)
     {
-        auto pos = input.find(' ');
-        springs = input.substr(0, pos);
-        damagedsprings = input.substr(pos + 1);
-
-        searchsprings(springs);
+        splitsprings(fold);
+        searchsprings(springs, validsprings);
     }
 
-    void searchsprings(string s)
+    // Split the input data and fold it for part 2
+    void splitsprings(int fold)
+    {
+        // Split input string
+        auto pos = input.find(' ');
+        springs = input.substr(0, pos);
+        string _damagedsprings = input.substr(pos + 1);
+
+        // Fold input
+        auto oldsprings(springs);
+        auto olddamagedsprings(_damagedsprings);
+        for ( int i=1; i<fold; ++i )
+        {
+            springs += "?" + oldsprings;
+            _damagedsprings += "," + olddamagedsprings;
+        }
+
+        // Make a vector of numbers
+        vector<string> _ds = stringtovector(_damagedsprings, ',');
+        for (auto s : _ds)
+            damagedsprings.push_back(stoi(s));
+    }
+
+    void searchsprings(string s, long& _validsprings)
     {
         auto pos = s.find('?');
+
         if (string::npos == pos) {
             if (verifyDamagedSprings(s))
-                validsprings.push_back(s);
+                ++_validsprings;
         } else {
-            s[pos] = '.';
-            searchsprings(s);
+            // Brute Force
             s[pos] = '#';
-            searchsprings(s);
+            searchsprings(s, _validsprings);
+            s[pos] = '.';
+            searchsprings(s, _validsprings);
         }
     }
 
     bool verifyDamagedSprings(string s)
     {
-        string v(getDamagedSprings(s));
+        vector<int> v(getDamagedSprings(s));
         return v == damagedsprings;
     }
 
-    static string getDamagedSprings(string s)
+    static vector<int> getDamagedSprings(string s)
     {
-        string damaged;
+        vector<int> damaged;
         auto ds = stringtovector(s, '.');
 
         for (auto s : ds) {
-            if (damaged.size())
-                damaged += ",";
-            damaged += to_string(s.size());
+            damaged.push_back(s.size());
         }
         return damaged;
     }
 
     long getResultA()
     {
-        return validsprings.size();
-    }
-
-    long getResultB()
-    {
-        string _input(input);
-        
-        validsprings.clear();
-        springs = springs + "?" + springs + "?" + springs + "?" + springs + "?" + springs;
-        damagedsprings = damagedsprings + "," + damagedsprings + "," + damagedsprings + "," + damagedsprings + "," + damagedsprings;
-        searchsprings(springs);
-
-        return validsprings.size();
-    }
-
-    string getString() { return input; }
-
-    friend bool operator<(const Springs& l, const Springs& r)
-    {
-        return l.input < r.input;
+        return validsprings;
     }
 
 private:
     string input;
     string springs;
-    string damagedsprings;
+    vector<int> damagedsprings;
 
-    vector<string> validsprings;
-
-    friend class HotSprings;
+    long validsprings=0;
 };
 
 class HotSprings {
 public:
-    HotSprings(const vector<string>& _input)
+    HotSprings(const vector<string>& _input, int fold)
         : input(_input)
     {
         cout << "Size of Input: " << input.size() << endl;
 
         // Parse data
         for (auto elem : input)
-            springs.push_back(Springs(elem));
+            springs.push_back(Springs(elem, fold));
     }
 
     long getResultA()
@@ -1120,36 +1120,32 @@ public:
         cout << "resultA: " << resultA << endl;
         return resultA;
     }
-    long getResultB()
-    {
-        long resultB = 0;
-
-        int i = 0;
-        for (auto e : springs) {
-                cout << i++ << " ";
-            resultB += e.getResultB();
-        }
-        cout << endl;
-
-        cout << "resultB: " << resultB << endl;
-        return resultB;
-    }
 
 private:
     const vector<string> input;
     vector<Springs> springs;
 };
 
-TEST_CASE("Testdata")
+TEST_CASE("Testdata1")
 {
-    HotSprings HotSpringsData(inputTestdata);
+    HotSprings HotSpringsData(inputTestdata, 1);
     REQUIRE(21 == HotSpringsData.getResultA());
-    REQUIRE(525152 == HotSpringsData.getResultB());
 }
 
-TEST_CASE("HotSprings")
+TEST_CASE("HotSprings1")
 {
-    HotSprings HotSpringsData(inputData);
+    HotSprings HotSpringsData(inputData, 1);
     REQUIRE(7221 == HotSpringsData.getResultA());
-    REQUIRE(0 == HotSpringsData.getResultB());
+}
+
+TEST_CASE("Testdata5")
+{
+    HotSprings HotSpringsData(inputTestdata, 5);
+    REQUIRE(525152 == HotSpringsData.getResultA());
+}
+
+TEST_CASE("HotSprings5")
+{
+    HotSprings HotSpringsData(inputData, 1);
+    REQUIRE(0 == HotSpringsData.getResultA());
 }
