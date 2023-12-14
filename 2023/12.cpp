@@ -1027,7 +1027,8 @@ public:
         : input(_input)
     {
         splitsprings(fold);
-        searchsprings(springs, validsprings);
+        // searchsprings(springs, validsprings);
+        validsprings = dp();
     }
 
     // Split the input data and fold it for part 2
@@ -1041,8 +1042,7 @@ public:
         // Fold input
         auto oldsprings(springs);
         auto olddamagedsprings(_damagedsprings);
-        for ( int i=1; i<fold; ++i )
-        {
+        for (int i = 1; i < fold; ++i) {
             springs += "?" + oldsprings;
             _damagedsprings += "," + olddamagedsprings;
         }
@@ -1067,6 +1067,46 @@ public:
             s[pos] = '.';
             searchsprings(s, _validsprings);
         }
+    }
+
+    long dp()
+    {
+        string s(springs + ".");
+        auto m = s.length();
+        auto a(damagedsprings);
+        auto n = a.size();
+        a.push_back(m + 1);
+
+        long*** f = new long**[m + 1];
+        for (long i = 0; i < m + 1; ++i) {
+            f[i] = new long*[n + 2];
+            for (long j = 0; j < n + 2; ++j) {
+                f[i][j] = new long[m + 2];
+                for (long k=0; k< m+2; ++k){
+                    f[i][j][k]=0;
+                }
+            }
+        }
+
+        f[0][0][0] = 1;
+
+        for (int i = 0; i < m + 1; ++i) {
+            for (int j = 0; j < n + 2; ++j) {
+                for (int k = 0; k < m + 2; ++k) {
+                    auto cur = f[i][j][k];
+
+                    if (!cur)
+                        continue;
+                    if (s[i] == '.' || s[i] == '?')
+                        if (k == 0 || k == a[j - 1])
+                            f[i + 1][j][0] += cur;
+                    if (s[i] == '#' || s[i] == '?')
+                        f[i + 1][j + !k][k + 1] += cur;
+                }
+            }
+        }
+
+        return f[m][n][0];
     }
 
     bool verifyDamagedSprings(string s)
@@ -1096,7 +1136,7 @@ private:
     string springs;
     vector<int> damagedsprings;
 
-    long validsprings=0;
+    long validsprings = 0;
 };
 
 class HotSprings {
@@ -1146,6 +1186,6 @@ TEST_CASE("Testdata5")
 
 TEST_CASE("HotSprings5")
 {
-    HotSprings HotSpringsData(inputData, 1);
-    REQUIRE(0 == HotSpringsData.getResultA());
+    HotSprings HotSpringsData(inputData, 5);
+    REQUIRE(7139671893722 == HotSpringsData.getResultA());
 }
