@@ -154,11 +154,87 @@ public:
                     }
             }
             break;
+        case 'E':
+            for (int r = 0; r < rows; ++r) {
+                int nextpos = columns - 1;
+                for (int c = columns - 1; c >= 0; --c)
+                    switch (tempstate[r][c]) {
+                    case '#':
+                        nextpos = c - 1;
+                        break;
+                    case 'O':
+                        tempstate[r][c] = '.';
+                        tempstate[r][nextpos--] = 'O';
+                        break;
+                    default:
+                        break;
+                    }
+            }
+            break;
+        case 'S':
+            for (int c = 0; c < columns; ++c) {
+                int nextpos = rows - 1;
+                for (int r = rows - 1; r >= 0; --r)
+                    switch (tempstate[r][c]) {
+                    case '#':
+                        nextpos = r - 1;
+                        break;
+                    case 'O':
+                        tempstate[r][c] = '.';
+                        tempstate[nextpos--][c] = 'O';
+                        break;
+                    default:
+                        break;
+                    }
+            }
+            break;
+        case 'W':
+            for (int r = 0; r < rows; ++r) {
+                int nextpos = 0;
+                for (int c = 0; c < columns; ++c)
+                    switch (tempstate[r][c]) {
+                    case '#':
+                        nextpos = c + 1;
+                        break;
+                    case 'O':
+                        tempstate[r][c] = '.';
+                        tempstate[r][nextpos++] = 'O';
+                        break;
+                    default:
+                        break;
+                    }
+            }
+
+            break;
         default:
             break;
         }
 
         currentstate = tempstate;
+    }
+
+    void cycle(long c)
+    {
+        for (long i = 0; i < c; ++i) {
+            if (!(i % 1000000))
+                cout << i << endl;
+            move('N');
+            move('W');
+            move('S');
+            move('E');
+
+            if (currentstate == periodicstate) {
+                cout << "Found at i = " << i << endl;
+                long diff = i-100;
+                
+                // Jump forward
+                i += ((c-i)/diff)*diff;
+            }
+
+            // Assumption: After at least 100 iterations it is periodic
+            if (100 == i)
+                periodicstate = currentstate;
+        }
     }
 
     long getLoad()
@@ -185,7 +261,9 @@ public:
     }
     long getResultB()
     {
-        long resultB = 0;
+        currentstate = input;
+        cycle(1000000000);
+        long resultB = getLoad();
 
         cout << "resultB: " << resultB << endl;
         return resultB;
@@ -196,18 +274,19 @@ private:
     const long rows, columns;
 
     vector<string> currentstate;
+    vector<string> periodicstate;
 };
 
 TEST_CASE("Testdata")
 {
     ParabolicReflectorDish ParabolicReflectorDishData(inputTestdata);
     REQUIRE(136 == ParabolicReflectorDishData.getResultA());
-    REQUIRE(0 == ParabolicReflectorDishData.getResultB());
+    REQUIRE(64 == ParabolicReflectorDishData.getResultB());
 }
 
 TEST_CASE("ParabolicReflectorDish")
 {
     ParabolicReflectorDish ParabolicReflectorDishData(inputData);
     REQUIRE(108826 == ParabolicReflectorDishData.getResultA());
-    REQUIRE(0 == ParabolicReflectorDishData.getResultB());
+    REQUIRE(99291 == ParabolicReflectorDishData.getResultB());
 }
