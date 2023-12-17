@@ -137,8 +137,11 @@ const vector<string> inputData = {
 
 class beam {
 public:
-    beam(long _rows, long _cols)
-        : rows(_rows)
+    beam(long _row, long _col, char _dir, long _rows, long _cols)
+        : row(_row)
+        , col(_col)
+        , direction(_dir)
+        , rows(_rows)
         , cols(_cols)
     {
     }
@@ -265,15 +268,12 @@ private:
 
 class TheFloorWillBeLava {
 public:
-    TheFloorWillBeLava(const vector<string>& _input)
+    TheFloorWillBeLava(const vector<string>& _input, bool partB = false)
         : input(_input)
         , rows(_input.size())
         , cols(_input[0].size())
     {
         cout << "Size of Input: " << rows << " rows and " << cols << " columns." << endl;
-
-        // Parse data
-        beams.push_back(beam(rows, cols));
     }
 
     void moveBeams()
@@ -318,25 +318,82 @@ public:
         }
     }
 
+    long getEnergized()
+    {
+        long en = 0;
+        for (auto e : energized)
+            if (e.second.size())
+                ++en;
+
+        return en;
+    }
+
     long getResultA()
     {
-        long resultA = 0;
+        beams.clear();
+        energized.clear();
+
+        beams.push_back(beam(0, 0, 'e', rows, cols));
 
         while (beams.size())
             moveBeams();
 
         //printFloor();
 
-        for (auto e : energized)
-            if (e.second.size())
-                ++resultA;
+        long resultA = getEnergized();
 
         cout << "resultA: " << resultA << endl;
         return resultA;
     }
+
     long getResultB()
     {
         long resultB = 0;
+
+        for (long r = 0; r < rows; ++r) {
+            beams.clear();
+            energized.clear();
+            beams.push_back(beam(r, 0, 'e', rows, cols));
+
+            while (beams.size())
+                moveBeams();
+
+            if (getEnergized() > resultB)
+                resultB = getEnergized();
+
+            beams.clear();
+            energized.clear();
+            beams.push_back(beam(r, cols - 1, 'w', rows, cols));
+
+            while (beams.size())
+                moveBeams();
+
+            if (getEnergized() > resultB)
+                resultB = getEnergized();
+        }
+        for (long c = 0; c < cols; ++c) {
+            beams.clear();
+            energized.clear();
+
+            beams.push_back(beam(0, c, 's', rows, cols));
+
+            while (beams.size())
+                moveBeams();
+
+            if (getEnergized() > resultB)
+                resultB = getEnergized();
+
+            beams.clear();
+            energized.clear();
+
+            beams.push_back(beam(rows - 1, c, 'n', rows, cols));
+
+            while (beams.size())
+                moveBeams();
+
+            if (getEnergized() > resultB)
+                resultB = getEnergized();
+        }
 
         cout << "resultB: " << resultB << endl;
         return resultB;
@@ -369,12 +426,12 @@ TEST_CASE("Testdata")
 {
     TheFloorWillBeLava TheFloorWillBeLavaData(inputTestdata);
     REQUIRE(46 == TheFloorWillBeLavaData.getResultA());
-    REQUIRE(0 == TheFloorWillBeLavaData.getResultB());
+    REQUIRE(51 == TheFloorWillBeLavaData.getResultB());
 }
 
 TEST_CASE("TheFloorWillBeLava")
 {
     TheFloorWillBeLava TheFloorWillBeLavaData(inputData);
-    REQUIRE(79 != TheFloorWillBeLavaData.getResultA());
-    REQUIRE(0 == TheFloorWillBeLavaData.getResultB());
+    REQUIRE(7798 == TheFloorWillBeLavaData.getResultA());
+    REQUIRE(8026 == TheFloorWillBeLavaData.getResultB());
 }
