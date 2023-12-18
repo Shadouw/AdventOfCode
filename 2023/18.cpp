@@ -1,3 +1,4 @@
+#include <climits>
 #include <iostream>
 #include <map>
 #include <set>
@@ -5,6 +6,7 @@
 #include <utility>
 #include <vector>
 
+#include <hextoint.h>
 #include <stringtovector.h>
 
 #include <catch2/catch_test_macros.hpp>
@@ -683,21 +685,29 @@ public:
         vector<string> tokens(stringtovector(input, ' '));
         dir = tokens[0][0];
         steps = stol(tokens[1]);
-        rgb = tokens[2];
+        rgb = tokens[2].substr(2, 6);
     }
 
-    long getResultA()
+    void parseRGB()
     {
-        long resultA = 0;
-
-        return resultA;
-    }
-
-    long getResultB()
-    {
-        long resultB = 0;
-
-        return resultB;
+        steps = hextoint(rgb.substr(0, rgb.size() - 1));
+        switch (rgb[5]) {
+        case '0':
+            dir = 'R';
+            break;
+        case '1':
+            dir = 'D';
+            break;
+        case '2':
+            dir = 'L';
+            break;
+        case '3':
+            dir = 'U';
+            break;
+        default:
+            cout << "Illegal rgb value: " << rgb << endl;
+            break;
+        }
     }
 
     string getString() { return input; }
@@ -729,8 +739,9 @@ public:
             items.push_back(item(elem));
     }
 
-    void dig()
+    long long dig()
     {
+        long long count = 0;
         long row = 0, col = 0;
         for (auto i : items) {
             for (int j = 0; j < i.steps; ++j) {
@@ -751,31 +762,116 @@ public:
                 default:
                     break;
                 }
+                if (trench[{ row, col }] == '#')
+                    cout << "Kollision" << endl;
                 trench[{ row, col }] = '#';
+                ++count;
             }
         }
+        return count;
     }
-
-    void fillTrench()
+    /*
+    long long dig()
     {
-        // Find a point in the middle of the trench, e.g. a row with two elements only
+        long long count = 0;
+        long row = 0, col = 0;
+        for (auto i : items) {
+            switch (i.dir) {
+            case 'U':
+                for (int j = 0; j < i.steps; ++j) {
+                    --row;
+                    trench[{ row, col }] = '#';
+                    ++count;
+                }
+                break;
+            case 'D':
+                for (int j = 0; j < i.steps; ++j) {
+                    ++row;
+                    trench[{ row, col }] = '#';
+                    ++count;
+                }
+                break;
+            case 'L':
+                col -= i.steps;
+                count -= i.steps;
+                trench[{ row, col }] = '#';
+                break;
+            case 'R':
+                col += i.steps;
+                count += i.steps;
+                trench[{ row, col }] = '#';
+                break;
+            default:
+                break;
+            }
+        }
+
+        cout << "Digged: " << count << endl;
+
+        return count;
+    }*/
+
+    long long fillTrench()
+    {
+        long long countrow = 0;
+
         map<long, set<long>> rowcounter;
         for (auto e : trench)
             rowcounter[e.first.first].insert(e.first.second);
 
-        vector<pair<long, long>> fillpoints;
+        //vector<pair<long, long>> fillpoints;
 
-        for (auto e : rowcounter)
-            if (e.second.size() == 2) {
+        for (auto e : rowcounter) {
+            // Count elements in Row
+
+            /* if (e.second.size() == 2) {
                 auto iter = e.second.begin();
                 long l = *iter;
                 ++iter;
                 long r = *iter;
 
-                if (r - l > 1) 
+                if (r - l > 1)
                     fillpoints.push_back({ e.first, l + 1 });
+            } */
+
+            long long lws = LONG_LONG_MAX; // Left Wall Start
+            long long lwe = LONG_LONG_MAX; // Left Wall End
+            long long rws = LONG_LONG_MAX; // Right Wall Start
+            long long rwe = LONG_LONG_MAX; // Right Wall End
+
+            for (auto rc : e.second) {
+                if (LONG_LONG_MAX == lws) {
+                    lws = rc;
+                    lwe = rc;
+                } else {
+                    if (lwe + 1 == rc) {
+                        lwe = rc;
+                    } else {
+                        if (LONG_LONG_MAX == rws) {
+                            rws = rc;
+                            rwe = rc;
+                        } else if (rwe + 1 == rc) {
+                            rwe = rc;
+                        } else {
+                            // Now it counts....
+                            countrow = rwe - lws + 1;
+                            lws = LONG_LONG_MAX;
+                            lwe = LONG_LONG_MAX;
+                            rws = LONG_LONG_MAX;
+                            rwe = LONG_LONG_MAX;
+                        }
+                    }
+                }
             }
 
+            // Count final element
+            if ( LONG_LONG_MAX == rws )
+                countrow += lwe - lws + 1;
+            else
+                countrow += rwe - lws +1;
+        }
+
+        /* 
         while (fillpoints.size()) {
             pair<long, long> fillpoint(fillpoints.back());
             fillpoints.pop_back();
@@ -787,7 +883,9 @@ public:
                 fillpoints.push_back({ fillpoint.first, fillpoint.second - 1 });
                 fillpoints.push_back({ fillpoint.first, fillpoint.second + 1 });
             }
-        }
+        } */
+
+        return countrow;
     }
 
     long countTrench()
@@ -802,7 +900,7 @@ public:
     long getResultA()
     {
         trench.clear();
-        dig();
+        count = dig();
         fillTrench();
 
         long resultA = countTrench();
@@ -810,11 +908,17 @@ public:
         cout << "resultA: " << resultA << endl;
         return resultA;
     }
+
     long getResultB()
     {
-        long resultB = 0;
-        for (auto e : items)
-            resultB += e.getResultB();
+        trench.clear();
+        for (auto& e : items)
+            e.parseRGB();
+
+        count == dig();
+        fillTrench();
+
+        long resultB = countTrench();
 
         cout << "resultB: " << resultB << endl;
         return resultB;
@@ -824,6 +928,7 @@ private:
     const vector<string> input;
     vector<item> items;
     map<pair<long, long>, char> trench;
+    long long count;
 };
 
 TEST_CASE("Testdata")
