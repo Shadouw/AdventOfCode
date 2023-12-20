@@ -204,8 +204,10 @@ class ClumsyCrucible {
 public:
     ClumsyCrucible(const vector<string>& _input)
         : input(_input)
+        , rows(_input[0].size())
+        , cols(_input[0].size())
     {
-        cout << "Size of Input: " << input.size() << endl;
+        cout << "Size of Input: " << rows << " rows " << cols << " cols " << endl;
 
         // Parse data
         for (auto elem : input)
@@ -233,6 +235,8 @@ public:
 
 private:
     const vector<string> input;
+    const long rows;
+    const long cols;
     vector<item> items;
 };
 
