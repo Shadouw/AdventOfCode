@@ -213,10 +213,13 @@ public:
             Pulse p = Pulses.front();
             Pulses.pop();
 
-            if ( p.pulse )
+            if (p.pulse)
                 ++highpulsecount;
-            else 
+            else {
                 ++lowpulsecount;
+                if ( "rx"== p.target)
+                    lowtorx = true;
+            }
 
             if (Modules[p.target].processPulse(p)) {
                 p.source = p.target;
@@ -245,10 +248,18 @@ public:
         return val;
     }
 
+    void resetModuleStates(){
+        for ( auto &m : Modules )
+            m.second.state = false;
+
+        lowpulsecount = 0;
+        highpulsecount = 0;
+        lowtorx = false;
+    }
+
     long getResultA()
     {
-        for ( int i=0; i<1000; ++i )
-        {
+        for (int i = 0; i < 1000; ++i) {
             pushButton();
             processPulses();
         }
@@ -258,10 +269,19 @@ public:
         cout << "resultA: " << resultA << endl;
         return resultA;
     }
+
     long getResultB()
     {
-        long resultB = 0;
+        resetModuleStates();
 
+        long resultB = 0;
+        while ( !lowtorx )
+        {
+            pushButton();
+            ++resultB;
+            processPulses();
+        }
+        
         cout << "resultB: " << resultB << endl;
         return resultB;
     }
@@ -272,6 +292,7 @@ private:
     queue<Pulse> Pulses;
     long lowpulsecount = 0;
     long highpulsecount = 0;
+    bool lowtorx = false;
 };
 
 TEST_CASE("Testdata1")
