@@ -3,6 +3,7 @@
 #include <vector>
 #include <set>
 #include <cmath>
+#include <map>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -1024,40 +1025,6 @@ const vector<string> inputData = {
 };
 
 
-class item {
-public:
-    item(const string _input)
-        : input(_input)
-    {
-    }
-
-    long getResultA()
-    {
-        long resultA = 0;
-
-        return resultA;
-    }
-
-    long getResultB()
-    {
-        long resultB = 0;
-
-        return resultB;
-    }
-
-    string getString() { return input; }
-
-    friend bool operator<(const item& l, const item& r)
-    {
-        return l.input < r.input;
-    }
-
-private:
-    string input;
-
-    friend class HistorianHysteria;
-};
-
 class HistorianHysteria {
 public:
     HistorianHysteria(const vector<string>& _input)
@@ -1068,10 +1035,16 @@ public:
         // Parse data
         for (auto elem : input)
         {
-            //items.push_back(item(elem));
             vector<string> line = stringtovector(elem, ' ');
-            left.insert(atol(line.front().c_str()));
-            right.insert(atol(line.back().c_str()));
+
+            long leftnumber=atol(line.front().c_str());
+            long rightnumber = atol(line.back().c_str());
+
+            leftset.insert(leftnumber);
+            rightset.insert(rightnumber);
+
+            ++leftmap[leftnumber];
+            ++rightmap[rightnumber];
         }
     }
 
@@ -1079,7 +1052,7 @@ public:
     {
         long resultA = 0;
 
-        for ( auto l = left.begin(), r = right.begin(); l!=left.end(); ++l, ++r)
+        for ( auto l = leftset.begin(), r = rightset.begin(); l!=leftset.end(); ++l, ++r)
         {
             resultA += abs(*l-*r);
         }
@@ -1090,8 +1063,11 @@ public:
     long getResultB()
     {
         long resultB = 0;
-        for (auto e : items)
-            resultB += e.getResultB();
+        for (auto e : leftmap)
+        {
+          resultB += e.first * e.second * rightmap[e.first];
+        }
+        //    resultB += e.getResultB();
 
         cout << "resultB: " << resultB << endl;
         return resultB;
@@ -1099,16 +1075,17 @@ public:
 
 private:
     const vector<string> input;
-    vector<item> items;
-    multiset<long> left;
-    multiset<long> right;
+    multiset<long> leftset;
+    multiset<long> rightset;
+    map<long, long> leftmap;
+    map<long, long> rightmap;
 };
 
 TEST_CASE("Testdata")
 {
     HistorianHysteria HistorianHysteriaData(inputTestdata);
     REQUIRE(11 == HistorianHysteriaData.getResultA());
-    REQUIRE(0 == HistorianHysteriaData.getResultB());
+    REQUIRE(31 == HistorianHysteriaData.getResultB());
 }
 
 TEST_CASE("HistorianHysteria")
