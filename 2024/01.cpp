@@ -1092,5 +1092,5 @@ TEST_CASE("HistorianHysteria")
 {
     HistorianHysteria HistorianHysteriaData(inputData);
     REQUIRE(2378066 == HistorianHysteriaData.getResultA());
-    REQUIRE(0 == HistorianHysteriaData.getResultB());
+    REQUIRE(18934359 == HistorianHysteriaData.getResultB());
 }
