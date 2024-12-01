@@ -19,6 +19,7 @@ target_link_libraries ( template PRIVATE Catch2::Catch2WithMain )
 add_test ( template ${CMAKE_BINARY_DIR}/template )
 
 # Include Sub folders per year
+include(2024/CMakeLists.txt)
 include(2023/CMakeLists.txt)
 include(2022/CMakeLists.txt)
 include(2021/CMakeLists.txt)
