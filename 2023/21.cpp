@@ -176,40 +176,49 @@ public:
         }
     }
 
-    long getSteps(long steps)
+    static long rotatingmod(long number, long modulo) 
     {
+        while (number < 0)
+            number += modulo;
+
+        return number % modulo;
+    }
+
+    long getSteps(long steps, bool infinite)
+    {
+        // Idea to improve:
+        // Each step calculates all follow up steps
+        // But: all places from steps 1,3,5,7 are included in 9
+        // Idea: Only add the new places not already visited
+        // Just check with s-2 since the new once can only grow towards outside
         map<long, set<pair<long, long>>> stepmap;
         stepmap[0].insert(S);
         for (long s = 1; s <= steps; ++s) {
             for (auto sm : stepmap[s - 1]) {
                 // Step into surrounding
-                if (sm.first > 0 && '#' != input[sm.first - 1][sm.second])
+                if ((infinite || sm.first > 0) && '#' != input[rotatingmod(sm.first - 1, rows)][rotatingmod(sm.second,cols)])
                     stepmap[s].insert({ sm.first - 1, sm.second });
-                if (sm.first < rows - 1 && '#' != input[sm.first + 1][sm.second])
+                if ((infinite || sm.first < rows - 1) && '#' != input[rotatingmod(sm.first + 1, rows)][rotatingmod(sm.second , cols)])
                     stepmap[s].insert({ sm.first + 1, sm.second });
-                if (sm.second > 0 && '#' != input[sm.first][sm.second - 1])
+                if ((infinite || sm.second > 0) && '#' != input[rotatingmod(sm.first, rows)][rotatingmod(sm.second - 1, cols)])
                     stepmap[s].insert({ sm.first, sm.second - 1 });
-                if (sm.second < cols - 1 && '#' != input[sm.first][sm.second + 1])
+                if ((infinite || sm.second < cols - 1) && '#' != input[rotatingmod(sm.first, rows)][rotatingmod(sm.second + 1, cols)])
                     stepmap[s].insert({ sm.first, sm.second + 1 });
             }
+            // Reduce memory consumption
+            if ( s>1 )
+                stepmap[s-2].clear();
         }
 
         return stepmap[steps].size();
     }
 
-    long getResultA(long steps)
+    long getResultA(long steps, bool infinite)
     {
-        long resultA = getSteps(steps);
+        long GardenPlots = getSteps(steps, infinite);
 
-        cout << "resultA: " << resultA << endl;
-        return resultA;
-    }
-    long getResultB()
-    {
-        long resultB = 0;
-
-        cout << "resultB: " << resultB << endl;
-        return resultB;
+        cout << "GardenPlots: " << GardenPlots << endl;
+        return GardenPlots;
     }
 
 private:
@@ -222,13 +231,21 @@ private:
 TEST_CASE("Testdata")
 {
     StepCounter StepCounterData(inputTestdata);
-    REQUIRE(16 == StepCounterData.getResultA(6));
-    REQUIRE(0 == StepCounterData.getResultB());
+    REQUIRE(16 == StepCounterData.getResultA(6,false));
+
+    // Part B
+    REQUIRE(16 == StepCounterData.getResultA(6, true));
+    REQUIRE(50 == StepCounterData.getResultA(10, true));
+    REQUIRE(1594 == StepCounterData.getResultA(50, true));
+    REQUIRE(6536 == StepCounterData.getResultA(100, true));
+    REQUIRE(167004 == StepCounterData.getResultA(500, true));
+    REQUIRE(668697 == StepCounterData.getResultA(1000, true));
+    REQUIRE(16733044 == StepCounterData.getResultA(5000, true));
 }
 
 TEST_CASE("StepCounter")
 {
     StepCounter StepCounterData(inputData);
-    REQUIRE(3830 == StepCounterData.getResultA(64));
-    REQUIRE(0 == StepCounterData.getResultB());
+    REQUIRE(3830 == StepCounterData.getResultA(64,false));
+    REQUIRE(3830 == StepCounterData.getResultA(26501365, true));
 }
