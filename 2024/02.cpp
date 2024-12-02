@@ -15,7 +15,7 @@ const vector<string> inputTestdata = {
     "1 3 2 4 5",
     "8 6 4 4 1",
     "1 3 6 7 9"
-};
+}; 
 
 const vector<string> inputData = {
     "22 25 27 28 30 31 32 29",
@@ -1030,25 +1030,38 @@ public:
           values.push_back(atol(_value.c_str()));
     }
 
-    bool getIsSafe()
+    bool getIsSafe() { return getIsSafe(values); }
+
+    bool getIsSafe(vector<long> _values)
     {
         long Counter = 0;
-        for (auto i = 0; i < values.size() - 1; ++i)
+        for (auto i = 0; i < _values.size() - 1; ++i)
         {
-            if ( values[i] > values[i+1] && values[i] - values[i+1]<=3)
-              ++Counter;
-            else if ( values[i] < values[i+1] && values[i+1]-values[i]<=3 )
-              --Counter;
+            if ( _values[i] > _values[i+1] && _values[i] - _values[i+1]<=3)
+                --Counter;
+            else if ( _values[i] < _values[i+1] && _values[i+1]-_values[i]<=3 )
+                ++Counter;
         }
 
-          return abs(Counter)==values.size()-1;
+        isIncreasing = (Counter > 0);
+
+        return abs(Counter)==_values.size()-1;
     }
 
-    long getResultB()
+    bool getIsSafeWithASingleBad()
     {
-        long resultB = 0;
+        if (getIsSafe())
+            return true;
 
-        return resultB;
+        for ( auto i = 0; i<values.size(); ++i) 
+        {
+            vector<long> temp(values);
+            temp.erase(temp.begin() + i);
+            if (getIsSafe(temp))
+                return true;
+        }
+
+        return false;
     }
 
     string getString() { return input; }
@@ -1061,6 +1074,8 @@ public:
 private:
     string input;
     vector<long> values;
+
+    bool isIncreasing;
 
     friend class RedNosedReports;
 };
@@ -1086,14 +1101,14 @@ public:
         cout << "IsSafe: " << IsSafe << endl;
         return IsSafe;
     }
-    long getResultB()
+    long getIsSafeWithASingleBad()
     {
-        long resultB = 0;
+        long IsSafeWithASingleBad = 0;
         for (auto e : reports)
-            resultB += e.getResultB();
+            IsSafeWithASingleBad += e.getIsSafeWithASingleBad();
 
-        cout << "resultB: " << resultB << endl;
-        return resultB;
+        cout << "IsSafeWithASingleBad: " << IsSafeWithASingleBad << endl;
+        return IsSafeWithASingleBad;
     }
 
 private:
@@ -1105,12 +1120,12 @@ TEST_CASE("Testdata")
 {
     RedNosedReports RedNosedReportsData(inputTestdata);
     REQUIRE(2 == RedNosedReportsData.getIsSafe());
-    REQUIRE(0 == RedNosedReportsData.getResultB());
+    REQUIRE(4 == RedNosedReportsData.getIsSafeWithASingleBad());
 }
 
 TEST_CASE("RedNosedReports")
 {
     RedNosedReports RedNosedReportsData(inputData);
     REQUIRE(639 == RedNosedReportsData.getIsSafe());
-    REQUIRE(0 == RedNosedReportsData.getResultB());
+    REQUIRE(674 == RedNosedReportsData.getIsSafeWithASingleBad());
 }
