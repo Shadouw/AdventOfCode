@@ -184,45 +184,54 @@ public:
         return input[y][x];
     }
 
-    long getResultA()
+    long getXMAS()
     {
-        long resultA = 0; 
+        long XMAS = 0; 
         // Find all 'X'
         for (size_t x = 0; x < xsize; x++) {
             for (size_t y = 0; y < ysize; y++) {
                 if ('X' == getLetter(x, y))
                 {
-                  if ('M'==getLetter(x,y+1) && 'A'==getLetter(x,y+2) && 'S'==getLetter(x,y+3))            // N
-                      ++resultA;
-                  if ('M'==getLetter(x+1,y+1) && 'A'==getLetter(x+2,y+2) && 'S'==getLetter(x+3,y+3)) // NE
-                      ++resultA;
-                  if ('M'==getLetter(x+1,y) && 'A'==getLetter(x+2,y) && 'S'==getLetter(x+3,y))       // E
-                      ++resultA;
-                  if ('M'==getLetter(x+1,y-1) && 'A'==getLetter(x+2,y-2) && 'S'==getLetter(x+3,y-3)) // SE
-                      ++resultA;
-                  if ('M'==getLetter(x,y-1) && 'A'==getLetter(x,y-2) && 'S'==getLetter(x,y-3))       // S
-                      ++resultA;
-                  if ('M'==getLetter(x-1,y-1) && 'A'==getLetter(x-2,y-2) && 'S'==getLetter(x-3,y-3)) // SW
-                      ++resultA;
-                  if ('M'==getLetter(x-1,y) && 'A'==getLetter(x-2,y) && 'S'==getLetter(x-3,y))       // W
-                      ++resultA;
-                  if ('M'==getLetter(x-1,y+1) && 'A'==getLetter(x-2,y+2) && 'S'==getLetter(x-3,y+3)) // NW
-                      ++resultA;
+                    if ('M'==getLetter(x,y+1) && 'A'==getLetter(x,y+2) && 'S'==getLetter(x,y+3))            // N
+                        ++XMAS;
+                    if ('M'==getLetter(x+1,y+1) && 'A'==getLetter(x+2,y+2) && 'S'==getLetter(x+3,y+3)) // NE
+                        ++XMAS;
+                    if ('M'==getLetter(x+1,y) && 'A'==getLetter(x+2,y) && 'S'==getLetter(x+3,y))       // E
+                        ++XMAS;
+                    if ('M'==getLetter(x+1,y-1) && 'A'==getLetter(x+2,y-2) && 'S'==getLetter(x+3,y-3)) // SE
+                        ++XMAS;
+                    if ('M'==getLetter(x,y-1) && 'A'==getLetter(x,y-2) && 'S'==getLetter(x,y-3))       // S
+                        ++XMAS;
+                    if ('M'==getLetter(x-1,y-1) && 'A'==getLetter(x-2,y-2) && 'S'==getLetter(x-3,y-3)) // SW
+                        ++XMAS;
+                    if ('M'==getLetter(x-1,y) && 'A'==getLetter(x-2,y) && 'S'==getLetter(x-3,y))       // W
+                        ++XMAS;
+                    if ('M'==getLetter(x-1,y+1) && 'A'==getLetter(x-2,y+2) && 'S'==getLetter(x-3,y+3)) // NW
+                        ++XMAS;
                 }
             }
         }
 
-        cout << "resultA: " << resultA << endl;
-        return resultA;
+        cout << "XMAS: " << XMAS << endl;
+        return XMAS;
     }
-    long getResultB()
+    long getX_MAS()
     {
-        long resultB = 0;
-//        for (auto e : items)
-//            resultB += e.getResultB();
+        long X_MAS = 0;
+        // Find all 'A'
+        for (size_t x = 0; x < xsize; x++) {
+            for (size_t y = 0; y < ysize; y++) {
+                if ('A' == getLetter(x, y))
+                {
+                    if ('M'==getLetter(x+1,y+1) && 'S'==getLetter(x-1,y-1) || 'S'==getLetter(x+1,y+1) && 'M'==getLetter(x-1,y-1))
+                        if ('M'==getLetter(x+1,y-1) && 'S'==getLetter(x-1,y+1) || 'S'==getLetter(x+1,y-1) && 'M'==getLetter(x-1,y+1))
+                            ++X_MAS;
+                }
+            }
+        }
 
-        cout << "resultB: " << resultB << endl;
-        return resultB;
+        cout << "X_MAS: " << X_MAS << endl;
+        return X_MAS;
     }
 
 private:
@@ -234,13 +243,13 @@ private:
 TEST_CASE("Testdata")
 {
     CeresSearch CeresSearchData(inputTestdata);
-    REQUIRE(18 == CeresSearchData.getResultA());
-    REQUIRE(0 == CeresSearchData.getResultB());
+    REQUIRE(18 == CeresSearchData.getXMAS());
+    REQUIRE(9 == CeresSearchData.getX_MAS());
 }
 
 TEST_CASE("CeresSearch")
 {
     CeresSearch CeresSearchData(inputData);
-    REQUIRE(2483 == CeresSearchData.getResultA());
-    REQUIRE(0 == CeresSearchData.getResultB());
+    REQUIRE(2483 == CeresSearchData.getXMAS());
+    REQUIRE(1925 == CeresSearchData.getX_MAS());
 }
