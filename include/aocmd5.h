@@ -5,6 +5,9 @@
 #include <iomanip>
 #include <string>
 #include <sstream>
+
+// Install on Linux: 
+// sudo apt-get install libssl-dev
 #include <openssl/md5.h>
 
 std::string getmd5hexhash(const std::string input)
