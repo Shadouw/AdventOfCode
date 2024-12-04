@@ -66,7 +66,7 @@ public:
         auto posdont=_input.find("don't()");
         auto posdo  =_input.find("do()");
 
-        while (posdo != string::npos && posdont!= string::npos)
+        while (posdo != string::npos || posdont!= string::npos)
         {
             if (posdont < posdo)
                 _input = _input.replace(posdont, posdo+4-posdont, "");
