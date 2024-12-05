@@ -1416,7 +1416,7 @@ public:
         assert(rule.first != rule.second);
     }
 
-    bool checkUpdate ( vector<long> update )
+    bool checkUpdate ( const vector<long> update )
     {
         auto pos1 = find(update.begin(), update.end(), rule.first);
         auto pos2 = find(update.begin(), update.end(), rule.second);
@@ -1439,6 +1439,7 @@ private:
     pair<long,long> rule;
 
     friend class PrintQueue;
+	friend class Update;
 };
 
 class Update {
@@ -1463,7 +1464,10 @@ public:
         for ( auto rule : PageOrderRules )
         {
             if ( !rule.checkUpdate(update) )
+			{
+				failedrule = rule.rule;
                 return false;
+			}
         }
         return true;
     }
@@ -1476,11 +1480,21 @@ public:
         return MiddleNumber;
     }
 
-    long getResultB()
+    long getMiddleNumberFixed(const vector<PageOrderRule> PageOrderRules)
     {
-        long resultB = 0;
+		// Fix the order
+		failedrule.first = 0;
+		failedrule.second = 0;
 
-        return resultB;
+		while ( !checkPageOrderRule(PageOrderRules) ) {
+			// Just swap the two positions.
+			auto pos1 = find(update.begin(), update.end(), failedrule.first);
+        	auto pos2 = find(update.begin(), update.end(), failedrule.second);
+
+			iter_swap(pos1, pos2);
+		}
+
+        return getMiddleNumber();
     }
 
     string getString() { return input; }
@@ -1493,6 +1507,7 @@ public:
 private:
     string input;
     vector<long> update;
+	pair<long,long> failedrule;
 
     friend class PrintQueue;
 };
@@ -1520,7 +1535,7 @@ public:
         cout << Updates.size() << " Updates" << endl;
     }
 
-    long getMiddleNumber()
+    long getMiddleNumbers()
     {
         long MiddleNumbers = 0;
         for (auto e : Updates)
@@ -1532,14 +1547,18 @@ public:
         cout << "MiddleNumbers: " << MiddleNumbers << endl;
         return MiddleNumbers;
     }
-    long getResultB()
-    {
-        long resultB = 0;
-        for (auto e : Updates)
-            resultB += e.getResultB();
 
-        cout << "resultB: " << resultB << endl;
-        return resultB;
+    long getMiddleNumbersFixed()
+    {
+        long MiddleNumbersFixed = 0;
+        for (auto e : Updates)
+		{
+			if ( !e.checkPageOrderRule(PageOrderRules) )
+            	MiddleNumbersFixed += e.getMiddleNumberFixed(PageOrderRules);
+		}
+
+        cout << "MiddleNumbersFixed: " << MiddleNumbersFixed << endl;
+        return MiddleNumbersFixed;
     }
 
 private:
@@ -1551,13 +1570,13 @@ private:
 TEST_CASE("Testdata")
 {
     PrintQueue PrintQueueData(inputTestdata);
-    REQUIRE(143 == PrintQueueData.getMiddleNumber());
-    REQUIRE(0 == PrintQueueData.getResultB());
+    REQUIRE(143 == PrintQueueData.getMiddleNumbers());
+    REQUIRE(123 == PrintQueueData.getMiddleNumbersFixed());
 }
 
 TEST_CASE("PrintQueue")
 {
     PrintQueue PrintQueueData(inputData);
-    REQUIRE(4905 == PrintQueueData.getMiddleNumber());
-    REQUIRE(0 == PrintQueueData.getResultB());
+    REQUIRE(4905 == PrintQueueData.getMiddleNumbers());
+    REQUIRE(6204 == PrintQueueData.getMiddleNumbersFixed());
 }
