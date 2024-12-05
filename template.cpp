@@ -1,9 +1,4 @@
-#include <iostream>
-#include <string>
-#include <vector>
-
-#include <catch2/catch_test_macros.hpp>
-
+#include <aoc.h>
 using namespace std;
 
 const vector<string> inputTestdata = {
