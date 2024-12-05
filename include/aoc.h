@@ -1,11 +1,14 @@
 #pragma once
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <utility>
-#include <cassert>
 #include <algorithm>
+#include <cassert>
+#include <iostream>
+#include <map>
+#include <regex>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 

@@ -1,9 +1,4 @@
-#include <iostream>
-#include <string>
-#include <vector>
-
-#include <catch2/catch_test_macros.hpp>
-
+#include <aoc.h>
 using namespace std;
 
 const vector<string> inputTestdata = {
@@ -16,7 +11,7 @@ const vector<string> inputTestdata = {
     "SMSMSASXSS",
     "SAXAMASAAA",
     "MAMMMXMMMM",
-    "MXMXAXMASX"    
+    "MXMXAXMASX"
 };
 
 const vector<string> inputData = {
@@ -172,13 +167,13 @@ public:
         cout << "Size of Input: " << xsize << "/" << ysize << endl;
 
         // Parse data
-        //for (auto elem : input)
+        // for (auto elem : input)
         //    items.push_back(item(elem));
     }
 
     char getLetter(size_t x, size_t y)
     {
-        if ( x < 0 || x >= xsize || y<0 || y>=ysize )
+        if (x < 0 || x >= xsize || y < 0 || y >= ysize)
             return '.';
 
         return input[y][x];
@@ -186,27 +181,26 @@ public:
 
     long getXMAS()
     {
-        long XMAS = 0; 
+        long XMAS = 0;
         // Find all 'X'
         for (size_t x = 0; x < xsize; x++) {
             for (size_t y = 0; y < ysize; y++) {
-                if ('X' == getLetter(x, y))
-                {
-                    if ('M'==getLetter(x,y+1) && 'A'==getLetter(x,y+2) && 'S'==getLetter(x,y+3))            // N
+                if ('X' == getLetter(x, y)) {
+                    if ('M' == getLetter(x, y + 1) && 'A' == getLetter(x, y + 2) && 'S' == getLetter(x, y + 3)) // N
                         ++XMAS;
-                    if ('M'==getLetter(x+1,y+1) && 'A'==getLetter(x+2,y+2) && 'S'==getLetter(x+3,y+3)) // NE
+                    if ('M' == getLetter(x + 1, y + 1) && 'A' == getLetter(x + 2, y + 2) && 'S' == getLetter(x + 3, y + 3)) // NE
                         ++XMAS;
-                    if ('M'==getLetter(x+1,y) && 'A'==getLetter(x+2,y) && 'S'==getLetter(x+3,y))       // E
+                    if ('M' == getLetter(x + 1, y) && 'A' == getLetter(x + 2, y) && 'S' == getLetter(x + 3, y)) // E
                         ++XMAS;
-                    if ('M'==getLetter(x+1,y-1) && 'A'==getLetter(x+2,y-2) && 'S'==getLetter(x+3,y-3)) // SE
+                    if ('M' == getLetter(x + 1, y - 1) && 'A' == getLetter(x + 2, y - 2) && 'S' == getLetter(x + 3, y - 3)) // SE
                         ++XMAS;
-                    if ('M'==getLetter(x,y-1) && 'A'==getLetter(x,y-2) && 'S'==getLetter(x,y-3))       // S
+                    if ('M' == getLetter(x, y - 1) && 'A' == getLetter(x, y - 2) && 'S' == getLetter(x, y - 3)) // S
                         ++XMAS;
-                    if ('M'==getLetter(x-1,y-1) && 'A'==getLetter(x-2,y-2) && 'S'==getLetter(x-3,y-3)) // SW
+                    if ('M' == getLetter(x - 1, y - 1) && 'A' == getLetter(x - 2, y - 2) && 'S' == getLetter(x - 3, y - 3)) // SW
                         ++XMAS;
-                    if ('M'==getLetter(x-1,y) && 'A'==getLetter(x-2,y) && 'S'==getLetter(x-3,y))       // W
+                    if ('M' == getLetter(x - 1, y) && 'A' == getLetter(x - 2, y) && 'S' == getLetter(x - 3, y)) // W
                         ++XMAS;
-                    if ('M'==getLetter(x-1,y+1) && 'A'==getLetter(x-2,y+2) && 'S'==getLetter(x-3,y+3)) // NW
+                    if ('M' == getLetter(x - 1, y + 1) && 'A' == getLetter(x - 2, y + 2) && 'S' == getLetter(x - 3, y + 3)) // NW
                         ++XMAS;
                 }
             }
@@ -221,10 +215,9 @@ public:
         // Find all 'A'
         for (size_t x = 0; x < xsize; x++) {
             for (size_t y = 0; y < ysize; y++) {
-                if ('A' == getLetter(x, y))
-                {
-                    if ('M'==getLetter(x+1,y+1) && 'S'==getLetter(x-1,y-1) || 'S'==getLetter(x+1,y+1) && 'M'==getLetter(x-1,y-1))
-                        if ('M'==getLetter(x+1,y-1) && 'S'==getLetter(x-1,y+1) || 'S'==getLetter(x+1,y-1) && 'M'==getLetter(x-1,y+1))
+                if ('A' == getLetter(x, y)) {
+                    if ('M' == getLetter(x + 1, y + 1) && 'S' == getLetter(x - 1, y - 1) || 'S' == getLetter(x + 1, y + 1) && 'M' == getLetter(x - 1, y - 1))
+                        if ('M' == getLetter(x + 1, y - 1) && 'S' == getLetter(x - 1, y + 1) || 'S' == getLetter(x + 1, y - 1) && 'M' == getLetter(x - 1, y + 1))
                             ++X_MAS;
                 }
             }
