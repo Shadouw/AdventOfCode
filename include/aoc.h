@@ -12,7 +12,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-// #include <aocmd5.h> This is deprecated
+// Do not link for all since it requires to link crypto 
+// #include <aocmd5.h>
 #include <hextoint.h>
 #include <kgv_ggt.h>
 #include <manhattan.h>
