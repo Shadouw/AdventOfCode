@@ -30,17 +30,6 @@ include(2017/CMakeLists.txt)
 include(2016/CMakeLists.txt)
 include(2015/CMakeLists.txt)
 
-# sudo apt install libssl-dev
-add_executable(2015.04 2015/04.cpp)
-target_link_libraries(2015.04 crypto)
-
-add_executable(2015.03 2015/03.cpp)
-add_executable(2015.02 2015/02.cpp)
-
-add_executable(2015.01 2015/01.cpp)
-target_link_libraries ( 2015.01 PRIVATE Catch2::Catch2WithMain )
-add_test ( 2015.01 ${CMAKE_BINARY_DIR}/2015.01 )
-
 #set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 #set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 #include(CPack)
