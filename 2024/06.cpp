@@ -152,11 +152,9 @@ public:
     GuardGallivant(const vector<string>& _input)
         : input(_input)
         , lab(_input[0].size(), _input.size())
-        , runner(lab)
+        , runner(_input[0].size(), _input.size())
     {
         cout << "Size of Input: " << input.size() << "/" << input.size() << endl;
-        lab.fill(' ');
-        lab.setblockedFieldTypes("#");
 
         // Parse data
         for (auto y = 0; y < _input.size(); ++y) {
@@ -166,6 +164,9 @@ public:
                     runner.setPosition(pair<long, long>(x, y));
             }
         }
+
+        runner.setMaze(lab);
+        runner.setblockedFieldTypes("#");
         runner.setOrientation('N');
         runner.setMarkAsSeen('X');
     }

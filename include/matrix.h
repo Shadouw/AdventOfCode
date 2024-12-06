@@ -10,6 +10,17 @@ public:
         m = new T[X * Y];
     }
 
+    matrix(const matrix& obj)
+
+    {
+        X = obj.X;
+        Y = obj.Y;
+        m = new T[X * Y];
+
+        for (size_t p = 0; p < X*Y; ++p)
+            m[p] = obj.m[p];
+    }
+
     std::size_t index(std::size_t x, std::size_t y) const
     {
         return x + Y * y;
@@ -17,7 +28,6 @@ public:
 
     T& operator[](std::size_t idx) { return m[idx]; }
     T& operator[](std::pair<std::size_t, std::size_t> idx) { return m[index(idx.first, idx.second)]; }
-
 
     void fill(T value)
     {
