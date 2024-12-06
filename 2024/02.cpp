@@ -1,11 +1,4 @@
-#include <iostream>
-#include <string>
-#include <vector>
-
-#include <catch2/catch_test_macros.hpp>
-
-#include <stringtovector.h>
-
+#include <aoc.h>
 using namespace std;
 
 const vector<string> inputTestdata = {
@@ -15,7 +8,7 @@ const vector<string> inputTestdata = {
     "1 3 2 4 5",
     "8 6 4 4 1",
     "1 3 6 7 9"
-}; 
+};
 
 const vector<string> inputData = {
     "22 25 27 28 30 31 32 29",
@@ -1026,8 +1019,8 @@ public:
         : input(_input)
     {
         vector<string> _values = stringtovector(_input, ' ');
-        for ( auto _value : _values )
-          values.push_back(atol(_value.c_str()));
+        for (auto _value : _values)
+            values.push_back(atol(_value.c_str()));
     }
 
     bool getIsSafe() { return getIsSafe(values); }
@@ -1035,17 +1028,16 @@ public:
     bool getIsSafe(vector<long> _values)
     {
         long Counter = 0;
-        for (auto i = 0; i < _values.size() - 1; ++i)
-        {
-            if ( _values[i] > _values[i+1] && _values[i] - _values[i+1]<=3)
+        for (auto i = 0; i < _values.size() - 1; ++i) {
+            if (_values[i] > _values[i + 1] && _values[i] - _values[i + 1] <= 3)
                 --Counter;
-            else if ( _values[i] < _values[i+1] && _values[i+1]-_values[i]<=3 )
+            else if (_values[i] < _values[i + 1] && _values[i + 1] - _values[i] <= 3)
                 ++Counter;
         }
 
         isIncreasing = (Counter > 0);
 
-        return abs(Counter)==_values.size()-1;
+        return abs(Counter) == _values.size() - 1;
     }
 
     bool getIsSafeWithASingleBad()
@@ -1053,8 +1045,7 @@ public:
         if (getIsSafe())
             return true;
 
-        for ( auto i = 0; i<values.size(); ++i) 
-        {
+        for (auto i = 0; i < values.size(); ++i) {
             vector<long> temp(values);
             temp.erase(temp.begin() + i);
             if (getIsSafe(temp))

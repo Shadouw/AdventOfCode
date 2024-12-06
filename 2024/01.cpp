@@ -1,14 +1,4 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include <set>
-#include <cmath>
-#include <map>
-
-#include <catch2/catch_test_macros.hpp>
-
-#include <stringtovector.h>
-
+#include <aoc.h>
 using namespace std;
 
 const vector<string> inputTestdata = {
@@ -19,7 +9,6 @@ const vector<string> inputTestdata = {
     "3 9",
     "3 3"
 };
-
 
 const vector<string> inputData = {
     "18102   93258",
@@ -1024,7 +1013,6 @@ const vector<string> inputData = {
     "13363   84471"
 };
 
-
 class HistorianHysteria {
 public:
     HistorianHysteria(const vector<string>& _input)
@@ -1033,11 +1021,10 @@ public:
         cout << "Size of Input: " << input.size() << endl;
 
         // Parse data
-        for (auto elem : input)
-        {
+        for (auto elem : input) {
             vector<string> line = stringtovector(elem, ' ');
 
-            long leftnumber=atol(line.front().c_str());
+            long leftnumber = atol(line.front().c_str());
             long rightnumber = atol(line.back().c_str());
 
             leftset.insert(leftnumber);
@@ -1052,9 +1039,8 @@ public:
     {
         long resultA = 0;
 
-        for ( auto l = leftset.begin(), r = rightset.begin(); l!=leftset.end(); ++l, ++r)
-        {
-            resultA += abs(*l-*r);
+        for (auto l = leftset.begin(), r = rightset.begin(); l != leftset.end(); ++l, ++r) {
+            resultA += abs(*l - *r);
         }
 
         cout << "resultA: " << resultA << endl;
@@ -1063,9 +1049,8 @@ public:
     long getResultB()
     {
         long resultB = 0;
-        for (auto e : leftmap)
-        {
-          resultB += e.first * e.second * rightmap[e.first];
+        for (auto e : leftmap) {
+            resultB += e.first * e.second * rightmap[e.first];
         }
         //    resultB += e.getResultB();
 
