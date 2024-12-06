@@ -17,5 +17,6 @@
 #include <kgv_ggt.h>
 #include <manhattan.h>
 #include <matrix.h>
+#include <mazerunner.h>
 #include <stringreplace.h>
 #include <stringtovector.h>
