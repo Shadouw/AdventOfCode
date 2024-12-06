@@ -33,3 +33,14 @@ add_executable(2015.08 2015/08.cpp)
 add_executable(2015.07 2015/07.cpp)
 add_executable(2015.06 2015/06.cpp)
 add_executable(2015.05 2015/05.cpp)
+
+# sudo apt install libssl-dev
+add_executable(2015.04 2015/04.cpp)
+target_link_libraries(2015.04 crypto)
+
+add_executable(2015.03 2015/03.cpp)
+add_executable(2015.02 2015/02.cpp)
+
+add_executable(2015.01 2015/01.cpp)
+target_link_libraries ( 2015.01 PRIVATE Catch2::Catch2WithMain )
+add_test ( 2015.01 ${CMAKE_BINARY_DIR}/2015.01 )
