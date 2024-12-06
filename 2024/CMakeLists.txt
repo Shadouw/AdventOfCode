@@ -1,5 +1,9 @@
 # 2024 
 
+add_executable(2024.07 2024/07.cpp)
+target_link_libraries ( 2024.07 PRIVATE Catch2::Catch2WithMain )
+add_test ( 2024.07 ${CMAKE_BINARY_DIR}/2024.07 )
+
 add_executable(2024.06 2024/06.cpp)
 target_link_libraries ( 2024.06 PRIVATE Catch2::Catch2WithMain )
 add_test ( 2024.06 ${CMAKE_BINARY_DIR}/2024.06 )
