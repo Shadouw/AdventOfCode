@@ -1,12 +1,15 @@
 #pragma once
 #include <cassert>
 #include <utility>
+#include <vector>
 
 typedef std::pair<long, long> position;
 
 class maze {
 public:
-    maze(std::size_t _X, std::size_t _Y):X(_X),Y(_Y)
+    maze(std::size_t _X, std::size_t _Y)
+        : X(_X)
+        , Y(_Y)
     {
         for (auto l = 0; l < _X * _Y; ++l)
             mazememory += ' ';
@@ -107,6 +110,7 @@ public:
     //  1: Target field is blocked
     //  0: Okay, runner moved
     // -1: New Position would be outside the maze
+    // -2: Loop detected
     int move()
     {
         position newpos = pos;
@@ -139,40 +143,47 @@ public:
         pos = newpos;
         if (markAsSeen)
             mymaze[newpos] = markAsSeen;
+
+        auto ret = loopDetector.insert({ newpos, orientation });
+        if (!ret.second)
+            return -2;
+
         return 0;
     }
 
-    /*     std::string getString() const
-        {
-            std::string mazeString;
-            for (std::size_t y = 0; y < mymaze.getY(); ++y) {
-                for (std::size_t x = 0; x < mymaze.getX(); ++x) {
-                    if (x == pos.first && y == pos.second) {
-                        switch (orientation) {
-                        case 'N':
-                            mazeString += "^";
-                            break;
-                        case 'E':
-                            mazeString += ">";
-                            break;
-                        case 'S':
-                            mazeString += "Y";
-                            break;
-                        case 'W':
-                            mazeString += "<";
-                            break;
-                        default:
-                            mazeString += mymaze.m[mymaze.index(x, y)];
-                            break;
-                        }
-                    } else {
-                        mazeString += mymaze.m[mymaze.index(x, y)];
+    maze& getMaze() { return mymaze; }
+
+    std::string getString()
+    {
+        std::string mazeString;
+        for (std::size_t y = 0; y < mymaze.Y; ++y) {
+            for (std::size_t x = 0; x < mymaze.X; ++x) {
+                if (x == pos.first && y == pos.second) {
+                    switch (orientation) {
+                    case 'N':
+                        mazeString += "^";
+                        break;
+                    case 'E':
+                        mazeString += ">";
+                        break;
+                    case 'S':
+                        mazeString += "Y";
+                        break;
+                    case 'W':
+                        mazeString += "<";
+                        break;
+                    default:
+                        mazeString += mymaze[mymaze.index(x, y)];
+                        break;
                     }
+                } else {
+                    mazeString += mymaze[mymaze.index(x, y)];
                 }
-                mazeString += "\n";
             }
-            return mazeString;
-        } */
+            mazeString += "\n";
+        }
+        return mazeString;
+    }
 
     long getSeenFields()
     {
@@ -191,4 +202,5 @@ private:
     char orientation = ' ';
     maze mymaze;
     char markAsSeen = 0;
+    std::set<std::pair<position, char>> loopDetector;
 };

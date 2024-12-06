@@ -166,39 +166,72 @@ public:
         }
 
         runner.setMaze(lab);
-        runner.setblockedFieldTypes("#");
+        runner.setblockedFieldTypes("#O");
         runner.setOrientation('N');
         runner.setMarkAsSeen('X');
     }
 
-    long getGuardsRoute()
+    static long nextstep(mazerunner& r, int lastMove)
     {
-        int lastMove = runner.move();
+        switch (lastMove) {
+        case 1:
+            r.rotate('R');
+            lastMove = 0;
+            break;
+        case 0:
+            lastMove = r.move();
+            break;
+        default:
+            return -1;
+            break;
+        }
+        return lastMove;
+    }
 
-        while (-1 != lastMove) {
-            switch (lastMove) {
-            case 1:
-                runner.rotate('R');
-                lastMove = 0;
-                break;
-            case 0:
-                lastMove = runner.move();
-            default:
-                break;
-            }
+    static long stepTillEnd(mazerunner& r)
+    {
+        int lastMove = 0;
+
+        while (-1 < lastMove) {
+            lastMove = nextstep(r, lastMove);
         }
 
-        long GuardsRoute = runner.getSeenFields();
+        return lastMove;
+    }
+
+    long getGuardsRoute()
+    {
+        // Make working copy
+        auto r = runner;
+        stepTillEnd(r);
+        long GuardsRoute = r.getSeenFields();
+
         cout << "GuardsRoute: " << GuardsRoute << endl;
         return GuardsRoute;
     }
 
-    long getResultB()
+    long getNumOfLoops()
     {
-        long resultB = 0;
+        // Make working copy
+        auto r = runner;
+        long NumOfLoops = 0;
 
-        cout << "resultB: " << resultB << endl;
-        return resultB;
+        stepTillEnd(r);
+
+        for (auto y = 0; y < input.size(); ++y) {
+            for (auto x = 0; x < input[0].size(); ++x) {
+                if ('X' == r.getMaze()[{ x, y }]) {
+                    // Make working copy
+                    auto r2 = runner;
+                    r2.getMaze()[{ x, y }] = 'O';
+
+                    if (-2 == stepTillEnd(r2))
+                        ++NumOfLoops;
+                }
+            }
+        }
+        cout << "NumOfLoops: " << NumOfLoops << endl;
+        return NumOfLoops;
     }
 
 private:
@@ -211,12 +244,12 @@ TEST_CASE("Testdata")
 {
     GuardGallivant problemData(inputTestdata);
     REQUIRE(41 == problemData.getGuardsRoute());
-    REQUIRE(0 == problemData.getResultB());
+    REQUIRE(6 == problemData.getNumOfLoops());
 }
 
 TEST_CASE("GuardGallivant")
 {
     GuardGallivant problemData(inputData);
     REQUIRE(5030 == problemData.getGuardsRoute());
-    REQUIRE(0 == problemData.getResultB());
+    REQUIRE(1928 == problemData.getNumOfLoops());
 }

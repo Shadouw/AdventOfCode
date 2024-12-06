@@ -10,8 +10,11 @@ public:
         m = new T[X * Y];
     }
 
-    matrix(const matrix& obj)
+    //
+    // Add Assignement Operator!!!
+    //
 
+    matrix(const matrix& obj)
     {
         X = obj.X;
         Y = obj.Y;
