@@ -883,6 +883,7 @@ public:
     long calculate()
     {
         long solution = values[0];
+        string val;
         for (auto i = 0; i < operators.size(); ++i) {
             switch (operators[i]) {
             case '+':
@@ -890,6 +891,11 @@ public:
                 break;
             case '*':
                 solution *= values[i + 1];
+                break;
+            case '|':
+                val = to_string(solution);
+                val += to_string(values[i + 1]);
+                solution = atol(val.c_str());
                 break;
             default:
                 assert(false);
@@ -918,6 +924,7 @@ public:
 
     long getResultA()
     {
+        oper = "+*";
         long resultA = 0;
 
         if (findSolution())
@@ -928,7 +935,11 @@ public:
 
     long getResultB()
     {
+        oper = "+*|";
         long resultB = 0;
+
+        if (findSolution())
+          resultB = calculate();
 
         return resultB;
     }
@@ -945,7 +956,7 @@ private:
     long testvalue = 0;
     vector<long> values;
     vector<char> operators;
-    const vector<char> oper = { '+', '*' };
+    string oper = "+*";
 
     friend class BridgeRepair;
 };
@@ -990,12 +1001,12 @@ TEST_CASE("Testdata")
 {
     BridgeRepair BridgeRepairData(inputTestdata);
     REQUIRE(3749 == BridgeRepairData.getResultA());
-    REQUIRE(0 == BridgeRepairData.getResultB());
+    REQUIRE(11387 == BridgeRepairData.getResultB());
 }
 
 TEST_CASE("BridgeRepair")
 {
     BridgeRepair BridgeRepairData(inputData);
     REQUIRE(1038838357795 == BridgeRepairData.getResultA());
-    REQUIRE(0 == BridgeRepairData.getResultB());
+    REQUIRE(254136560217241 == BridgeRepairData.getResultB());
 }
