@@ -76,8 +76,7 @@ public:
         std::vector<position> positions;
         std::size_t pos = 0;
 
-        while ( std::string::npos != pos )
-        {
+        while (std::string::npos != pos) {
             if (c == mapmemory[pos])
                 positions.push_back(index(pos));
             pos = mapmemory.find(c, pos + 1);
@@ -96,11 +95,74 @@ public:
 
     bool setIfFree(position p, char c)
     {
-        if ( !isFree(p) )
+        if (!isFree(p))
             return false;
 
         mapmemory[index(p)] = c;
         return true;
+    }
+
+    std::string getString()
+    {
+        std::string ret;
+        for (auto y = 0; y < Y; ++y) {
+            for (auto x = 0; x < X; ++x) {
+                ret += (*this)[{ x, y }];
+            }
+            ret += "\n";
+        }
+        return ret;
+    }
+
+    std::vector<std::vector<position>> findTrails(char start, char end)
+    {
+        std::vector<std::vector<position>> trails;
+        for (auto p : findAllChars(start))
+            trails.push_back({ p });
+
+        for (auto c = start + 1; c <= end; ++c) {
+            std::vector<std::vector<position>> temptrails;
+
+            while (trails.size()) {
+                auto const curtrail = trails.back();
+                trails.pop_back();
+
+                const auto lastpos = curtrail.back();
+
+                for (int i = 0; i < 4; ++i) {
+                    auto newpos = lastpos;
+
+                    switch (i) {
+                    case 0: // N
+                        newpos.second -= 1;
+                        break;
+                    case 1: // E
+                        newpos.first += 1;
+                        break;
+                    case 2: // S
+                        newpos.second += 1;
+                        break;
+                    case 3: // W
+                        newpos.first -= 1;
+                        break;                        
+                    default:
+                        assert(false);
+                        break;
+                    }
+                    if (isValidPosition(newpos)) {
+                        if ((*this)[newpos] == c) {
+                            auto temptrail = curtrail;
+                            temptrail.push_back(newpos);
+                            temptrails.push_back(temptrail);
+                        }
+                    }
+                }
+            }
+
+            trails = temptrails;
+        }
+
+        return trails;
     }
 
 private:
