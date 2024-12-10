@@ -95,7 +95,7 @@ public:
     }
     long getResultB()
     {
-        long resultB = 0;
+        long resultB = trails.size();
 
         cout << "resultB: " << resultB << endl;
         return resultB;
@@ -111,12 +111,12 @@ TEST_CASE("Testdata")
 {
     HoofIt HoofItData(inputTestdata);
     REQUIRE(36 == HoofItData.getResultA());
-    REQUIRE(0 == HoofItData.getResultB());
+    REQUIRE(81 == HoofItData.getResultB());
 }
 
 TEST_CASE("HoofIt")
 {
     HoofIt HoofItData(inputData);
     REQUIRE(587 == HoofItData.getResultA());
-    REQUIRE(0 == HoofItData.getResultB());
+    REQUIRE(1340 == HoofItData.getResultB());
 }
