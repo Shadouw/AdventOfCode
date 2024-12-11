@@ -1,7 +1,6 @@
 #include <aoc.h>
 using namespace std;
 
-
 const string inputData = {
     "5 62914 65 972 0 805922 6521 1639064"
 };
@@ -14,34 +13,20 @@ public:
     {
     }
 
-    Stone blink()
+    string blink()
     {
         long number = atol(input.c_str());
-        Stone s2;
+        string s2;
         if (0 == number)
             input = "1";
         else if (input.size() % 2 == 0) {
-            s2 = to_string(atol(input.substr(input.size() / 2).c_str()));
-            input = input.substr(0, input.size() / 2);
+            s2 = input.substr(0, input.size() / 2);
+            input = to_string(atol(input.substr(input.size() / 2).c_str()));
         } else {
             input = to_string(number * 2024);
         }
 
         return s2;
-    }
-
-    long getResultA()
-    {
-        long resultA = 0;
-
-        return resultA;
-    }
-
-    long getResultB()
-    {
-        long resultB = 0;
-
-        return resultB;
     }
 
     string getString() { return input; }
@@ -71,22 +56,41 @@ public:
 
     void blink()
     {
-        vector<Stone> tempStones;
-        for (auto s : Stones) {
-            auto s2 = s.blink();
-            tempStones.push_back(s);
+        /*
+        for (vector<Stone>::size_type s = 0; s < Stones.size(); ++s) {
+            auto s2 = Stones[s].blink();
 
-            if ("" != s2.input)
-                tempStones.push_back(s2);
+            if ("" != s2) {
+                Stones.insert(Stones.begin()+s, { s2 });
+                s++;
+            }
         }
-        Stones.clear();
+        */
+
+        vector<Stone> tempStones;
+        // for (auto s : Stones) {
+        while (Stones.size()) {
+            auto s = Stones.front();
+            Stones.erase(Stones.begin());
+
+            auto s2 = s.blink();
+            if ("" != s2) {
+                tempStones.push_back({ s2 });
+                Stoned.insert(s2);
+            }
+            tempStones.push_back(s);
+            Stoned.insert(s.input);
+        }
+        // Stones.clear();
         Stones = tempStones;
     }
 
     void blink(long i)
     {
-        for (auto j = 0; j < i; ++j)
+        for (auto j = 0; j < i; ++j) {
             blink();
+            cout << j << "/" << Stoned.size() << ": " << Stones.size() << endl;
+        }
     }
 
     string getString()
@@ -102,26 +106,13 @@ public:
 
     long getNumberofStones() { return Stones.size(); }
 
-    long getResultA()
-    {
-        long resultA = Stones.size();
-
-        cout << "resultA: " << resultA << endl;
-        return resultA;
-    }
-    long getResultB()
-    {
-        long resultB = 0;
-        for (auto e : Stones)
-            resultB += e.getResultB();
-
-        cout << "resultB: " << resultB << endl;
-        return resultB;
-    }
-
 private:
     const string input;
     vector<Stone> Stones;
+
+    // How many different values do actually exist?
+    // I wonder if I can save lot of memory if I check, if something already exists and build kind of tree.
+    set<string> Stoned;
 };
 
 TEST_CASE("Test1")
@@ -159,6 +150,6 @@ TEST_CASE("PlutonianPebbles")
     PlutonianPebbles problemData(inputData);
     problemData.blink(25);
     REQUIRE(199753 == problemData.getNumberofStones());
- //   problemData.blink(50);
+    problemData.blink(50);
     REQUIRE(-1 == problemData.getNumberofStones());
 }
