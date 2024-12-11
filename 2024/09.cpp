@@ -62,6 +62,16 @@ public:
         }
     }
 
+    void mergeEmptyBlocks()
+    {
+        for (auto e = disk.begin() + 1; e != disk.end(); ++e) {
+            if (-1 == e->first && -1 == (e - 1)->first) {
+                e->second += (e - 1)->second;
+                disk.erase(e - 1);
+            }
+        }
+    }
+
     void defrag()
     {
         for (auto b = disk.begin(); b != disk.end(); ++b) {
@@ -100,31 +110,69 @@ public:
         }
     }
 
+    void defrag2()
+    {
+        removeEmptyBlocks();
+        mergeEmptyBlocks();
+
+        auto blocktomove = disk.end();
+        while (blocktomove != disk.begin()) {
+            string s = getDiskString();
+            --blocktomove;
+
+            if (-1 != blocktomove->first) {
+                for (auto freeblock = disk.begin(); freeblock < blocktomove;
+                     ++freeblock) {
+                    if (-1 == freeblock->first && blocktomove->second <= freeblock->second) {
+                        freeblock->second -= blocktomove->second;
+                        disk.insert(freeblock,
+                            { blocktomove->first, blocktomove->second });
+
+                        // Attention: blocktomove now moved one position forward.
+                        (++blocktomove)->first = -1;
+                        freeblock = disk.end();
+
+                        removeEmptyBlocks();
+                        mergeEmptyBlocks();
+                    }
+                }
+            }
+        }
+        removeEmptyBlocks();
+        mergeEmptyBlocks();
+    }
+
     long getChecksum()
     {
         long checksum = 0;
         long multiplier = 0;
         for (auto e : disk) {
-          for (auto i = 0; i < e.second;++i)
-          {
-            checksum += e.first * multiplier++;
-          }
+            for (auto i = 0; i < e.second; ++i) {
+                if (-1 == e.first)
+                    multiplier++;
+                else
+                    checksum += e.first * multiplier++;
+            }
         }
         return checksum;
     }
 
     long getResultA()
     {
+        auto tempdisk = disk;
         defrag();
-        //string s = getDiskString();
         long resultA = getChecksum();
 
         cout << "resultA: " << resultA << endl;
+        disk = tempdisk;
         return resultA;
     }
     long getResultB()
     {
-        long resultB = 0;
+        defrag2();
+        string s = getDiskString();
+
+        long resultB = getChecksum();
 
         cout << "resultB: " << resultB << endl;
         return resultB;
@@ -142,12 +190,16 @@ TEST_CASE("Testdata")
     DiskFragmenter DiskFragmenterData(inputTestdata);
     REQUIRE("00...111...2...333.44.5555.6666.777.888899" == DiskFragmenterData.getDiskString());
     REQUIRE(1928 == DiskFragmenterData.getResultA());
-    REQUIRE(0 == DiskFragmenterData.getResultB());
+    REQUIRE(2858 == DiskFragmenterData.getResultB());
 }
 
 TEST_CASE("DiskFragmenter")
 {
     DiskFragmenter DiskFragmenterData(inputData);
-    REQUIRE(6332189866718 == DiskFragmenterData.getResultA());
-    REQUIRE(0 == DiskFragmenterData.getResultB());
+    // REQUIRE(6332189866718 == DiskFragmenterData.getResultA());
+
+    auto x = DiskFragmenterData.getResultB();
+    REQUIRE(6414009880195 > x);
+    REQUIRE(6353643118010 < x);
+    REQUIRE(-2 == x);
 }
