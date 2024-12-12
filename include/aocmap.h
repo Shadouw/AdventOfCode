@@ -1,7 +1,9 @@
 #pragma once
 #include <aoc.h>
+#include <manhattan.h>
 
 typedef std::pair<long, long> position;
+typedef std::vector<position> region;
 
 class aocmap {
 public:
@@ -144,7 +146,7 @@ public:
                         break;
                     case 3: // W
                         newpos.first -= 1;
-                        break;                        
+                        break;
                     default:
                         assert(false);
                         break;
@@ -165,12 +167,94 @@ public:
         return trails;
     }
 
+    void getAllCharPositions()
+    {
+        for (auto p = 0; p < mapmemory.size(); p++)
+            allCharPositions[mapmemory[p]].push_back(index(p));
+    }
+
+    void findRegions()
+    {
+        if (allCharPositions.empty())
+            getAllCharPositions();
+
+        for (auto cp : allCharPositions) {
+            while (cp.second.size()) {
+                region currentregion;
+                currentregion.push_back(cp.second.back());
+                cp.second.pop_back();
+
+                // Get all elements in this region
+                bool found = true;
+                while (found) {
+                    found = false;
+                    for (auto e = cp.second.begin(); e != cp.second.end(); ++e) { // A reverse iterator might be faster
+                        for (auto f : currentregion) {
+                            if (1 == manhattandistanceP<long>(*e, f)) {
+                                currentregion.push_back(*e);
+                                e = cp.second.erase(e);
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (cp.second.end() == e)
+                            break;
+                    }
+                }
+                regions.push_back(currentregion);
+            }
+        }
+    }
+
+    long getArea(region r)
+    {
+        return r.size();
+    }
+
+    std::vector<position> getSurroundingPositions(const position &p) const
+    {
+        std::vector<position> ret;
+        ret.push_back({p.first+1, p.second});
+        ret.push_back({p.first, p.second+1});
+        ret.push_back({p.first-1, p.second});
+        ret.push_back({p.first, p.second-1});
+
+        return ret;
+    }
+
+    long getPerimeter(region r)
+    {
+        long perimeter = 0;
+        const char c = (*this)[r.front()];
+        for (auto f : r) {
+            for ( auto f2 : getSurroundingPositions(f) )
+            {
+                if ( !isValidPosition(f2) ) ++perimeter;
+                else if ( c!= (*this)[f2] ) ++perimeter;
+            }
+        }
+        return perimeter;
+    }
+
+    long getAreaXPerimeter()
+    {
+        long areaXperimeter = 0;
+        for (auto r : regions) {
+            areaXperimeter += getArea(r) * getPerimeter(r);
+        }
+
+        return areaXperimeter;
+    }
+
 private:
     std::size_t X;
     std::size_t Y;
     std::string mapmemory;
 
     std::string freeFields = ".";
+
+    std::map<char, std::vector<position>> allCharPositions;
+    std::vector<region> regions;
 
     friend class mazerunner;
 };

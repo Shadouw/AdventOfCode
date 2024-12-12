@@ -22,6 +22,7 @@
 #include <manhattan.h>
 #include <matrix.h>
 #include <mazerunner.h>
+#include <manhattan.h>
 // This is not yet complete
 // #include <position.h>
 #include <stringreplace.h>
