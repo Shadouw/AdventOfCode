@@ -1325,48 +1325,74 @@ public:
         return pos.first * 3 + pos.second;
     }
 
-    long getResultA()
+    long getCheapestWay()
     {
-        long resultA = numeric_limits<long>::max();
+        long CheapestWay = numeric_limits<long>::max();
         matrix<pair<long, long>> machine(2 + prize.first / min(amove.first, bmove.first), 2 + prize.second / min(amove.second, bmove.second));
         machine[{ 0, 0 }] = { 0, 0 };
 
         for (int a = 1; a < machine.getX(); ++a) {
             machine[{ a, 0 }] = { machine[{ a - 1, 0 }].first + amove.first, machine[{ a - 1, 0 }].second + amove.second };
-            if (machine[{ a, 0 }] == prize && getPrice({ a, 0 }) < resultA)
-                resultA = getPrice({ a, 0 });
+            if (machine[{ a, 0 }] == prize && getPrice({ a, 0 }) < CheapestWay)
+                CheapestWay = getPrice({ a, 0 });
         }
 
         for (int b = 1; b < machine.getY(); ++b) {
             auto h1 = machine[{ 0, b - 1 }].first + bmove.first;
             auto h2 = machine[{ 0, b - 1 }].second + bmove.second;
             pair<long, long> h3 = { machine[{ 0, b - 1 }].first + bmove.first, machine[{ 0, b - 1 }].second + bmove.second };
-            machine[{0, b}] = {0, 0};
+            machine[{ 0, b }] = { 0, 0 };
 
-            machine[{0, b}] = {machine[{0, b - 1}].first + bmove.first,
-                               machine[{0, b - 1}].second + bmove.second};
-            if (machine[{ 0, b }] == prize && getPrice({ 0, b }) < resultA)
-                resultA = getPrice({ 0, b });
+            machine[{ 0, b }] = { machine[{ 0, b - 1 }].first + bmove.first,
+                machine[{ 0, b - 1 }].second + bmove.second };
+            if (machine[{ 0, b }] == prize && getPrice({ 0, b }) < CheapestWay)
+                CheapestWay = getPrice({ 0, b });
         }
 
         for (int a = 1; a < machine.getX(); ++a) {
             for (int b = 1; b < machine.getY(); ++b) {
                 machine[{ a, b }] = { machine[{ a - 1, b }].first + amove.first, machine[{ a - 1, b }].second + amove.second };
-                if (machine[{ a, b }] == prize && getPrice({ a, b }) < resultA)
-                    resultA = getPrice({ a, b });
+                if (machine[{ a, b }] == prize && getPrice({ a, b }) < CheapestWay)
+                    CheapestWay = getPrice({ a, b });
                 if (machine[{ a, b }].first >= prize.first || machine[{ a, b }].second >= prize.second)
                     break;
             }
         }
 
-        return (numeric_limits<long>::max()!=resultA?resultA:0);
+        auto test = getCheapestPrice();
+        return (numeric_limits<long>::max() != CheapestWay ? CheapestWay : 0);
+    }
+
+    long getCheapestPrice()
+    {
+        // double b = ((double)prize.second - (double)(prize.first * amove.second) / (double)amove.first) / ((double)bmove.second - (double)(amove.second * bmove.first) / (double)amove.first);
+        // double b = (double)(amove.first * prize.second - amove.second * prize.first) / (double)(amove.first * bmove.second - amove.second * bmove.first);
+        long bz = amove.first * prize.second - amove.second * prize.first;
+        long bn = amove.first * bmove.second - amove.second * bmove.first;
+        if (bz % bn)
+            return 0;
+        long b = bz / bn;
+        if (b < 0)
+            return 0;
+
+        //double a = ((double)prize.first - (b * (double)bmove.first)) / (double)amove.first;
+        long az = prize.first - b * bmove.first;
+        long an = amove.first;
+        if (az % an)
+            return 0;
+        long a = az / an;
+        if (a < 0)
+            return 0;
+
+        return b+ 3 * a;
     }
 
     long getResultB()
     {
-        long resultB = 0;
+        prize.first += 10000000000000;
+        prize.second += 10000000000000;
 
-        return resultB;
+        return getCheapestPrice();
     }
 
 private:
@@ -1389,14 +1415,14 @@ public:
             ClawMachines.push_back(ClawMachine(input[i], input[i + 1], input[i + 2]));
     }
 
-    long getResultA()
+    long getCheapestWay()
     {
-        long resultA = 0;
+        long CheapestWay = 0;
         for (auto e : ClawMachines)
-            resultA += e.getResultA();
+            CheapestWay += e.getCheapestWay();
 
-        cout << "resultA: " << resultA << endl;
-        return resultA;
+        cout << "CheapestWay: " << CheapestWay << endl;
+        return CheapestWay;
     }
     long getResultB()
     {
@@ -1416,13 +1442,12 @@ private:
 TEST_CASE("Testdata")
 {
     ClawContraption ClawContraptionData(inputTestdata);
-    REQUIRE(480 == ClawContraptionData.getResultA());
-    REQUIRE(0 == ClawContraptionData.getResultB());
+    REQUIRE(480 == ClawContraptionData.getCheapestWay());
 }
 
 TEST_CASE("ClawContraption")
 {
     ClawContraption ClawContraptionData(inputData);
-    REQUIRE(39996 == ClawContraptionData.getResultA());
-    REQUIRE(0 == ClawContraptionData.getResultB());
+    REQUIRE(39996 == ClawContraptionData.getCheapestWay());
+    REQUIRE(73267584326867 == ClawContraptionData.getResultB());
 }
