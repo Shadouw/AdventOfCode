@@ -1325,6 +1325,7 @@ public:
         return pos.first * 3 + pos.second;
     }
 
+    // This complicated solution is working but not used any longer
     long getCheapestWay()
     {
         long CheapestWay = numeric_limits<long>::max();
@@ -1419,7 +1420,7 @@ public:
     {
         long CheapestWay = 0;
         for (auto e : ClawMachines)
-            CheapestWay += e.getCheapestWay();
+            CheapestWay += e.getCheapestPrice();
 
         cout << "CheapestWay: " << CheapestWay << endl;
         return CheapestWay;
