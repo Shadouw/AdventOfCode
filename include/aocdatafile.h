@@ -23,6 +23,9 @@ public:
                   << std::endl;
     }
 
+    long getXSize() { return lines[0].size(); }
+    long getYSize() { return lines.size(); }
+
     std::vector<std::string> getLines()
     {
         return lines;
