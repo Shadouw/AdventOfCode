@@ -1,5 +1,6 @@
 #include <aoc.h>
 using namespace std;
+using namespace aoc;
 
 const vector<string> inputTestdata = {
     "....#.....",
@@ -149,18 +150,16 @@ const vector<string> inputData = {
 
 class GuardGallivant {
 public:
-    GuardGallivant(const vector<string>& _input)
-        : input(_input)
-        , lab(_input[0].size(), _input.size())
-        , runner(_input[0].size(), _input.size())
+    GuardGallivant(string _file, string _extension)
+        : datafile(_file, _extension)
+        , lab(datafile.getXSize(), datafile.getYSize())
+        , runner(datafile.getXSize(), datafile.getYSize())
     {
-        cout << "Size of Input: " << input.size() << "/" << input.size() << endl;
-
         // Parse data
-        for (auto y = 0; y < _input.size(); ++y) {
-            for (auto x = 0; x < _input[0].size(); ++x) {
-                lab[pair<size_t, size_t>(x, y)] = input[y][x];
-                if ('^' == input[y][x])
+        for (auto y = 0; y < datafile.getYSize(); ++y) {
+            for (auto x = 0; x < datafile.getXSize(); ++x) {
+                lab[pair<size_t, size_t>(x, y)] = datafile.getLines()[y][x];
+                if ('^' == datafile.getLines()[y][x])
                     runner.setPosition(pair<long, long>(x, y));
             }
         }
@@ -218,8 +217,8 @@ public:
 
         stepTillEnd(r);
 
-        for (auto y = 0; y < input.size(); ++y) {
-            for (auto x = 0; x < input[0].size(); ++x) {
+        for (auto y = 0; y < datafile.getYSize(); ++y) {
+            for (auto x = 0; x < datafile.getXSize(); ++x) {
                 if ('X' == r.getMaze()[{ x, y }]) {
                     // Make working copy
                     auto r2 = runner;
@@ -235,21 +234,21 @@ public:
     }
 
 private:
-    const vector<string> input;
+    aocdatafile datafile;
     maze lab;
     mazerunner runner;
 };
 
 TEST_CASE("Testdata")
 {
-    GuardGallivant problemData(inputTestdata);
+    GuardGallivant problemData(__FILE__, "example");
     REQUIRE(41 == problemData.getGuardsRoute());
     REQUIRE(6 == problemData.getNumOfLoops());
 }
 
 TEST_CASE("GuardGallivant")
 {
-    GuardGallivant problemData(inputData);
+    GuardGallivant problemData(__FILE__, "mydata");
     REQUIRE(5030 == problemData.getGuardsRoute());
     REQUIRE(1928 == problemData.getNumOfLoops());
 }
