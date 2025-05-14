@@ -65,8 +65,6 @@ public:
     RedNosedReports(string _file, string _extension)
     : datafile(_file, _extension)
     {
-        cout << "Size of Input: " << input.size() << endl;
-
         // Parse data
         for (auto elem : datafile.getLines() )
             reports.push_back(report(elem));
@@ -92,9 +90,8 @@ public:
     }
 
 private:
-    const vector<string> input;
-    vector<report> reports;
     aocdatafile datafile;
+    vector<report> reports;
 };
 
 TEST_CASE("Testdata")

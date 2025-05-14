@@ -44,11 +44,11 @@ public:
     }
 
 private:
+    aocdatafile datafile;
     multiset<long> leftset;
     multiset<long> rightset;
     map<long, long> leftmap;
     map<long, long> rightmap;
-    aocdatafile datafile;
 };
 
 TEST_CASE("Testdata")

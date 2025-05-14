@@ -66,8 +66,8 @@ public:
     }
 
 private:
-    vector<item> items;
     aocdatafile datafile;
+    vector<item> items;
 };
 
 TEST_CASE("Testdata")
