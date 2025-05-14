@@ -38,6 +38,11 @@ public:
         return ret;
     }
 
+    aocmap getAOCMap()
+    {
+        return aocmap(lines);
+    }
+
 private:
     std::string basefilename;
     std::string extension;
