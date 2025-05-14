@@ -27,4 +27,6 @@
 #include <stringreplace.h>
 #include <stringtovector.h>
 
+#include <aocdatafile.h>
+
 
