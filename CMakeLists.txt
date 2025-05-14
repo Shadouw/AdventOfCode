@@ -18,6 +18,9 @@ add_executable(template template.cpp)
 target_link_libraries ( template PRIVATE Catch2::Catch2WithMain )
 add_test ( template ${CMAKE_BINARY_DIR}/template )
 
+get_filename_component(AOC_FILE_PATH . ABSOLUTE)
+configure_file(include/aocfolders.h.in include/aocfolders.h)
+
 # Include Sub folders per year
 include(2024/CMakeLists.txt)
 include(2023/CMakeLists.txt)
