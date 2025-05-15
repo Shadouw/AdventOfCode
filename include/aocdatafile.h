@@ -11,6 +11,7 @@ public:
         , extension(_extension)
     {
         filename = basefilename.substr(0, basefilename.rfind(".")+1) + _extension;
+        filename = filename.substr(0, basefilename.rfind("/")+1) + "data/"+ filename.substr(basefilename.rfind("/")+1);
 
         std::ifstream infile(filename);
 
