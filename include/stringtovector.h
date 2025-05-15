@@ -20,3 +20,18 @@ std::vector <std::string> stringtovector(const std::string &inputstring, const c
 
     return tokens;
 }
+
+std::vector <long> stringtolongvector(const std::string &inputstring, const char separator)
+{
+    std::string token;
+    std::stringstream sstream(inputstring);
+    std::vector <long>tokens;
+
+    while ( getline( sstream, token, separator ) )
+    {
+        if ( token.size() )
+            tokens.push_back(atol(token.c_str()));
+    }
+
+    return tokens;
+}
