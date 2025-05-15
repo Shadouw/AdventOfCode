@@ -11,6 +11,7 @@ public:
         , extension(_extension)
     {
         filename = basefilename.substr(0, basefilename.rfind(".")+1) + _extension;
+        filename = filename.substr(0, basefilename.rfind("/")+1) + "data/"+ filename.substr(basefilename.rfind("/")+1);
 
         std::ifstream infile(filename);
 
@@ -22,6 +23,9 @@ public:
         std::cout << "Input file: " << filename << ", lines: " << lines.size()
                   << std::endl;
     }
+
+    long getXSize() { return lines[0].size(); }
+    long getYSize() { return lines.size(); }
 
     std::vector<std::string> getLines()
     {
@@ -36,6 +40,11 @@ public:
             ret.push_back(stringtovector(elem, ' '));
 
         return ret;
+    }
+
+    aocmap getAOCMap()
+    {
+        return aocmap(lines);
     }
 
 private:
