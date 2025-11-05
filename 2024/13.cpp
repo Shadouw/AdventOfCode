@@ -77,7 +77,7 @@ public:
         if (b < 0)
             return 0;
 
-        //double a = ((double)prize.first - (b * (double)bmove.first)) / (double)amove.first;
+        // double a = ((double)prize.first - (b * (double)bmove.first)) / (double)amove.first;
         long az = prize.first - b * bmove.first;
         long an = amove.first;
         if (az % an)
@@ -86,7 +86,7 @@ public:
         if (a < 0)
             return 0;
 
-        return b+ 3 * a;
+        return b + 3 * a;
     }
 
     long getResultB()
@@ -108,10 +108,10 @@ private:
 class ClawContraption {
 public:
     ClawContraption(string _file, string _extension)
-    : datafile(_file, _extension)
+        : datafile(_file, _extension)
     {
         // Parse data
-        vector<string> input=datafile.getLines();
+        vector<string> input = datafile.getLines();
         for (auto i = 0; i < input.size(); i += 4)
             ClawMachines.push_back(ClawMachine(input[i], input[i + 1], input[i + 2]));
     }

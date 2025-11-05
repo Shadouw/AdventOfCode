@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "kylinideteam.cppdebug",
+    "ebextensions.clang-format-2025",
+    "llvm-vs-code-extensions.vscode-clangd",
+    "kylinideteam.cmake-intellisence",
+    "kylinideteam.kylin-cmake-tools",
+    "mhutchie.git-graph",
+    "cschlosser.doxdocgen",
+    "serianonim.clone-copilot",
+    "google.geminicodeassist"
+  ]
+}
