@@ -38,7 +38,7 @@ public:
 
     std::size_t index(std::size_t x, std::size_t y) const
     {
-        return x + Y * y;
+        return x + X * y;
     }
 
     T& operator[](std::size_t idx) { return m[idx]; }

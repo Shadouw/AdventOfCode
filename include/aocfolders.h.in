@@ -1,0 +1,5 @@
+#pragma once 
+
+namespace aoc {
+    static constexpr auto file_path = "@AOC_FILE_PATH@"	
+}

@@ -1,13 +1,6 @@
 #include <aoc.h>
 using namespace std;
-
-const vector<string> inputTestdata = {
-    ""
-};
-
-const vector<string> inputData = {
-    ""
-};
+using namespace aoc;
 
 class item {
 public:
@@ -45,13 +38,11 @@ private:
 
 class problem {
 public:
-    problem(const vector<string>& _input)
-        : input(_input)
+    problem(string _file, string _extension)
+        : datafile(_file, _extension)
     {
-        cout << "Size of Input: " << input.size() << endl;
-
         // Parse data
-        for (auto elem : input)
+        for (auto elem : datafile.getLines())
             items.push_back(item(elem));
     }
 
@@ -75,20 +66,20 @@ public:
     }
 
 private:
-    const vector<string> input;
+    aocdatafile datafile;
     vector<item> items;
 };
 
 TEST_CASE("Testdata")
 {
-    problem problemData(inputTestdata);
+    problem problemData(__FILE__, "example");
     REQUIRE(0 == problemData.getResultA());
     REQUIRE(0 == problemData.getResultB());
 }
 
 TEST_CASE("Problem")
 {
-    problem problemData(inputData);
+    problem problemData(__FILE__, "mydata");
     REQUIRE(0 == problemData.getResultA());
     REQUIRE(0 == problemData.getResultB());
 }

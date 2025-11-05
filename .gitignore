@@ -45,4 +45,4 @@ bin/
 *.layout
 
 # VSCode Settings
-.vscode/*
+.vscode/settings.json
